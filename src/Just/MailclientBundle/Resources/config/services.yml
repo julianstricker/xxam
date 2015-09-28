@@ -1,0 +1,17 @@
+services:
+#    just_admin.example:
+#        class: Just\MailclientBundle\Example
+#        arguments: [@service_id, "plain_value", %parameter%]
+
+
+#    justportalwidget.mailclient.mails:
+#        class: Just\MailclientBundle\Controller\MailsWidgetController
+#        tags:
+#            -  { name: justportalwidget }
+
+    #every portal-widget must start with "justportalwidget...."
+    justportalwidget.mailclient.newmails:
+        class: Just\MailclientBundle\Controller\NewmailsWidgetController
+        arguments: ["@templating", "@security.context"]
+        tags:
+            -  { name: justportalwidget }

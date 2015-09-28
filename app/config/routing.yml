@@ -1,0 +1,66 @@
+just_comm:
+    resource: "@JustCommBundle/Resources/config/routing.yml"
+    prefix:   /
+
+
+
+just_contact:
+    resource: "@JustContactBundle/Resources/config/routing.yml"
+    prefix:   /
+
+just_admin:
+    resource: "@JustAdminBundle/Resources/config/routing.yml"
+    prefix:   /
+    
+just_emailclient:
+    resource: "@JustMailclientBundle/Resources/config/routing.yml"
+    prefix:   /
+    
+just_calendar:
+    resource: "@JustCalendarBundle/Resources/config/routing.yml"
+    prefix:   /
+    
+just_coding:
+    resource: "@JustCodingBundle/Resources/config/routing.yml"
+    prefix:   /
+    
+just_filemanager:
+    resource: "@JustFilemanagerBundle/Resources/config/routing.yml"
+    prefix:   /
+    
+just_user:
+    resource: "@JustUserBundle/Resources/config/routing.yml"
+    prefix:   /
+
+fos_user:
+    resource: "@FOSUserBundle/Resources/config/routing/all.xml"
+
+fos_user_group:
+    resource: "@FOSUserBundle/Resources/config/routing/group.xml"
+    prefix: /group
+    
+#JS\ThumbnailBundle\Controller
+just_thumbnail:
+    pattern:  /thumbnails/{mode}/{maxx}x{maxy}/{img}
+    defaults: { _controller: JustThumbnailBundle:Thumbnail:thumbnail }
+    requirements:
+        #mode: ~
+        #maxx: ~
+        #maxy: ~
+        img: ".+"
+
+just_thumbnail_x:
+    pattern:  /thumbnails/{mode}/{maxx}x/{img}
+    defaults: { _controller: JustThumbnailBundle:Thumbnail:thumbnail }
+    requirements:
+        #mode: ~
+        #maxx: ~
+        img: ".+"
+
+just_thumbnail_y:
+    pattern:  /thumbnails/{mode}/x{maxy}/{img}
+    defaults: { _controller: JustThumbnailBundle:Thumbnail:thumbnail }
+    requirements:
+        #mode: ~
+        #maxy: ~
+        img: ".+"

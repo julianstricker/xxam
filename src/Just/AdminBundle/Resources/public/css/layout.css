@@ -1,0 +1,74 @@
+html { 
+  background: url(/images/DSC_0098.JPG) no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+.headerbar{ 
+  background-image: url('/bundles/justadmin/images/DSC_0098.JPG');
+  background-repeat: repeat;
+  height: 100%;
+}
+.defaultmenuicon{
+    background-image: url('/bundles/justadmin/icons/defaultmenuicon.png');
+}
+.msg {
+    position:absolute;
+    left:35%;
+    top:0px;
+    width:300px;
+    z-index:20000;
+    
+    border-radius: 8px;
+    -moz-border-radius: 8px;
+    background: #F6F6F6;
+    border: 2px solid #ccc;
+    margin-top: 2px;
+    padding: 10px 15px;
+    color: #555;
+}
+.msg h3 {
+    margin: 0 0 8px;
+    font-weight: bold;
+    font-size: 11px;
+    font-family: tahoma,arial,verdana,sans-serif;
+}
+.msg p {
+    margin: 0;
+}
+.msg .msgimg {
+    float: left;
+    padding: 8px;
+    background-color: white;
+    margin-right: 8px;
+    border: 1px solid lightgray;
+}
+/*ext-js portal */
+.x-panel-ghost {
+    z-index: 1;
+}
+.x-border-layout-ct {
+    background: #DFE8F6;
+}
+/*.x-portal-body {
+    padding: 0 0 0 8px;
+}*/
+.x-portal .x-panel-dd-spacer {
+    border: 2px dashed #99bbe8;
+    background: #f6f6f6;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    margin: 10px;
+}
+.x-portlet {
+    margin:10px;
+    padding: 1px;
+}
+.x-portlet .x-panel-body {
+    background: #fff;
+}
+.portlet-content {
+    padding: 10px;
+    font-size: 11px;
+}

@@ -1,0 +1,237 @@
+imports:
+    - { resource: parameters.yml }
+    - { resource: security.yml }
+    - { resource: services.yml }
+ #   - { resource: menu.yml }
+    
+parameters:   
+  tenants: 
+    1:  { id: 1, name: Xxam, subdomain: '' }
+    2:  { id: 2, name: Testmandant, subdomain: testmandant }
+    
+  #roledefinitions: ["ROLE_ADMIN","ROLE_USER_CREATE","ROLE_USER_LIST","ROLE_USER_EDIT","ROLE_USER_DELETE","ROLE_GROUP_LIST","ROLE_GROUP_CREATE","ROLE_GROUP_EDIT","ROLE_GROUP_DELETE"]
+
+
+framework:
+    #esi:             ~
+    translator:      { fallbacks: ["%locale%"] }
+    secret:          "%secret%"
+    router:
+        resource: "%kernel.root_dir%/config/routing.yml"
+        strict_requirements: ~
+    form:            ~
+    csrf_protection: false #only use for public API
+    validation:      { enable_annotations: true }
+    templating:
+        engines: ['twig']
+        #assets_version: SomeVersionScheme
+    default_locale:  "%locale%"
+    trusted_hosts:   ~
+    trusted_proxies: ~
+    session:
+        # handler_id set to null will use default session handler from php.ini
+        #auto_start:     false
+        name: xxamid
+        cookie_lifetime:    0
+        gc_probability:     0
+        
+    fragments:       ~
+    http_method_override: true
+    serializer:
+        enabled: true
+
+# Twig Configuration
+twig:
+    debug:            "%kernel.debug%"
+    strict_variables: "%kernel.debug%"
+    globals:
+        #menu: %menu%
+        exttheme: 'carbon' #carbon, aria, classic, gray, crisp, crisp-touch, neptune, neptune-touch
+        tenants: %tenants%
+    
+    form:
+      resources:
+        #- SimpleThingsFormExtraBundle:Form:translation_domain.html.twig
+        #- SimpleThingsFormExtraBundle:Form:field_type_help.html.twig
+        #- JustAdminBundle:Form:extformfields.js.twig
+
+# Assetic Configuration
+assetic:
+    debug:          "%kernel.debug%"
+    use_controller: false
+    bundles:        [ ]
+    #java: /usr/bin/java
+    filters:
+        cssrewrite: ~
+        #closure:
+        #    jar: "%kernel.root_dir%/Resources/java/compiler.jar"
+        #yui_css:
+        #    jar: "%kernel.root_dir%/Resources/java/yuicompressor-2.4.7.jar"
+
+# Doctrine Configuration
+doctrine:
+    dbal:
+        driver:   "%database_driver%"
+        host:     "%database_host%"
+        port:     "%database_port%"
+        dbname:   "%database_name%"
+        user:     "%database_user%"
+        password: "%database_password%"
+        charset:  UTF8
+        # if using pdo_sqlite as your database driver:
+        #   1. add the path in parameters.yml
+        #     e.g. database_path: "%kernel.root_dir%/data/data.db3"
+        #   2. Uncomment database_path in parameters.yml.dist
+        #   3. Uncomment next line:
+        #     path:     "%database_path%"
+
+    orm:
+        auto_generate_proxy_classes: "%kernel.debug%"
+        entity_managers:
+            default:
+                auto_mapping: true
+                filters:
+                    softdeleteable:
+                        class: Gedmo\SoftDeleteable\Filter\SoftDeleteableFilter
+                        enabled: true
+                    tenant_filter:
+                        class: Just\AdminBundle\Filter\TenantFilter 
+                        enabled: true
+                    
+                mappings:
+                    gedmo_loggable:
+                        type: annotation
+                        prefix: Gedmo\Loggable\Entity
+                        dir: "%kernel.root_dir%/../vendor/gedmo/doctrine-extensions/lib/Gedmo/Loggable/Entity"
+                        alias: GedmoLoggable # this one is optional and will default to the name set for the mapping
+                        is_bundle: false
+
+# Swiftmailer Configuration
+swiftmailer:
+    transport: "%mailer_transport%"
+    host:      "%mailer_host%"
+    username:  "%mailer_user%"
+    password:  "%mailer_password%"
+    spool:     { type: memory }
+
+fos_user:
+    db_driver: orm # other valid values are 'mongodb', 'couchdb' and 'propel'
+    firewall_name: main
+    user_class: Just\UserBundle\Entity\User
+    group:
+        group_class: Just\UserBundle\Entity\Group
+        
+stof_doctrine_extensions:
+    default_locale: %locale% 
+    translation_fallback: true
+    #class:
+    #    timestampable: AdminBundle\TimestampableListener
+    #    translatable:  AdminBundle\TranlationListener
+    orm:
+        default: 
+          timestampable: true
+          softdeleteable: true
+          
+#fos_rest:
+#    view:
+#        formats:
+#            json: true
+#            xml: false
+#        templating_formats:
+#            html: true
+#        force_redirects:
+#            html: true
+#        failed_validation: HTTP_BAD_REQUEST
+#        default_engine: twig
+#        mime_types:
+#            json: ['application/json', 'application/x-json', 'application/vnd.example-com.foo+json']
+#            rss: 'application/rss+xml'
+#            jpg: 'image/jpeg'
+#            png: 'image/png'
+#    disable_csrf_role: ROLE_API
+#    routing_loader:
+#        default_format: json
+
+#exercise_html_purifier:
+#    default:
+#        Cache.SerializerPath: '%kernel.cache_dir%/htmlpurifier'
+#        HTML.Allowed: null
+#        HTML.AllowedAttributes: null
+##            '*.width': true
+##            '*.height': true
+##            '*.alt': true
+#        HTML.AllowedElements: null
+#        HTML.AllowedModules: null
+#        
+#        HTML.SafeObject: true
+#        URI.DisableExternal: false
+#        URI.DisableExternalResources: false
+       
+        
+#            width: true
+#            height: true
+#    email:
+#        Cache.SerializerPath: '%kernel.cache_dir%/htmlpurifier'
+#        HTML.SafeObject: false
+
+#bit_ratchet:
+#    client:
+#        maxRetries: 60
+#        retryDelay: 2000
+#    websocket:
+#        #host: 0.0.0.0
+#        host: xxam.com
+#        port: 1337
+#    listeners:
+#        listener1:
+#          class: Just\AdminBundle\Services\ChatWampServerService
+            
+#voryx_thruway:
+#    realm: 'realm1'
+#    url: 'ws://xxam.com:1337' #The url that the clients will use to connect to the router
+#    router:
+#        ip: '85.25.199.157'  # the ip that the router should start on
+#        port: '1337'  # public facing port.  If authentication is enabled, this port will be protected
+#        trusted_port: '1338' # Bypasses all authentication.  Use this for trusted clients.
+##        authentication: false # true will load the AuthenticationManager
+#    locations:
+#        bundles: ["JustCommBundle"]
+#        files:
+#            - "Just\\CommBundle\\Controller\\CommController"     
+          
+fos_rest:
+    routing_loader:
+        default_format: json
+    param_fetcher_listener: true
+    body_listener: true
+    #disable_csrf_role: ROLE_USER
+    body_converter:
+        enabled: true
+    view:
+        view_response_listener: force
+
+nelmio_cors:
+    defaults:
+        allow_credentials: false
+        allow_origin: []
+        allow_headers: []
+        allow_methods: []
+        expose_headers: []
+        max_age: 0
+    paths:
+        '^/api/':
+            allow_origin: ['*']
+            allow_headers: ['*']
+            allow_methods: ['POST', 'PUT', 'GET', 'DELETE']
+            max_age: 3600
+
+sensio_framework_extra:
+    request: { converters: true }
+    view:    { annotations: false }
+    router:  { annotations: true }
+    
+just_thumbnail:
+    #imagesrootdir: "/var/www/vhosts/xxam.com/xxam/web/"
+    #placeholder: "/path/to/a/placeholder/image.jpg"
+    expiretime: 86400
+    

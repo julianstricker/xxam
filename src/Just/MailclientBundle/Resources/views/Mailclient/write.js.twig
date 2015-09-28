@@ -1,0 +1,448 @@
+{% set iconsize = '16x16' %}
+{% set buttonsize = 'medium' %}
+{% if buttonsize == 'large' %}
+    {% set iconsize = '32x32' %}
+{% endif %}
+{% set defaultaccountid = '' %}
+{% set defaultaccountname = '' %}
+{
+    tabtitle: '{% trans %}Write Mail{% endtrans %}',
+    tabicon: '/bundles/justmailclient/icons/16x16/email_edit.png',
+    getitems: function (){
+        if (typeof(Xxam.form) == 'undefined' || typeof(Xxam.form.field) == 'undefined' || typeof(Xxam.form.field.tag) == 'undefined'){
+            Ext.define('Xxam.form.field.tag', {
+                extend: 'Ext.form.field.Tag',
+                xtype: 'xxamtagfield',
+                anchor: '100%',
+                
+                store: {
+                    fields: ['value'],
+                    proxy: {
+                        type: 'ajax',
+                        url: '{{path('contact_searchcontacts')}}',
+                        reader: {
+                            rootProperty: 'contacts'
+                        },
+                        simpleSortMode: true
+                    },
+                    data:[]
+                },
+                valueField: 'value',
+                displayField: 'value',
+                //createNewOnEnter: true,
+                createNewOnBlur: true/*,
+                filterPickList: true,
+                queryMode: 'remote',
+                publishes: 'value',
+                multiSelect: true,
+                forceSelection: false*/
+            });
+        }
+    
+        Ext.create('Ext.data.Store', {
+            storeId:'attachmentsgridStore',
+            fields:[
+                {name: 'name', type: 'string'}, 
+                {name: 'size', type: 'int'}, 
+                {name: 'status', type: 'int'},
+                {name: 'data', type: 'string'}
+            ],
+            data: {'items':[]},
+            proxy: {
+                type: 'memory',
+                reader: {
+                    type: 'json',
+                    rootProperty: 'items'
+                }
+            }
+        });
+    
+        
+
+        return {
+            layout: 'fit',
+            items: [
+                {
+                    xtype: 'form',
+                    layout: 'border',
+                    //layout: 'fit',
+                    //bodyPadding: 10,
+                    //width: '100%',
+                    //height: '600',
+                    itemId: 'writemailform',
+                    id: 'writemailform',
+                    jsonSubmit: true,
+                    paramsAsHash: true,
+                    url: '{{path('mailclient_sendmail')}}?type={{type}}&path={{path}}&mailid={{mailid}}',
+                    buttons: [{ text: 'Cancel'},
+                    {
+                        text: '{% trans %}Send{% endtrans %}',
+                        formBind: true, //only enabled once the form is valid
+                        disabled: true,
+                        handler: function(evt){
+                            var form = this.up('form').getForm();
+                            fff=form;
+                            if (form.isValid()) {
+                                var formvalues=form.getValues();
+                                if(formvalues.fieldto=='' && formvalues.fieldcc=='' && formvalues.fieldbcc==''){
+                                    Ext.Msg.alert('{% trans %}Send{% endtrans %}', '{% trans %}Please enter at least one recipient.{% endtrans %}');
+                                    return false;
+                                }else{
+                                    Ext.Ajax.request({
+                                        url: form.url,
+                                        method: 'POST',
+                                        waitTitle: 'Connecting',
+                                        waitMsg: '{% trans %}Sending data...{% endtrans %}',
+                                        jsonData: form.getValues(),
+                                        timeout: 600000,
+                                        success: function(response) {
+                                            var resp=Ext.JSON.decode(response.responseText);
+                                            console.log('success',resp);
+                                            Xxam.msg('{% trans %}Send{% endtrans %}','{% trans %}Email was send{% endtrans %}', '/bundles/justmailclient/icons/32x32/email.png');
+                                            Ext.getCmp('contenttabpanel').getActiveTab().destroy();
+                                        },
+                                        failure: function(response) {
+                                            var resp=Ext.JSON.decode(response.responseText);
+                                            console.log('failure',response.responseText);
+                                            Ext.Msg.alert('{% trans %}Failed{% endtrans %}', resp.error);
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    }],
+                    items: [
+                        {
+                            xtype: 'fieldcontainer',
+                            region: 'north',
+                            layout: 'anchor',
+                            width: '100%',
+                            //height: 300,
+                            defaults: {
+                                anchor: '100%',
+                                padding: '4 2 0 2'
+                            },
+                            items: [
+                                {
+                                    xtype: 'combobox',
+                                    fieldLabel: '{% trans %}From{% endtrans %}',
+                                    name: 'fieldfrom',
+                                    allowBlank: false,
+                                    store: {
+                                        fields: ['id','name'],
+                                        data: [{% for mailaccount in mailaccounts %}
+                                            {% if not loop.first %},{% endif %}{"id": {{mailaccount.id}}, "name": "{{mailaccount.accountname}}"}
+                                            {% if (mailaccount.isdefault or defaultaccountid == "") %}
+                                                {% set defaultaccountid = mailaccount.id %}
+                                                {% set defaultaccountname = mailaccount.accountname %}
+                                            {% endif %}
+                                        {% endfor %}]
+                                    },
+                                    displayField: 'name',
+                                    valueField: 'id',
+                                    value: '{{defaultaccountid}}',
+                                },
+                                {
+                                    xtype: 'fieldcontainer',
+                                    layout: 'hbox',
+                                    flex: 1,
+                                    fieldLabel: '{% trans %}To{% endtrans %}',
+                                    items: [{
+                                        xtype: 'xxamtagfield',
+                                        itemId: 'fieldto',
+                                        hideLabel: true,
+                                        flex: 1,
+                                        name: 'fieldto',
+                                        required: true,
+                                        /*valueField: 'value',
+                                        displayField: 'value',
+                                        createNewOnBlur: true,
+                                        store: Ext.create('Ext.data.Store', {
+                                            // store configs
+                                            storeId: 'myStore',
+                                            proxy: {
+                                                type: 'ajax',
+                                                url: '{{path('contact_searchcontacts')}}',
+                                                reader: {
+                                                    rootProperty: 'contacts'
+                                                },
+                                                simpleSortMode: true
+                                            },
+                                            data:[],
+                                            // reader configs
+                                            fields: ['value']
+                                        }),*/
+                                        value: [{% if mail.to %}{% for addr,name in mail.to %}{% if not loop.first %},{% endif %}'{% if name !='' %}{{name}} <{{addr}}>{% else %}{{addr}}{% endif %}'{% endfor %}{% endif %}]
+                                    },{
+                                        xtype: 'button',
+                                        margin: '0 0 0 5',
+                                        text: 'Cc...',
+                                        handler: function(e){
+                                            e.findParentByType('fieldcontainer').findParentByType('fieldcontainer').getComponent('fieldcc').show();
+                                            e.hide();
+                                        }
+                                    },{
+                                        xtype: 'button',
+                                        margin: '0 0 0 5',
+                                        text: 'Bcc...',
+                                        handler: function(e){
+                                            e.findParentByType('fieldcontainer').findParentByType('fieldcontainer').getComponent('fieldbcc').show();
+                                            e.hide();
+                                        }
+                                    },{
+                                        xtype: 'button',
+                                        margin: '0 0 0 5',
+                                        text: 'Reply-To...',
+                                        handler: function(e){
+                                            e.findParentByType('fieldcontainer').findParentByType('fieldcontainer').getComponent('fieldreplyto').show();
+                                            e.hide();
+                                        }
+                                    }
+                                    
+                                    ]
+                                },
+                                {
+                                    xtype: 'xxamtagfield',
+                                    fieldLabel: '{% trans %}Cc{% endtrans %}',
+                                    itemId: 'fieldcc',
+                                    name: 'fieldcc',
+                                    hidden: true,
+                                    value: [{% if mail.cc is defined %}{% for addr,name in mail.cc %}{% if not loop.first %},{% endif %}'{% if name !='' %}{{name}} <{{addr}}>{% else %}{{addr}}{% endif %}'{% endfor %}{% endif %}]
+                                },
+                                {
+                                    xtype: 'xxamtagfield',
+                                    fieldLabel: '{% trans %}Bcc{% endtrans %}',
+                                    itemId: 'fieldbcc',
+                                    name: 'fieldbcc',
+                                    hidden: true,
+                                    value: [{% if mail.bcc is defined %}{% for addr,name in mail.bcc %}{% if not loop.first %},{% endif %}'{% if name !='' %}{{name}} <{{addr}}>{% else %}{{addr}}{% endif %}'{% endfor %}{% endif %}]
+                                },
+                                {
+                                    xtype: 'xxamtagfield',
+                                    fieldLabel: '{% trans %}Reply-To{% endtrans %}',
+                                    itemId: 'fieldreplyto',
+                                    name: 'fieldreplyto',
+                                    hidden: true,
+                                    value: [{% if mail.replyTo is defined %}{% for addr,name in mail.replyTo %}{% if not loop.first %},{% endif %}'{% if name !='' %}{{name}} <{{addr}}>{% else %}{{addr}}{% endif %}'{% endfor %}{% endif %}]
+                                },
+                                {
+                                    xtype: 'textfield',
+                                    fieldLabel: '{% trans %}Subject{% endtrans %}',
+                                    itemId: 'fieldsubject',
+                                    name: 'fieldsubject',
+                                    padding: '4 2 4 2',
+                                    value: '{% if mail.subject is defined %}{{ mail.subject }}{% endif %}'
+                                }
+                            ]
+                        },
+                        {
+                            layout: 'border',
+                            height: 'auto',
+                            xtype: 'panel',
+                            region: 'center',
+                            items: [
+                                {
+                                    xtype: 'panel',
+                                    region: 'center',
+                                    split: true,
+                                    layout: 'fit',
+                                    bbar:[{
+                                        text: '{% trans %}Editor type{% endtrans %}:'
+                                    },{
+                                        xtype     : 'combo',
+                                        width     : 100,
+                                        value: 'html',
+                                        store     : [
+                                            ['html','{% trans %}HTML{% endtrans %}'],
+                                            ['plain','{% trans %}Plain text{% endtrans %}']
+                                        ],
+                                        listeners:{
+                                            //scope: yourScope,
+                                            'select': function(combo,records){
+                                                if(combo.getValue()=='plain'){
+                                                    combo.up('panel').items.items[0].setValue('').hide();
+                                                    combo.up('panel').items.items[1].setValue('').show();
+                                                }else{
+                                                    combo.up('panel').items.items[1].setValue('').hide();
+                                                    combo.up('panel').items.items[0].setValue('').show();
+                                                }
+                                            }
+                                        }
+                                    }],
+                                    items: [
+                                        {
+                                            xtype: 'htmleditor',
+                                            name: 'fieldhtml',
+                                            fieldLabel: '',
+                                            value: '{% if mail.textHtml is defined and mail.textHtml!='' %}{{ mail.textHtml }}{% endif %}'
+                                        },
+                                        {
+                                            xtype: 'textareafield',
+                                            name: 'fieldtext',
+                                            fieldLabel: '',
+                                            hidden: true,
+                                            value: '{% if mail.textPlain is defined and mail.textPlain!='' %}{{ mail.textPlain }}{% endif %}'
+                                        },
+                                    ]
+                                },
+                                {
+                                    xtype: 'hiddenfield',
+                                    name: 'fieldattachments',
+                                    itemId: 'fieldattachments',
+                                    value: ''
+                                },
+                                {
+                                    xtype: 'gridpanel',
+                                    region: 'east',
+                                    split: true,
+                                    collapsible: true,
+                                    title: '{% trans %}Attachments{% endtrans %}',
+                                    width: 300,
+                                    itemId: 'attachmentsgrid',
+                                    viewConfig: {
+                                        deferEmptyText: false,
+                                        emptyText: '{% trans %}Drag files here or use the button below{% endtrans %}',
+                                    },
+                                    listeners: {
+                                        afterrender: function(ele, eOpts){
+                                            window.ondragenter = function(e)
+                                            {
+                                                e.dataTransfer.dropEffect = 'none';
+                                                e.preventDefault();
+                                                return false;
+                                            };
+
+                                            window.ondragover = function(e)
+                                            {
+                                                e.preventDefault();
+                                                return false;
+                                            };
+
+                                            window.ondrop = function(e)
+                                            {
+                                                return false;
+                                            };
+
+                                            window.ondragleave = function(e)
+                                            {
+                                                return false;
+                                            };
+                                            ee=ele;
+                                            var elebodydom=ele.body.dom;
+                                            elebodydom.ondragover = function () {Ext.get(this).addCls('filedndhighlight'); return false; };
+                                            elebodydom.ondragleave = function () {Ext.get(this).removeCls('filedndhighlight'); return false; };
+                                            elebodydom.ondragend = function () {Ext.get(this).removeCls('filedndhighlight'); return false; };
+                                            elebodydom.ondrop = function (e) {
+                                                var grid=Ext.get(this).component;
+                                                Ext.get(this).removeCls('filedndhighlight');
+                                                e.preventDefault();
+                                                var files = e.dataTransfer.files;
+                                                Ext.Array.each(files,function(file,index){
+                                                    grid.store.add({'name': file.name, 'size': file.size});
+                                                    var xhr = new XMLHttpRequest();
+                                                    xhr.upload.grid=grid;
+                                                    xhr.open("POST", '{{path('mailclient_uploadfile')}}', true);
+                                                    xhr.setRequestHeader("X_FILENAME", file.name);
+                                                    xhr.upload.addEventListener("progress", function(e){
+                                                        var complete = Math.round(e.loaded / e.total * 100);
+                                                        var datapos=e.target.grid.store.find('name',file.name);
+                                                        e.target.grid.store.data.items[datapos].data.status=complete;
+                                                        e.target.grid.getView().refresh();
+                                                        
+                                                    });
+                                                    xhr.addEventListener('load', function(){
+                                                        console.log('fertig',this);
+                                                        var response=Ext.JSON.decode(this.responseText);
+                                                        if(response.status=='OK'){
+                                                            var datapos=this.upload.grid.store.find('name',response.filename);
+                                                            this.upload.grid.store.data.items[datapos].data.hash=response.hash;
+                                                            var fieldattachments=this.upload.grid.ownerCt.getComponent('fieldattachments');
+                                                            var hashes=[];
+                                                            Ext.Array.each(this.upload.grid.store.data.items,function(item){
+                                                                if (typeof item.data.hash !='undefined') hashes.push(item.data.hash);
+                                                            });
+                                                            fieldattachments.setValue(Ext.JSON.encode(hashes));
+                                                        }
+                                                    });
+                                                    xhr.send(file);
+                                                    
+                                                });
+                                            }
+                                        }
+                                    },
+                                    bbar:[
+                                        {
+                                            xtype: 'filefield',
+                                            width: 'auto'
+                                        }
+                                    ],
+                                    columns: [
+                                        {
+                                            xtype: 'gridcolumn',
+                                            dataIndex: 'name',
+                                            flex: 2,
+                                            renderer: function(value, p, model) {
+                                                return Ext.String.format(
+                                                    '<b>{0}</b> {1}',
+                                                    value,
+                                                    model.get('size')
+                                                );
+                                            },
+                                            text: 'Name'
+                                        },
+                                        {
+                                            xtype: 'gridcolumn',
+                                            dataIndex: 'status',
+                                            flex: 2,
+                                            renderer: function(value, p, model) {
+                                                return value+'%'
+                                                
+                                            },
+                                            text: 'Status'
+                                        },
+                                        {
+                                            menuDisabled: true,
+                                            sortable: false,
+                                            xtype: 'actioncolumn',
+                                            width: 50,
+                                            items: [{
+                                                icon: '/bundles/justmailclient/icons/16x16/cross.png',
+                                                tooltip: '{% trans %}Remove{% endtrans %}',
+                                                handler: function(grid, rowIndex, colIndex) {
+                                                    var rec = grid.getStore().getAt(rowIndex);
+                                                    Ext.Msg.alert('{% trans %}Remove{% endtrans %}', '{% trans %}Remove{% endtrans %} ' + rec.get('name'));
+                                                }
+                                            }]
+                                        }
+                                    ],
+
+                                    store: Ext.data.StoreManager.lookup('attachmentsgridStore')
+
+
+                                }
+                            ]
+                        }
+
+
+
+
+
+
+
+                    ]
+                }
+            ],
+            listeners:{
+                afterrender: function(tab){
+                  ttt=tab;
+                   /*{% if mail.to %}{% for key, val in mail.to %}
+                      Ext.getCmp('writeemailform'){{ val }}<{{key}}>
+                   {% endfor %}{% endif %}*/
+                                    
+                }
+
+
+            }
+        }
+    }
+}

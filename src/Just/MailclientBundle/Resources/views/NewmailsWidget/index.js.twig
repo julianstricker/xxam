@@ -1,0 +1,366 @@
+{% set iconsize = '16x16' %}
+{% set buttonsize = 'medium' %}
+{% if buttonsize == 'large' %}
+    {% set iconsize = '32x32' %}
+{% endif %}
+{
+    
+    getitems: function (){
+        if (typeof(EmaillistModel)=='undefined'){
+            Ext.define('EmaillistModel',{
+                extend: 'Ext.data.Model',
+                fields: [
+                    {name: 'subject', type: 'string'},
+                    {name: 'from', type: 'string'},
+                    {name: 'to', type: 'string'},
+                    {name: 'date', type: 'string'},
+                    {name: 'message_id', type: 'string'},
+                    {name: 'size', type: 'int'},
+                    {name: 'uid', type: 'int', unique: true, convert: null},
+                    {name: 'msgno', type: 'int'},
+                    {name: 'recent', type: 'boolean'},
+                    {name: 'flagged', type: 'boolean'},
+                    {name: 'answered', type: 'boolean'},
+                    {name: 'deleted', type: 'boolean'},
+                    {name: 'seen', type: 'boolean'},
+                    {name: 'draft', type: 'boolean'},
+                    {name: 'udate', type: 'int'}
+                ],
+                idProperty: 'uid'
+            });
+        }
+        
+        
+       
+    
+    
+        return {
+                    
+                    xtype: 'gridpanel',
+                    //height: 300,
+                    region: 'center',
+                    id: 'mailswidget{{id}}_mailsgrid',
+                    loadMask: true,
+                    selModel: {
+                        pruneRemoved: false
+                    },
+                    multiSelect: true,
+                    viewConfig: {
+                        trackOver: false
+                    },
+                    /*features: [{
+                        ftype: 'grouping',
+                        hideGroupedHeader: false
+                    }],*/
+                    plugins: 'gridfilters',
+                    
+                    store: Ext.create('Ext.data.BufferedStore', {
+                        model: 'EmaillistModel',
+                        remoteSort: true,
+                        leadingBufferZone: 30,
+                        pageSize: 20,
+                        listeners:{
+                            load: function(store, records, successful, operation, node, eOpts ){
+                                console.log('check');
+                                Ext.Array.each(records,function(record,index){
+                                    if(record.data.recent==1){
+                                        if (!windowhasfocus){
+                                            notify('{% trans %}New mail from{% endtrans %} '+record.data.from, Ext.String.htmlEncode(record.data.subject), '/bundles/justmailclient/icons/32x32/email.png')
+                                        }
+                                        Xxam.msg('{% trans %}New mail from{% endtrans %} '+record.data.from, Ext.String.htmlEncode(record.data.subject), '/bundles/justmailclient/icons/32x32/email.png');
+                                    }
+                                });
+                            }
+                        },
+
+
+                        proxy:{
+                            type: 'ajax',
+                            url: '{{path('mailclient_listmails')}}',
+                            extraParams: { 
+                                path: {{params.account}}
+                            },
+                            reader : {
+                                type: 'json',
+                                rootProperty: 'mails',
+                                totalProperty: 'totalCount'
+                            },
+                            
+                            simpleSortMode: true,
+                            
+
+
+                        },
+                        autoLoad: false
+                    }),
+                    columns: [
+                        { 
+                            text: 'Subject',  
+                            dataIndex: 'subject', 
+                            stateId: 'mailclient_maillist_subject',
+                            stateful: true,
+                            flex: 1, 
+                            cellWrap: true, 
+                            filter: {type: 'string'},
+                            renderer: function(value, metaData, record) {
+                                if(record.data.seen==true){
+                                    return Ext.String.htmlEncode(value);
+                                }else{
+                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                }
+                            } 
+                        },
+                        { 
+                            text: 'From', 
+                            dataIndex: 'from', 
+                            stateId: 'mailclient_maillist_from',
+                            stateful: true, 
+                            filter: {type: 'string'},
+                            renderer: function(value, metaData, record) {
+                                if(record.data.seen==true){
+                                    return Ext.String.htmlEncode(value);
+                                }else{
+                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                }
+                            } 
+                        },
+                        { 
+                            text: 'To', 
+                            dataIndex: 'to', 
+                            stateId: 'mailclient_maillist_to',
+                            stateful: true, 
+                            hidden: true, 
+                            filter: {type: 'string'},
+                            renderer: function(value, metaData, record) {
+                                if(record.data.seen==true){
+                                    return Ext.String.htmlEncode(value);
+                                }else{
+                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                }
+                            } 
+                        },
+                        { 
+                            text: 'Date', 
+                            dataIndex: 'date', 
+                            stateId: 'mailclient_maillist_date',
+                            stateful: true, 
+                            filter: {type: 'date'},
+                            renderer: function(value, metaData, record) {
+                                if(record.data.seen==true){
+                                    return Ext.String.htmlEncode(value);
+                                }else{
+                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                }
+                            } 
+                        },
+                        { 
+                            text: 'Message Id', 
+                            dataIndex: 'message_id', 
+                            stateId: 'mailclient_maillist_message_id',
+                            stateful: true, 
+                            hidden: true,
+                            renderer: function(value, metaData, record) {
+                                if(record.data.seen==true){
+                                    return Ext.String.htmlEncode(value);
+                                }else{
+                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                }
+                            }  
+                        },
+                        { 
+                            text: 'References', 
+                            dataIndex: 'references', 
+                            stateId: 'mailclient_maillist_references',
+                            stateful: true, 
+                            hidden: true,
+                            renderer: function(value, metaData, record) {
+                                if(record.data.seen==true){
+                                    return Ext.String.htmlEncode(value);
+                                }else{
+                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                }
+                            }  
+                        },
+                        { 
+                            text: 'In reply to', 
+                            dataIndex: 'in_reply_to', 
+                            stateId: 'mailclient_maillist_in_reply_to',
+                            stateful: true, 
+                            hidden: true,
+                            renderer: function(value, metaData, record) {
+                                if(record.data.seen==true){
+                                    return Ext.String.htmlEncode(value);
+                                }else{
+                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                }
+                            }  
+                        },
+                        { 
+                            text: 'Size', 
+                            dataIndex: 'size', 
+                            stateId: 'mailclient_maillist_size',
+                            stateful: true,
+                            renderer: function(value, metaData, record) {
+                                if(record.data.seen==true){
+                                    return Ext.String.htmlEncode(value);
+                                }else{
+                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                }
+                            }  
+                        },
+                        { 
+                            text: 'Uid', 
+                            dataIndex: 'uid', 
+                            stateId: 'mailclient_maillist_uid',
+                            stateful: true, 
+                            hidden: true,
+                            renderer: function(value, metaData, record) {
+                                if(record.data.seen==true){
+                                    return Ext.String.htmlEncode(value);
+                                }else{
+                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                }
+                            }  
+                        },
+                        { 
+                            text: 'Msgno', 
+                            dataIndex: 'msgno', 
+                            stateId: 'mailclient_maillist_msgno',
+                            stateful: true, 
+                            hidden: true,
+                            renderer: function(value, metaData, record) {
+                                if(record.data.seen==true){
+                                    return Ext.String.htmlEncode(value);
+                                }else{
+                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                }
+                            }  
+                        },
+                        { 
+                            text: 'Recent', 
+                            dataIndex: 'recent', 
+                            stateId: 'mailclient_maillist_recent',
+                            stateful: true, 
+                            hidden: true, 
+                            filter: {type: 'boolean'},
+                            renderer: function(value, metaData, record) {
+                                if(record.data.seen==true){
+                                    return Ext.String.htmlEncode(value);
+                                }else{
+                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                }
+                            }  
+                        },
+                        { 
+                            text: 'Flagged', 
+                            dataIndex: 'flagged', 
+                            stateId: 'mailclient_maillist_flagged',
+                            stateful: true, 
+                            hidden: true, 
+                            filter: {type: 'boolean'},
+                            renderer: function(value, metaData, record) {
+                                if(value==true){
+                                    return '<img title="{% trans %}Flagged{% endtrans %}" alt="{% trans %}Flagged{% endtrans %}" src="/bundles/justmailclient/icons/16x16/star.png" />';
+                                }else{
+                                    return ' ';
+                                }
+                            }  
+                        },
+                        { 
+                            text: 'Answered', 
+                            dataIndex: 'answered', 
+                            stateId: 'mailclient_maillist_answered',
+                            stateful: true, 
+                            hidden: true, 
+                            filter: {type: 'boolean'},
+                            renderer: function(value, metaData, record) {
+                                if(record.data.seen==true){
+                                    return Ext.String.htmlEncode(value);
+                                }else{
+                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                }
+                            } 
+                        },
+                        { 
+                            text: 'Deleted', 
+                            dataIndex: 'deleted', 
+                            stateId: 'mailclient_maillist_deleted',
+                            stateful: true, 
+                            hidden: true, 
+                            filter: {type: 'boolean'},
+                            renderer: function(value, metaData, record) {
+                                if(record.data.seen==true){
+                                    return Ext.String.htmlEncode(value);
+                                }else{
+                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                }
+                            }  
+                        },
+                        { 
+                            text: 'Seen', 
+                            dataIndex: 'seen', 
+                            stateId: 'mailclient_maillist_seen',
+                            stateful: true, 
+                            hidden: true, 
+                            filter: {type: 'boolean'},
+                            renderer: function(value, metaData, record) {
+                                if(record.data.seen==true){
+                                    return Ext.String.htmlEncode(value);
+                                }else{
+                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                }
+                            }  
+                        },
+                        { 
+                            text: 'Draft', 
+                            dataIndex: 'draft', 
+                            stateId: 'mailclient_maillist_draft',
+                            stateful: true, 
+                            hidden: true,
+                            renderer: function(value, metaData, record) {
+                                if(record.data.seen==true){
+                                    return Ext.String.htmlEncode(value);
+                                }else{
+                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                }
+                            }  
+                        },
+                        { 
+                            text: 'Udate', 
+                            dataIndex: 'udate', 
+                            stateId: 'mailclient_maillist_udate',
+                            stateful: true, 
+                            hidden: true,
+                            renderer: function(value, metaData, record) {
+                                if(record.data.seen==true){
+                                    return Ext.String.htmlEncode(value);
+                                }else{
+                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                }
+                            }  
+                        }
+                    ],
+                    
+            listeners:{
+                 added: function(tab, container, pos ){
+                    console.log('added');
+                    if (typeof mailswidget{{id}}_timeout == 'undefined'){
+                        mailswidget{{id}}_timeoutfunction=function(){ 
+                            if (!windowhasfocus) Ext.getCmp('mailswidget{{id}}_mailsgrid').store.load(); 
+                            mailswidget{{id}}_timeout=setTimeout(mailswidget{{id}}_timeoutfunction, 60000);
+                        }
+                        mailswidget{{id}}_timeout=setTimeout(mailswidget{{id}}_timeoutfunction, 60000);
+                    }
+                 },
+                 removed: function(tab, container, pos ){
+                    console.log('removed');
+                    if (typeof mailswidget{{id}}_timeout != 'undefined'){
+                        clearTimeout(mailswidget{{id}}_timeout);
+                        delete mailswidget{{id}}_timeout;
+                    }
+                 }
+
+            }
+        }
+    }
+}

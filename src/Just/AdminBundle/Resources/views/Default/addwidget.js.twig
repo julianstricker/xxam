@@ -1,0 +1,99 @@
+{% set iconsize = '16x16' %}
+{% set buttonsize = 'medium' %}
+{% if buttonsize == 'large' %}
+    {% set iconsize = '32x32' %}
+{% endif %}
+{
+    tabtitle: '{% trans %}Add widget{% endtrans %}',
+    getitems: function (){
+        
+        
+        return {
+            xtype: 'panel',
+            frame: false,
+            scrollable: 'y',
+            items: Ext.create('Ext.panel.Panel', {
+               layout: {
+                    // layout-specific configs go here
+                    type: 'accordion',
+                    titleCollapse: false,
+                    animate: true,
+                    activeOnTop: false
+                },
+                items: [],
+                listeners: {
+                    'afterrender': function(){
+                        Ext.Ajax.request({
+                            url: '{{path('just_admin_getwidgets')}}',
+                            scope: this,
+                            success: function(response){
+                                var widgetsdata = Ext.JSON.decode(response.responseText);
+                                var accordion=this;
+                                if (typeof(widgetsdata.widgets)!='undefined'){
+                                    Ext.Array.each(widgetsdata.widgets,function(widget){
+                                        var formitems=[{
+                                            xtype: 'displayfield',
+                                            fieldLabel: 'Description',
+                                            bodyStyle: 'padding:5px',
+                                            value: '<img src="'+widget.icon+'" style="vertical-align: top; padding-right: 10px;" />'+widget.description
+                                        },{
+                                            xtype: 'hiddenfield',
+                                            name: 'service',
+                                            value: widget.service	
+                                        },{
+                                            fieldLabel: 'Title',
+                                            name: 'title',
+                                            xtype:  'textfield',
+                                            allowBlank: false,
+                                            value: widget.title
+                                        }];
+                                        Ext.Array.each(widget.settings,function(setting){
+                                            formitems.push(setting);
+                                        });
+                                        accordion.add({
+                                            title: widget.title,
+                                            icon: widget.icon.replace(/32x32/,'16x16'),
+                                            xtype: 'form',
+                                            bodyStyle: 'padding:5px',
+                                            items: formitems,
+                                            url: '{{path('just_admin_doaddwidget')}}',
+                                            // Reset and Submit buttons
+                                            buttons: [{
+                                                text: 'Add...',
+                                                formBind: true, //only enabled once the form is valid
+                                                disabled: true,
+                                                handler: function() {
+                                                    var form = this.up('form').getForm();
+                                                    if (form.isValid()) {
+                                                        form.submit({
+                                                            success: function(form, action) {
+                                                                var response=Ext.JSON.decode(action.response.responseText);
+                                                                if (Ext.getCmp('xxam-portal')){
+                                                                    var widget=response.widget;
+                                                                    loadwidget(widget.id, widget.title, widget.col, widget.sortfield, widget.params);
+                                                                }
+                                                                Ext.getCmp('contenttabpanel').getActiveTab().close();
+                                                                window.location.href='#portal';
+                                                            },
+                                                            failure: function(form, action) {
+                                                                Ext.Msg.alert('Failed', action.result.msg);
+                                                            }
+                                                        });
+                                                    }
+                                                }
+                                            }]
+                                        });
+                                        
+                                    });
+                                }
+                                console.log(this,widgetsdata);
+                                // process server response here
+                            }
+                        });
+                    }
+                }
+            })
+            
+        }
+    }
+}

@@ -1,0 +1,71 @@
+{% extends '::base.html.twig' %}
+
+{% block body -%}
+    <h1>Contact list</h1>
+
+    <table class="records_list">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Contact_id</th>
+                <th>Contacttype_id</th>
+                <th>Organizationname</th>
+                <th>Surname</th>
+                <th>Firstname</th>
+                <th>Nameprefix</th>
+                <th>Middlename</th>
+                <th>Namesuffix</th>
+                <th>Nickname</th>
+                <th>Vat</th>
+                <th>Tax</th>
+                <th>Birthday</th>
+                <th>Photo</th>
+                <th>Organizationfunction</th>
+                <th>Created</th>
+                <th>Updated</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entity in entities %}
+            <tr>
+                <td><a href="{{ path('contact_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+                <td>{{ entity.contactid }}</td>
+                <td>{{ entity.contacttypeid }}</td>
+                <td>{{ entity.organizationname }}</td>
+                <td>{{ entity.surname }}</td>
+                <td>{{ entity.firstname }}</td>
+                <td>{{ entity.nameprefix }}</td>
+                <td>{{ entity.middlename }}</td>
+                <td>{{ entity.namesuffix }}</td>
+                <td>{{ entity.nickname }}</td>
+                <td>{{ entity.vat }}</td>
+                <td>{{ entity.tax }}</td>
+                <td>{% if entity.birthday %}{{ entity.birthday|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{{ entity.photo }}</td>
+                <td>{{ entity.organizationfunction }}</td>
+                <td>{% if entity.created %}{{ entity.created|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.updated %}{{ entity.updated|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>
+                <ul>
+                    <li>
+                        <a href="{{ path('contact_show', { 'id': entity.id }) }}">show</a>
+                    </li>
+                    <li>
+                        <a href="{{ path('contact_edit', { 'id': entity.id }) }}">edit</a>
+                    </li>
+                </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+        <ul>
+        <li>
+            <a href="{{ path('contact_new') }}">
+                Create a new entry
+            </a>
+        </li>
+    </ul>
+    {% endblock %}

@@ -1,0 +1,86 @@
+{% set iconsize = '16x16' %}
+{% set buttonsize = 'medium' %}
+{% if buttonsize == 'large' %}
+    {% set iconsize = '32x32' %}
+{% endif %}
+{
+    tabtitle: '{% if entity.id %}{% trans with {'%name%': entity.name } %}Edit %name%{% endtrans %}{% else %}{% trans %}Create new Group{% endtrans %}{% endif %}',
+    getitems: function (){
+        if (typeof(GroupModel)=='undefined'){
+          Ext.define('GroupModel',{
+             extend: 'Ext.data.Model',
+             fields: [{% for mf in modelfields %}{ {% for key,field in mf %}{%if field|slice(0,8) == 'function'%}"{{key}}":{{field|raw}}{%else%}"{{key}}":"{{field}}"{%endif%}{% if not loop.last %},{% endif %}{% endfor %} }{% if not loop.last %},{% endif %}{% endfor %}],
+             idProperty: 'id',
+             proxy: {
+                type: 'rest',
+                url : '{{path('post_group')}}',
+                writer: {
+                    type: "json",
+                    writeAllFields: true
+                }
+            }
+          });
+        }
+        
+        
+        return {
+            xtype: 'form',
+            layout: 'form',
+            defaultType: 'textfield',
+            defaults: {
+                labelWidth: 120
+            },
+            items: [{
+                xtype: 'hiddenfield',
+                name: 'id',
+                value: '{{entity.id}}'
+            },{
+                fieldLabel: '{%trans%}Groupname{%endtrans%}',
+                name: 'name',
+                value: '{{entity.name}}'
+            },{
+                fieldLabel: 'Roles',
+                submitValue: false,
+                xtype: 'checkboxgroup',
+                columns: 2,
+                vertical: true,
+                items: [{% for role in roles %}
+                { boxLabel: '{{role|slice(5)|replace({'_':' '})|capitalize}}', name: 'roles', inputValue: '{{role}}' {%if role in entity.getRoles %}, checked: true{% endif %}}{% if not loop.last %},{% endif %}
+                {% endfor%}]
+            }],
+            buttons: [{
+                text: '{%trans%}Save{%endtrans%}',
+                handler: function() {
+                    // The getForm() method returns the Ext.form.Basic instance:
+                    var form = this.up('form').getForm();
+                    if (form.isValid()) {
+                        console.log(typeof(GroupModel));
+                        var newgroup=Ext.create('GroupModel',form.getValues());
+                        
+                        
+                        // Submit the Ajax request and handle the response
+                        newgroup.save({
+                            scope: this.up('form'),
+                            success: function(group) {
+                                ttt=this;
+                                this.up('panel').close();
+                                if (typeof Ext.getCmp('group_grouplist') !='undefined'){
+                                    Ext.getCmp('group_grouplist').getStore().load({
+                                        callback: function(records, operation, success) {
+                                            //Ext.getCmp('mailclient_maillist').view.scrollTo(0,scrollpos);
+                                        }
+                                    });
+                                }
+                               //Ext.Msg.alert('Success', action.result.message);
+                            },
+                            failure: function(group) {
+                            
+                                
+                            }
+                        });
+                    }
+                }
+            }]
+        }
+    }
+}

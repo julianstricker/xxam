@@ -1,0 +1,134 @@
+{% set iconsize = '16x16' %}
+{% set buttonsize = 'medium' %}
+{% if buttonsize == 'large' %}
+    {% set iconsize = '32x32' %}
+{% endif %}
+{
+    tabtitle: '{% if entity.id %}{% trans with {'%username%': entity.username } %}Edit %username%{% endtrans %}{% else %}{% trans %}Create new User{% endtrans %}{% endif %}',
+    getitems: function (){
+        if (typeof(UserModel)=='undefined'){
+          Ext.define('UserModel',{
+             extend: 'Ext.data.Model',
+             fields: [{% for mf in modelfields %}{ {% for key,field in mf %}{%if field|slice(0,8) == 'function'%}{{key}}:{{field|raw}}{%else%}{{key}}:"{{field}}"{%endif%}{% if not loop.last %},{% endif %}{% endfor %} }{% if not loop.last %},{% endif %}{% endfor %}],
+             idProperty: 'id',
+             proxy: {
+                type: 'rest',
+                url : '{{path('post_user')}}',
+                writer: {
+                    type: "json",
+                    writeAllFields: true
+                }
+            }
+          });
+        }
+        var grouproles=[];
+        {% for group in groups %}
+        grouproles[{{group.id}}]={{group.roles|json_encode|raw}};
+        {% endfor %}
+        
+        return {
+            xtype: 'form',
+            layout: 'form',
+            defaultType: 'textfield',
+            defaults: {
+                labelWidth: 120
+            },
+            items: [{
+                xtype: 'hiddenfield',
+                name: 'id',
+                value: '{{entity.id}}'
+            },{
+                fieldLabel: '{%trans%}Username{%endtrans%}',
+                name: 'username',
+                value: '{{entity.username}}'
+            },{
+                fieldLabel: '{%trans%}Email{%endtrans%}',
+                name: 'email',
+                vtype:'email',
+                value: '{{entity.email}}'
+            },{
+                fieldLabel: '{%trans%}Password{%endtrans%}',
+                name: 'passwordplain',
+                inputType: 'password',
+                value: ''
+            },{
+                fieldLabel: 'Locked',
+                name: 'locked',
+                xtype: 'checkbox',
+                inputValue: 'On',
+                checked   :  {% if entity.locked %}true{% else %}false{% endif %},
+                value: '{{entity.locked}}'
+            },{
+                fieldLabel: 'Groups',
+                name: 'groups',
+                xtype: 'checkboxgroup',
+                items: [{% for group in groups %}
+                { boxLabel: '{{group.name}}', name: 'groups', inputValue: '{{group.id}}' {%if group in entity.getGroups %}, checked: true{% endif %}}{% if not loop.last %},{% endif %}
+                {% endfor%}],
+                listeners:{
+                    change: function(groupfield,newvalue){
+                        var gr=[];
+                        Ext.Array.each(newvalue.groups,function(group){
+                            gr=Ext.Array.merge(gr,grouproles[group]);
+                        });
+                        gf=groupfield;
+                        var rolesfields=groupfield.up('form').getForm().findField('rolesg').items.items;
+                        Ext.Array.each(rolesfields,function(rolefield){
+                            if(Ext.Array.indexOf(gr,rolefield.inputValue)>-1){
+                                rolefield.setDisabled(true);
+                                rolefield.setValue(true);
+                            }else if(rolefield.disabled==true){
+                                rolefield.setDisabled(false);
+                                rolefield.setValue(false);
+                            }
+                        });
+                        
+                    }
+                }
+            },{
+                fieldLabel: 'Roles',
+                submitValue: false,
+                xtype: 'checkboxgroup',
+                columns: 4,
+                name:'rolesg',
+                vertical: true,
+                items: [{% for role in roles %}
+                { boxLabel: '{{role|slice(5)|replace({'_':' '})|capitalize}}', name: 'roles', inputValue: '{{role}}' {%if role in entity.getDirectroles %}, checked: true{% elseif role in entity.getRoles %}, checked: true, disabled: true{% endif %}}{% if not loop.last %},{% endif %}
+                {% endfor%}]
+            }],
+            buttons: [{
+                text: '{%trans%}Save{%endtrans%}',
+                handler: function() {
+                    // The getForm() method returns the Ext.form.Basic instance:
+                    var form = this.up('form').getForm();
+                    if (form.isValid()) {
+                        console.log(typeof(UserModel));
+                        var newuser=Ext.create('UserModel',form.getValues());
+                        console.log(newuser);
+                        
+                        // Submit the Ajax request and handle the response
+                        newuser.save({
+                            scope: this.up('form'),
+                            success: function(user) {
+                                ttt=this;
+                                this.up('panel').close();
+                                if (typeof Ext.getCmp('user_userlist') !='undefined'){
+                                    Ext.getCmp('user_userlist').getStore().load({
+                                        callback: function(records, operation, success) {
+                                            //Ext.getCmp('mailclient_maillist').view.scrollTo(0,scrollpos);
+                                        }
+                                    });
+                                }
+                               //Ext.Msg.alert('Success', action.result.message);
+                            },
+                            failure: function(user) {
+                            
+                                
+                            }
+                        });
+                    }
+                }
+            }]
+        }
+    }
+}

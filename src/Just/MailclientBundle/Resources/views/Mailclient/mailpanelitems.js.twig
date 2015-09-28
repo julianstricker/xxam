@@ -1,0 +1,193 @@
+                {
+                    //xtype: 'panel',
+                    layout: 'fit',
+                    width: '100%',
+                    //weight: 10,
+                    
+                    itemId: 'mailpanelheader',
+                    html: '',
+                    border: false,
+                    //preventHeader: true,
+                    //hideCollapseTool:false,
+                    region: 'north',
+                    tbar: [
+                        { 
+                            xtype: 'button', 
+                            text: '{%trans%}Reply{%endtrans%}', 
+                            tooltip: '{%trans%}Reply to sender{%endtrans%}', 
+                            scale: '{{buttonsize}}', 
+                            icon: '/bundles/justmailclient/icons/{{iconsize}}/outlook_reply.png',
+                            handler: function(){
+                                var path=Ext.getCmp('mailclient_maillist').getStore().getProxy().extraParams.path.toString()
+                                var mailid=Ext.getCmp('mailclient_maillist').view.selection.id
+                                window.location.href='#mailclient/write?type=reply&path='+path+'&mailid='+mailid;
+                            } 
+                        },
+                        { xtype: 'button', text: '{%trans%}Reply all{%endtrans%}', tooltip: '{%trans%}Reply to list or to sender and all recipients{%endtrans%}', scale: '{{buttonsize}}', icon: '/bundles/justmailclient/icons/{{iconsize}}/outlook_reply_all.png',
+                            menu: [
+                                { text: '{%trans%}Reply all{%endtrans%}' },
+                                { text: '{%trans%}Reply list{%endtrans%}' }
+                            ]
+                        },
+                        { xtype: 'button', text: '{%trans%}Forward{%endtrans%}', tooltip: '{%trans%}Forward{%endtrans%}', scale: '{{buttonsize}}', icon: '/bundles/justmailclient/icons/{{iconsize}}/email_forward.png' },
+                        { 
+                            xtype: 'button', text: '{%trans%}Trash{%endtrans%}', 
+                            tooltip: '{%trans%}Move message to trash{%endtrans%}', 
+                            scale: '{{buttonsize}}', 
+                            icon: '/bundles/justmailclient/icons/{{iconsize}}/outlook_delete_all.png',
+                            handler: function(){
+                                
+                                if (typeof mailid == 'undefined'){
+                                    selected=Ext.getCmp('mailclient_maillist').selModel.selected.items;
+                                    selectedids=[];
+                                    Ext.Array.each(selected,function(item){
+                                        selectedids.push(item.id);
+                                    });
+                                }else{
+                                    var selectedids=[mailid];
+                                }
+                                
+                                if (typeof path == 'undefined'){
+                                    from=Ext.getCmp('mailclient_maillist').getStore().getProxy().extraParams.path.toString();
+                                }else{
+                                    from=path;
+                                }
+                                Ext.Ajax.request({
+                                    url: 'mailclient/trashmails?from='+from+'&ids='+selectedids.join(','),
+                                    success: function(response){
+                                        var responsejson=Ext.JSON.decode(response.responseText);
+                                        scrollpos=Ext.getCmp('mailclient_maillist').view.getScrollY();
+                                        Ext.getCmp('mailclient_maillist').getStore().load({
+                                            callback: function(records, operation, success) {
+                                                Ext.getCmp('mailclient_maillist').view.scrollTo(0,scrollpos);
+                                            }
+                                        });
+
+                                    }
+
+                                });
+                            }
+                        },
+                        { xtype: 'button', text: '{%trans%}Junk{%endtrans%}', tooltip: '{%trans%}Mark as junk{%endtrans%}', scale: '{{buttonsize}}', icon: '/bundles/justmailclient/icons/{{iconsize}}/spam_assassin.png' },
+                        { xtype: 'button', text: '{%trans%}Mark{%endtrans%}', tooltip: '{%trans%}Mark message{%endtrans%}', scale: '{{buttonsize}}', icon: '/bundles/justmailclient/icons/{{iconsize}}/publisher_bookmark.png',
+                            menu: [
+                                { text: '{%trans%}As read{%endtrans%}' },
+                                { text: '{%trans%}As unread{%endtrans%}' },
+                                { text: '{%trans%}As flagged{%endtrans%}' },
+                                { text: '{%trans%}As unflagged{%endtrans%}' }
+                            ] 
+                        },
+                        { xtype: 'tbfill' },
+                        { 
+                            xtype: 'button', 
+                            tooltip: '{%trans%}Minimize header{%endtrans%}', 
+                            enableToggle: true, 
+                            scale: '{{buttonsize}}', 
+                            id: 'mailclient_minimizeheaderbutton{{id}}',
+                            stateful: true,
+                            stateId: 'mailclient_minimizeheaderbutton{{id}}',
+                            stateEvents: ['press'],
+                            getState: function() {
+                                return { pressed: this.pressed };
+                            },
+                            applyState: function(state) {
+                                //this.toggle(state.pressed);
+                                this.toggle(1);
+                            },
+                            icon: '/bundles/justmailclient/icons/{{iconsize}}/bullet_arrow_top.png',
+                            listeners: {
+                                toggle: function(button){
+                                    if (Ext.getCmp('mailclient_mailpanel{{id}}')){
+                                        if(button.pressed){
+                                            Ext.get(Ext.getCmp('mailclient_mailpanel{{id}}').body.dom.querySelector('.mailpanelheader')).setVisibilityMode(Ext.Element.DISPLAY).hide();
+                                        }else{
+                                            Ext.get(Ext.getCmp('mailclient_mailpanel{{id}}').body.dom.querySelector('.mailpanelheader')).show();
+                                        }
+                                        Ext.getCmp('mailclient_mailpanel{{id}}').doLayout();
+                                    }
+                                    this.fireEvent('press');
+                                }
+                            }
+                        }{% if id == '' %},
+                        { 
+                            xtype: 'button', 
+                            tooltip: '{%trans%}Open in new tab{%endtrans%}', 
+                            scale: '{{buttonsize}}', 
+                            icon: '/bundles/justmailclient/icons/{{iconsize}}/arrow_out.png',
+                            handler: function(){
+                                path=Ext.getCmp('mailclient_maillist').getStore().getProxy().extraParams.path.toString()
+                                var mailid=Ext.getCmp('mailclient_maillist').view.selection.id
+                                window.location.href='#mailclient/show/'+path+'/'+mailid;
+                                
+                            }
+                        }{% endif %}
+                      ]
+                    //collapseMode: 'mini'
+                    
+                },
+                {
+                    region: 'center',
+                    layout: 'border',
+                    items: [{
+                            xtype: 'uxiframe',
+                            //layout: 'fit',
+                            region: 'center',
+                            //weight: 10,
+                            //itemId: 'mailpanelbody',
+                            id: 'mailclient_mailpanelbody{{id}}',
+                            border: false
+                            //autoScroll: true
+                            //overflowY: 'auto'
+                        },
+                        {
+                            title: '{%trans%}Attachments{%endtrans%}',
+                            split: true,
+                            stateful:false,
+                            collapsible: true,
+                            collapsed: true,
+                            //minWidth: 75,
+                            maxWidth: 450,
+                            width: 240,
+                            region: 'east',
+                            border: false,
+                            items:{
+                                xtype: 'dataview',
+                                //weight: 10,
+                                id: 'mailclient_mailpanelattachments{{id}}',
+                                autoScroll: true,
+                                //minWidth: 200,
+                                
+                                //overflowY: 'auto'
+                                itemSelector: 'div.thumb-wrap',
+                                emptyText: 'No attachments available',
+                                store: Ext.create('Ext.data.Store', {
+                                    fields: ['id', 'name', 'filesize', 'filepath'],
+                                    data : []
+                                }),
+                                tpl: new Ext.XTemplate(
+                                    '<tpl for=".">',
+                                        '<div style="margin: 2px;" class="mailclient_attachment thumb-wrap">',
+                                          '<img src="{thumbnail}" />',
+                                          '<span class="filename">{name}</span><br/><span class="filesize">{[this.formatFilesize(values.filesize)]}</span>',
+                                          '<div style="clear:both"></div>',
+                                        '</div>',
+                                    '</tpl>',
+                                    {
+                                        formatFilesize: function(value){
+                                            var valuestring;
+                                            if(value > 0){
+                                                var s = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+                                                var e = Math.floor(Math.log(value)/Math.log(1024));
+                                                valuestring= (value/Math.pow(1024, Math.floor(e))).toFixed(2)+" "+s[e];
+                                            }
+                                            else{
+                                                valuestring= '0 ' + 'bytes';
+                                            }
+                                            return valuestring;
+                                        }
+                                    }
+                                )
+                            }
+                        }
+                    ]
+                }

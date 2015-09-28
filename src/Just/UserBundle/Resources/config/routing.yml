@@ -1,0 +1,17 @@
+user:
+    resource: "@JustUserBundle/Controller/UserController.php"
+    type: annotation
+
+just_user_user_api:
+    resource: "@JustUserBundle/Controller/UserRESTController.php"
+    type:   rest
+    prefix:   /api
+    
+group:
+    resource: "@JustUserBundle/Controller/GroupController.php"
+    type: annotation
+    
+just_user_group_api:
+    resource: "@JustUserBundle/Controller/GroupRESTController.php"
+    type:   rest
+    prefix:   /api

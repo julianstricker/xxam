@@ -1,0 +1,72 @@
+mailclient:
+    path: /mailclient
+    defaults: { _controller: JustMailclientBundle:Mailclient:index }
+    
+mailclient_listfolders:
+    path: /mailclient/listfolders
+    defaults: { _controller: JustMailclientBundle:Mailclient:listfolders }
+
+mailclient_listmails:
+    path: /mailclient/listmails
+    defaults: { _controller: JustMailclientBundle:Mailclient:listmails }
+    
+mailclient_getmail:
+    path: /mailclient/getmail
+    defaults: { _controller: JustMailclientBundle:Mailclient:getmail }
+
+mailclient_getmailcontent:
+    path: /mailclient/getmailcontent
+    defaults: { _controller: JustMailclientBundle:Mailclient:getmailcontent }
+    
+mailclient_movemails:
+    path: /mailclient/movemails
+    defaults: { _controller: JustMailclientBundle:Mailclient:movemails }
+    
+mailclient_show:
+    path: /mailclient/show/{path}/{id}
+    defaults: { _controller: JustMailclientBundle:Mailclient:show }
+    
+mailclient_trashmails:
+    path: /mailclient/trashmails
+    defaults: { _controller: JustMailclientBundle:Mailclient:trashmails }
+ 
+mailclient_junkmails:
+    path: /mailclient/junkmails
+    defaults: { _controller: JustMailclientBundle:Mailclient:junkmails }
+
+mailclient_markmailsasread:
+    path: /mailclient/markmailsasread
+    defaults: { _controller: JustMailclientBundle:Mailclient:markmailsasread }
+
+mailclient_markmailsasunread:
+    path: /mailclient/markmailsasunread
+    defaults: { _controller: JustMailclientBundle:Mailclient:markmailsasunread }
+
+mailclient_markmailsasflagged:
+    path: /mailclient/markmailsasflagged
+    defaults: { _controller: JustMailclientBundle:Mailclient:markmailsasflagged }
+    
+mailclient_markmailsasunflagged:
+    path: /mailclient/markmailsasunflagged
+    defaults: { _controller: JustMailclientBundle:Mailclient:markmailsasunflagged }
+    
+mailclient_getmailboxinfo:
+    path: /mailclient/getmailboxinfo
+    defaults: { _controller: JustMailclientBundle:Mailclient:getmailboxinfo }
+    
+mailclient_write:
+    path: /mailclient/write
+    defaults: { _controller: JustMailclientBundle:Mailclient:write }
+    
+mailclient_uploadfile:
+    path: /mailclient/uploadfile
+    defaults: { _controller: JustMailclientBundle:Mailclient:uploadfile }
+    
+mailclient_sendmail:
+    path: /mailclient/sendmail
+    defaults: { _controller: JustMailclientBundle:Mailclient:sendmail }
+    
+mailclient_settings:
+    path: /mailclient/settings
+    defaults: { _controller: JustMailclientBundle:Mailclient:settings }
+    

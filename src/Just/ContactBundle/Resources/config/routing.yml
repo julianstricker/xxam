@@ -1,0 +1,8 @@
+contact:
+    resource: "@JustContactBundle/Controller/ContactController.php"
+    type: annotation
+
+just_contact_contact_api:
+    resource: "@JustContactBundle/Controller/ContactRESTController.php"
+    type:   rest
+    prefix:   /api

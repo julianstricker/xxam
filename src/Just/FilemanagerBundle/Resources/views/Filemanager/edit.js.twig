@@ -1,0 +1,193 @@
+{% set iconsize = '16x16' %}
+{% set buttonsize = 'medium' %}
+{% if buttonsize == 'large' %}
+    {% set iconsize = '32x32' %}
+{% endif %}
+{
+    tabtitle: '{% if entity.id %}{% trans with {'%firstname%': entity.firstname, '%lastname%': entity.lastname} %}Edit %firstname% %lastname%{% endtrans %}{% else %}{% trans %}Create new filesystem{% endtrans %}{% endif %}',
+    getitems: function (){
+        if (typeof(FilemanagerModel)=='undefined'){
+          Ext.define('FilemanagerModel',{
+             extend: 'Ext.data.Model',
+             fields: {{modelfields|json_encode(false)|raw}},
+             idProperty: 'id',
+             proxy: {
+                type: 'rest',
+                url : '{{path('post_filesystem')}}',
+                writer: {
+                    type: "json",
+                    writeAllFields: true
+                }
+            }
+          });
+        }
+        var filesystemtypesStore = Ext.create('Ext.data.Store', {
+            fields: ['id', 'value'],
+            data : {{filesystemtypes|json_encode()|raw}}
+        });
+        
+        return {
+            xtype: 'form',
+            layout: 'form',
+            defaultType: 'textfield',
+            defaults: {
+                labelWidth: 120
+            },
+            items: [{
+                xtype: 'hiddenfield',
+                name: 'id',
+                value: '{{entity.id}}'
+            },{
+                xtype: 'combo',
+                fieldLabel: 'Type',
+                name: 'filesystemtype_id',
+                store: filesystemtypesStore,
+                queryMode: 'local',
+                displayField: 'value',
+                valueField: 'id',
+                value: '{{entity.getFilemanagertypeId}}'
+            },{
+                fieldLabel: 'Organisation',
+                name: 'organizationname',
+                value: '{{entity.organizationname}}'
+            },{
+                fieldLabel: 'Name',
+                xtype: 'fieldcontainer',
+                layout: {
+                    type: 'hbox'
+                },
+                shrinkWrap: 2,
+                defaultType: 'textfield',
+                defaults: {
+                    labelAlign: 'top'
+                },
+                items: [{
+                     fieldLabel: 'Prefix',
+                     name: 'nameprefix',
+                     allowBlank:true,
+                     flex: 1,
+                     value: '{{entity.nameprefix}}'
+                 },{
+                    xtype: 'splitter'
+                 },{
+                     fieldLabel: 'First',
+                     name: 'firstname',
+                     allowBlank:false,
+                     flex: 4,
+                     value: '{{entity.firstname}}'
+                 },{
+                    xtype: 'splitter'
+                 },{
+                     fieldLabel: 'Last',
+                     name: 'lastname',
+                     flex: 5,
+                     value: '{{entity.lastname}}'
+                 }]
+            },{
+                fieldLabel: 'Nickname/Initials',
+                xtype: 'fieldcontainer',
+                layout: {
+                    type: 'hbox'
+                },
+                shrinkWrap: 2,
+                defaultType: 'textfield',
+                defaults: {
+                    labelAlign: 'top'
+                },
+                items: [{
+                     fieldLabel: 'Nickname',
+                     name: 'nickname',
+                     allowBlank:true,
+                     flex: 1,
+                     value: '{{entity.nickname}}'
+                 },{
+                     xtype: 'splitter'
+                 },{
+                     fieldLabel: 'Initials',
+                     name: 'initials',
+                     allowBlank:true,
+                     flex: 1,
+                     value: '{{entity.initials}}'
+                 }]
+                
+            },{
+                fieldLabel: 'VAT/Tax Number',
+                xtype: 'fieldcontainer',
+                layout: {
+                    type: 'hbox'
+                    //align: 'middle'
+                },
+                shrinkWrap: 2,
+                defaultType: 'textfield',
+                defaults: {
+                    labelAlign: 'top'
+                },
+                items: [{
+                    fieldLabel: 'VAT',
+                    name: 'vat',
+                    allowBlank:true,
+                    flex: 1,
+                    value: '{{entity.vat}}'
+                 },{
+                    xtype: 'splitter'
+                 },{
+                    fieldLabel: 'Tax',
+                    name: 'tax',
+                    allowBlank:true,
+                    flex: 1,
+                    value: '{{entity.tax}}'
+                }]
+            },{
+                fieldLabel: 'Organisation function',
+                name: 'organizationfunction',
+                allowBlank:true,
+                value: '{{entity.organizationfunction}}'
+            }, {
+                fieldLabel: 'Birthday',
+                name: 'birthday',
+                xtype: 'datefield',
+                maxValue: new Date(),
+                format: 'Y-m-d',
+                value: '{{entity.birthday|date('Y-m-d')}}'
+            }, {
+                fieldLabel: 'Email',
+                name: 'email',
+                vtype:'email',
+                value: ''
+            }],
+            buttons: [{
+                text: '{%trans%}Save{%endtrans%}',
+                handler: function() {
+                    // The getForm() method returns the Ext.form.Basic instance:
+                    var form = this.up('form').getForm();
+                    if (form.isValid()) {
+                        console.log(typeof(FilemanagerModel));
+                        var newfilesystem=Ext.create('FilemanagerModel',form.getValues());
+                        console.log(newfilesystem);
+                        
+                        // Submit the Ajax request and handle the response
+                        newfilesystem.save({
+                            scope: this.up('form'),
+                            success: function(filesystem) {
+                                ttt=this;
+                                this.up('panel').close();
+                                if (typeof Ext.getCmp('filesystem_filesystemlist') !='undefined'){
+                                    Ext.getCmp('filesystem_filesystemlist').getStore().load({
+                                        callback: function(records, operation, success) {
+                                            //Ext.getCmp('mailclient_maillist').view.scrollTo(0,scrollpos);
+                                        }
+                                    });
+                                }
+                               //Ext.Msg.alert('Success', action.result.message);
+                            },
+                            failure: function(filesystem) {
+                            
+                                //Ext.Msg.alert('Failed', action.result ? action.result.message : 'No response');
+                            }
+                        });
+                    }
+                }
+            }]
+        }
+    }
+}

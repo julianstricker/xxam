@@ -1,0 +1,46 @@
+parameters:
+    menu:
+#        logo:
+#            xtype: 'box'
+#            autoEl: { tag: 'img', src:'/bundles/justadmin/images/logoxxam.png', width: 67, height: 26 }
+        hauptmenu_1:
+            text:       'Portal'
+            iconCls:    'defaultmenuicon'            
+            #handler:    'function() { window.location.href="#portal"}'
+            href:       '#portal'
+            hrefTarget: '_self'
+            stateId: 'xxam_menu_portal'
+        hauptmenu_2:
+            text:       'Mailclient'
+            iconCls:    'defaultmenuicon'  
+            stateId:    'xxam_menu_mailclient'
+#            href:       '#mailclient'
+            menu:
+                menu_1:
+                    text:       'Mails'
+                    iconCls:    'defaultmenuicon'            
+                    href:       '#mailclient'
+                menu_2:
+                    text:       'Create new Message'
+                    iconCls:    'defaultmenuicon'            
+                    href:       '#mailclient/write'
+                    
+        hauptmenu_3:
+            text:       'Calendar'
+            iconCls:    'defaultmenuicon'  
+            stateId:    'xxam_menu_calendar'
+            menu:
+                menu_1:
+                    text:       'Calendar'
+                    iconCls:    'defaultmenuicon'            
+                    href:       '#calendar'
+        hauptmenu_4:
+            text:       'Contact'
+            iconCls:    'defaultmenuicon'  
+            stateId:    'xxam_menu_contact'
+            menu:
+                menu_1:
+                    text:       'Contact'
+                    iconCls:    'defaultmenuicon'            
+                    href:       '#contact'
+        

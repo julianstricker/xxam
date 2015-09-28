@@ -1,0 +1,39 @@
+parameters:
+    security.authentication.success_handler.class: Just\UserBundle\Handler\AuthenticationSuccessHandler
+    security.authentication.failure_handler.class: Just\UserBundle\Handler\AuthenticationFailureHandler
+
+
+services:
+#    security.authentication.failure_handler:
+#        class: Just\UserBundle\Handler\AuthenticationFailureHandler
+#        arguments: [@kernel]
+#    security.authentication.success_handler:
+#        class: Just\UserBundle\Handler\AuthenticationSuccessHandler
+#        arguments: [@kernel]
+    just_user.login_success_handler:
+        class:  "%security.authentication.success_handler.class%"
+        #abstract: false
+        #public: false
+        arguments:  [@security.http_utils ]
+        calls:
+            - [setTranslator, ["@translator"]]
+        tags:
+          - { name: 'monolog.logger', channel: 'security' }
+          
+          
+          
+  
+          
+          
+    just_user.login_failure_handler:
+        class:  "%security.authentication.failure_handler.class%"
+        #abstract: false
+        #public: false
+        arguments:  [@http_kernel, @security.http_utils, [], @logger ]
+        calls:
+            - [setTranslator, ["@translator"]]
+        tags:
+          - { name: 'monolog.logger', channel: 'security' }
+
+
+ 

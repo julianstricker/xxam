@@ -1,0 +1,45 @@
+services:
+#    just_admin.example:
+#        class: Just\AdminBundle\Example
+#        arguments: [@service_id, "plain_value", %parameter%]
+
+
+#every portal-widget must start with "justportalwidget...."
+    justportalwidget.admin.feed:
+        class: Just\AdminBundle\Controller\FeedWidgetController
+        arguments: ["@templating"]
+        tags:
+            -  { name: justportalwidget }
+            
+    
+        
+        
+            
+    kernel.listener.tenantsetparameter:    
+       class: Just\AdminBundle\EventListener\TenantSetParameter
+       arguments: [ @service_container, @doctrine.orm.entity_manager ]
+       tags:
+           - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 20 }
+           
+    kernel.listener.command_tenantsetparameter:    
+       class: Just\AdminBundle\EventListener\TenantSetParameter
+       arguments: [ @service_container, @doctrine.orm.entity_manager ]
+       tags:
+           - { name: kernel.event_listener, event: console.command, method: onCommand, priority: 20 }
+           
+    tenant.listener:
+        class: Just\AdminBundle\EventListener\TenantSetter
+        tags:
+            - { name: doctrine.event_listener, event: prePersist }
+            
+            
+#    xxam_bit_ratchet_server:
+#        class: Just\AdminBundle\Services\XxamServerService
+#        arguments:
+#          websocket:
+#            host: %bit_ratchet.websocket.host%
+#            port: %bit_ratchet.websocket.port%
+#          listeners: %bit_ratchet.listeners%
+#          logger: @logger
+#        tags:
+#            - { name: monolog.logger, channel: ratchet_server }

@@ -1,0 +1,46 @@
+.mailpanelheader{ 
+    width: 99%;
+}
+.mailpanelheader td{ 
+    white-space: nowrap
+}
+.mailpanelheader th{ 
+    text-align: right;
+    color: gray;
+}
+.mailpanelheadernotice{
+    background-color: #FFF4BF;
+    margin: 4px;
+    border: 1px solid yellow;
+    padding: 4px;
+    text-align: center;
+}
+
+.mailtitlefrom{
+    font-weight: normal;
+    font-style: italic;
+}
+
+/*.x-grid-tree-node-expanded .x-tree-icon-parent {
+    background-image: none;
+    background: url('http://icons.iconarchive.com/icons/sekkyumu/developpers/16/Play-Green-Button-icon.png') no-repeat center center !important;
+}
+.x-grid-row  .x-tree-icon-leaf {
+	background-image:url('http://icons.iconarchive.com/icons/graphicrating/koloria/16/Button-Play-Pause-icon.png');
+}*/
+
+.filedndhighlight{
+    background-color: yellow !important;
+}
+.filedndhighlight * {
+    background-color: yellow !important;
+}
+.mailclient_attachment img{
+    float:left;
+}
+.mailclient_attachment .filename{
+    font-weight: bold;
+}
+.mailclient_attachment .filesize{
+    font-style: italic;
+}

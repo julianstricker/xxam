@@ -1,0 +1,369 @@
+{% set iconsize = '16x16' %}
+{% set buttonsize = 'medium' %}
+{% if buttonsize == 'large' %}
+    {% set iconsize = '32x32' %}
+{% endif %}
+{
+    tabtitle: 'Filemanager',
+    tabicon: '/bundles/justfilemanager/icons/16x16/drive.png',
+    getitems: function (){
+        
+        
+        Xxam.appendHead({
+            css: ['/bundles/justfilemanager/css/layout.css']
+        });  
+        
+        if (typeof(justfilemanager_filesmodel)=='undefined'){
+            Ext.define('justfilemanager_filesmodel',{
+                extend: 'Ext.data.Model',
+                idProperty: 'id',
+                fields: [
+                    {name: 'name', type: 'string'},
+                    {name: 'id', type: 'string'},
+                    {name:'timestamp', type:'date', dateFormat:'timestamp'},
+                    {name: 'size', type: 'int'},
+                    {name: 'type', type: 'string'},
+                    {
+                        name: 'thumbnail', 
+                        type: 'string', 
+                        calculate: function(data){
+
+                            if (data.type=='dir') {
+                                return "/bundles/justadmin/icons/64x64/folder.png";
+                            }else if (data.type=='fs') {
+                                return "/bundles/justadmin/icons/64x64/folder.png";
+                            }else if (data.type=='privatefs') {
+                                return "/bundles/justadmin/icons/64x64/folder_user.png";
+                            }
+                            return getthumbnailurl(data.id);
+
+
+                        }
+                    }
+                ]
+            });
+        }
+
+        
+        
+        Ext.define('Xxam.FileView', {
+            extend: 'Ext.view.View',
+            alias : 'widget.fileview',
+            requires: ['Ext.data.Store'],
+            mixins: {
+                dragSelector: 'Ext.ux.DataView.DragSelector',
+                draggable   : 'Ext.ux.DataView.Draggable'
+            },
+            tpl: [
+                '<tpl for=".">',
+                    '<div class="thumb-wrap" id="{[Ext.util.Base64.encode(name)]}">',
+                        '<div class="thumb"><img src="{thumbnail}" title="{name:htmlEncode}"></div>',
+                        '<span class="x-editable">{name:htmlEncode}</span>',
+                    '</div>',
+                '</tpl>',
+                '<div class="x-clear"></div>'
+            ],
+            itemSelector: 'div.thumb-wrap',
+            multiSelect: true,
+            singleSelect: false,
+            cls: 'x-file-view',
+            scrollable: true,
+
+            initComponent: function() {
+                this.store= new Ext.data.Store({
+                    model: 'justfilemanager_filesmodel',
+
+                    proxy:{
+                        type: 'ajax',
+                        url: '{{path('filemanager_listfiles')}}',
+                        reader : {
+                            type: 'json',
+                            rootProperty: 'children'
+                        }
+                    },
+                    //nodeParam: 'path',
+                    autoLoad: true
+                });
+
+                this.mixins.dragSelector.init(this);
+                this.mixins.draggable.init(this, {
+                    ddConfig: {
+                        ddGroup: 'fileDD'
+                    },
+                    ghostTpl: [
+                        '<tpl for=".">',
+                            '<img src="{thumbnail}" title="{name:htmlEncode}" />',
+                            '<tpl if="xindex % 4 == 0"><br /></tpl>',
+                        '</tpl>',
+                        '<div class="count">',
+                            '{[values.length]} files selected',
+                        '<div>'
+                    ]
+                });
+
+                this.callParent();
+            }
+        });
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        getthumbnailurl=function(filename){
+            var fileextensiontomimetype={{fileextensiontomimetype|json_encode|raw}};
+            var fileextensionswiththumbnails={{fileextensionswiththumbnails|json_encode|raw}}
+            var filenamesplit=filename.split('.');
+            
+            var filetype=filenamesplit[filenamesplit.length-1].toLowerCase();
+            if (Ext.Array.indexOf(fileextensionswiththumbnails,filetype)>-1){
+                return '{{path('filemanager_getthumbnail')}}?path='+filename+'&size=s';
+            }
+            if (typeof fileextensiontomimetype[filetype] != 'undefined'){
+                return "/bundles/justadmin/icons/64x64/mimetypes/"+fileextensiontomimetype[filetype];
+            }
+            return "/bundles/justadmin/icons/64x64/mimetypes/unknown.png";
+
+        };
+        
+        
+        return {
+            layout: 'border',
+            items: [{
+                region: 'west',
+                title: '{% trans %}Directories{% endtrans %}',
+                width: 300,
+                split: true,
+                collapsible: true,
+                minWidth: 100,
+                maxWidth: 450,
+                layout: 'fit',
+                margins: '0 2 2 2',
+                autoScroll: true,
+                border: 0,
+                items: [{
+                    xtype: 'treepanel',
+                    rootVisible: false,
+                    loadMask: true,
+                    useArrows: true,
+                    id:'justfilemanager_directories',
+                    border: 0,
+                    viewConfig: {
+                        renderer: function(value,metaData,record){
+                            return value;
+                        },
+                        copy: false,
+                        plugins: [
+                            {
+                                ptype: 'treeviewdragdrop',
+                                appendOnly: true,
+                                allowParentInsert: true,
+                                ddGroup: 'fileDD',
+                                displayField: 'name'
+                            }
+                        ],
+                        listeners: {
+
+                            beforedrop: function(node, data, overModel, dropPosition, dropHandlers){
+                                console.log(node, data, overModel, dropPosition, dropHandlers);
+                                if (data.view.xtype=='dataview'){ //move file into folder:
+                                    dropHandlers.wait = true;
+                                    console.log('move file into folder');
+                                    var ids=[];
+                                    Ext.Array.each(data.records, function(record){
+                                        ids.push(record.id);
+                                    });
+                                    var from=data.view.getStore().getProxy().extraParams.path.toString();
+                                    var to=overModel.raw.path;
+                                    /*Ext.Ajax.request({
+                                        url: 'filemanager/movefile?from='+from+'&to='+to+'&ids='+ids,
+
+                                        success: function(response){
+                                            var responsejson=Ext.JSON.decode(response.responseText);
+                                            scrollpos=Ext.getCmp('filemanager_filelist').view.getScrollY();
+                                            Ext.getCmp('mailclient_maillist').getStore().load({
+                                                callback: function(records, operation, success) {
+                                                    console.log('lalala',scrollpos);
+                                                    Ext.getCmp('mailclient_maillist').view.scrollTo(0,scrollpos);
+                                                }
+                                            });
+
+                                        }
+
+                                    });*/
+                                    dropHandlers.cancelDrop();
+                                    return false;
+                                }else{
+                                    dropHandlers.wait = true;
+
+                                    console.log('tree beforedrop',node, data, overModel, dropPosition, dropHandlers);
+                                    Ext.MessageBox.confirm('Drop', 'Are you sure', function(btn){
+                                        if (btn === 'yes') {
+                                            dropHandlers.processDrop();
+                                        } else {
+                                            dropHandlers.cancelDrop();
+                                        }
+                                    });
+                                }
+
+                                //return true;
+                            },
+                            drop: function(node, data, overModel, dropPosition) {
+                                console.log('tree drop');
+                                return false;
+                                console.log('tree drop',node, data, overModel, dropPosition);
+                            }
+                        }
+                    },
+                    store: {
+                        extend: 'Ext.data.TreeStore',
+                        model: {
+                            extend: 'Ext.data.Model',
+                            fields: [
+                                {name: 'name', type: 'string'},
+                                {name: 'id', type: 'string'},
+                                {name: 'basename', type: 'string'},
+                                {name: 'leaf', type: 'boolean'},
+                                {name:'timestamp', type:'date', dateFormat:'timestamp'}
+                            ]
+                        },
+                        proxy:{
+                            type: 'ajax',
+                            url: '{{path('filemanager_listfolders')}}',
+                            reader : {
+                                type: 'json'
+                            }
+                        },
+                        defaultRootId: '0',
+                        defaultRootProperty: 'children',
+                        nodeParam: 'path',
+                        //node: 'path',
+                        autoLoad: true
+                    },
+                    columns: [{
+                        xtype: 'treecolumn', 
+                        text: '{% trans %}Name{% endtrans %}', 
+                        dataIndex: 'name', 
+                        flex: 1
+                    }],
+                    listeners: {
+                        load: function(store, records, successful, operation, node, eOpts ){
+                            if (store.ownerTree.getSelection().length==0){
+                                //store.ownerTree.getSelectionModel().select(0);
+                                //store.ownerTree.selectPath(store.first().data.id);
+                                //store.ownerTree.expandNode(store.first().data.id);
+                            }
+                        },
+                        selectionchange: function(model, selected, eOpts){
+                            var view=Ext.getCmp('justfilemanager_files');
+                            view.store.getProxy().setExtraParam('path',selected[0].data.id);
+                            view.store.load();
+                        },
+                        beforeiteminsert : function(obj, node) {
+                            console.log('beforeinteminsert',obj,node);   
+                       }
+
+                    }
+                }]
+            },{
+                region: 'center',
+                layout: 'fit',
+                margins: '2 2 0 0',
+                border: 0,
+                items: [{
+                    xtype: 'panel',
+                    title: '{% trans %}Filesystems{% endtrans %}',
+                    border: 0,
+                    autoScroll: true,
+                    items: Ext.create('Xxam.FileView', {
+                        id: 'justfilemanager_files',
+                        
+                        
+                        multiSelect: true,
+                        //height: 310,
+                        trackOver: true,
+                        overItemCls: 'x-item-over',
+                        itemSelector: 'div.thumb-wrap',
+                        emptyText: 'No files to display',
+                        plugins: [
+                            //Ext.create('Ext.ux.DataView.DragSelector', {}),
+                            Ext.create('Ext.ux.DataView.LabelEditor', {dataIndex: 'name',listeners: {
+                                complete: function(editor,value,startValue,eOpts){
+                                    
+                                    eee=editor;
+                                    console.log('complete',editor,value,startValue,eOpts);
+                                    var path=Ext.getCmp('justfilemanager_files').store.proxy.config.extraParams.path;
+                                    Ext.Ajax.request({
+                                        url: '{{path('filemanager_movefile')}}?path='+path+'/'+startValue+'&newname='+path+'/'+value,
+                                        scope: {selection: Ext.getCmp('justfilemanager_files').selection,oldvalue:startValue,value:value, path:path},
+                                        success: function(response){
+                                            var responsejson=Ext.JSON.decode(response.responseText);
+                                            if (typeof responsejson.success != 'undefined' && responsejson.success==true){
+                                                Xxam.msg('{% trans %}Rename{% endtrans %} ', '{% trans %}File was successfully renamed{% endtrans %}', '');
+                                                //this.selection.id=this.selection.data.id=this.path+'/'+this.value;
+                                                Ext.getCmp('justfilemanager_directories').store.reload();
+                                                Ext.getCmp('justfilemanager_files').store.reload();
+                                            }else{
+                                                Ext.Msg.alert('Error', response.error);
+                                                this.selection.data.name=this.oldvalue;
+                                                Ext.getCmp('justfilemanager_files').refresh();
+                                            }
+                                        }
+                                    });
+                                }
+                            }})
+                        ],
+                        viewConfig: {
+                            plugins: {
+                                ptype: 'dataviewdragdrop',
+                                dragText: 'Drag and drop to reorganize',
+                                dragGroup: 'fileDD'
+                            }
+                        },
+                        listeners: {
+                            beforedrop: function(node, data, overModel, dropPosition, dropHandlers){
+                                console.log(node, data, overModel, dropPosition, dropHandlers);
+                            },
+                            selectionchange: function(dv, nodes ){
+                                var l = nodes.length,
+                                    s = l !== 1 ? 's' : '';
+                                this.up('panel').setTitle('Simple DataView (' + l + ' item' + s + ' selected)');
+                            },
+                            itemdblclick: function(thethis, record,item){
+                                console.log(thethis, record,item, record.data.id);
+                                rrr=record;
+                                if (record.data.type=='dir' || record.data.type=='fs' || record.data.type=='privatefs'){  //open folder:
+                                    Ext.getCmp('justfilemanager_directories').expandPath(record.data.id,{select:true,field:'basename'});
+                                }else{
+                                    var codingextensions=['.js','.css','.php','.java','.cpp','.txt'];
+                                    var found=false;
+                                    for(var i=0; i<codingextensions.length; i++){
+                                        if(record.data.id.substr(-codingextensions[i].length)==codingextensions[i]){
+                                            found=true;
+                                            break;
+                                        }
+                                    }
+                                    if (found){
+                                        window.location.href='#coding?path='+record.data.id
+                                    }else{
+                                        var win = window.open('{{path('filemanager_readfile')}}?path='+record.data.id, '_blank');
+                                    }
+                                    win.focus();
+                                }
+                            }
+                            
+                            
+                        }
+                    })
+                    
+                }]
+            }]
+        }
+    }
+}

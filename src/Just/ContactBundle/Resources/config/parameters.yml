@@ -1,0 +1,12 @@
+parameters:
+  contacttypes:
+    1: Person
+    2: Organisation
+    3: Freelancer
+  addresstypes:
+    1: Postal
+    2: Billing
+    3: International
+    4: Parcel
+    5: Home
+    6: Work
