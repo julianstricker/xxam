@@ -24,7 +24,7 @@ class UserType extends AbstractType
                $roledefinitions[$value]=$value; 
             }
         }
-        //var_dump($roledefinitions);
+        //dump($roledefinitions);
         $builder
             ->add('username')
             ->add('email')

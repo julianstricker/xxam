@@ -60,7 +60,7 @@ class MailclientController extends Controller {
 
             $returndata[] =  $this->removeChildrenkeys($children);
         }
-        //var_dump($returndata);
+        //dump($returndata);
         //setLocale(LC_ALL,'de_DE.UTF8');
         $response = new Response(json_encode($returndata));
         $response->headers->set('Content-Type', 'text/html; charset=UTF-8');

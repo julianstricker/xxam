@@ -24,7 +24,7 @@ class GroupType extends AbstractType
                $roledefinitions[$value]=$value; 
             }
         }
-        //var_dump($roledefinitions);
+        //dump($roledefinitions);
         $builder
             ->add('name')
             ->add('roles' ,'choice' ,array('choices'=>$roledefinitions,'multiple'=>true,'expanded'=>true )) 

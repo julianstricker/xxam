@@ -21,7 +21,7 @@ class DefaultController extends DefaultBaseController
                 $menuitems=array_replace_recursive($menuitems,call_user_func($name.'::getMenu'));
             }
         }
-        //var_dump($menuitems);
+        //dump($menuitems);
         $menu=$this->getMenu($menuitems);
         $menu[]=Array('xtype'=>'tbfill','stateId'=>'xxam_menu_tbfill');
         $menu[]=Array(
@@ -49,8 +49,8 @@ class DefaultController extends DefaultBaseController
     public function uploadfileprogressAction(Request $request) {
         $progressid=$request->get('progressid','');
         //echo 'upload_progress_'.$progressid;
-        var_dump(session_name());
-        var_dump($_SESSION);
+        dump(session_name());
+        dump($_SESSION);
         $response = new Response(json_encode(Array('status'=>'OK','uploadstatus'=>$this->get('session')->get("upload_progress_".$progressid))));
         $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
         return $response; 

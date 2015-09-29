@@ -166,7 +166,7 @@ class MailclientController extends Controller {
 
             $returndata[] =  $this->removeChildrenkeys($children);
         }
-        //var_dump($returndata);
+        //dump($returndata);
         //setLocale(LC_ALL,'de_DE.UTF8');
         $response = new Response(json_encode($returndata));
         $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
@@ -219,7 +219,7 @@ class MailclientController extends Controller {
         foreach($mails as $m){
             $mailsbyid[$m->uid]=$m;
         }
-        //print_r($mailsbyid);
+        //dump($mailsbyid);
         foreach($pagingmails_ids as $id){
             $returndata[]=$mailsbyid[$id];
         } 
@@ -315,11 +315,11 @@ class MailclientController extends Controller {
 //                $fetchedHtml = str_replace($placeholder, $baseUri . basename($mail->attachments[$attachmentId]->filePath), $fetchedHtml);
 //        }
         /*foreach($mail->getAttachments() as $attachment) {
-            var_dump($attachment->filePath);
+            dump($attachment->filePath);
         }
-        var_dump($mail->getInternalLinksPlaceholders());
-        var_dump($fetchedHtml);*/
-        //var_dump(json_encode($returndata->textHtml));
+        dump($mail->getInternalLinksPlaceholders());
+        dump($fetchedHtml);*/
+        //dump(json_encode($returndata->textHtml));
         $response = new Response(json_encode($returndata,JSON_HEX_QUOT));
         $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
         return $response; 
@@ -925,7 +925,7 @@ class MailclientController extends Controller {
             }
         }
         
-        //print_r($params);
+        //dump($params);
         $mailaccounts=$user->getMailaccounts();
         foreach($mailaccounts as $ma){
             $params['mailaccounts'][]=$ma;
@@ -967,7 +967,7 @@ class MailclientController extends Controller {
                 ->setFrom(array($mailaccount->getAccountemail()=>$mailaccount->getName()));
         try {
             if ($request->get('fieldreplyto',false)) $message->setReplyto($this->cleanEmailaddress($request->get('fieldreplyto',false)));
-            //print_r($this->cleanEmailaddress($request->get('fieldto',false)));
+            //dump($this->cleanEmailaddress($request->get('fieldto',false)));
             if ($request->get('fieldto',false)) $message->setTo($this->cleanEmailaddress($request->get('fieldto',false)));
             if ($request->get('fieldbcc',false)) $message->setBcc($this->cleanEmailaddress($request->get('fieldbcc',false)));
             if ($request->get('fieldcc',false)) $message->setCc($this->cleanEmailaddress($request->get('fieldcc',false)));
@@ -1022,9 +1022,9 @@ class MailclientController extends Controller {
             return $this->throwJsonError($e->getMessage());
         } catch (\Exception $e) {
             // Catch default PHP exceptions
-            var_dump($e->getCode());
-            var_dump($e->getLine());
-            var_dump($e->getTraceAsString());
+            dump($e->getCode());
+            dump($e->getLine());
+            dump($e->getTraceAsString());
             
             return $this->throwJsonError($e->getMessage());
         }

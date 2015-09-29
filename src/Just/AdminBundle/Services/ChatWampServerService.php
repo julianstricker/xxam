@@ -46,8 +46,8 @@ class ChatWampServerService implements WampServerInterface
 
     public function onPublish(ConnectionInterface $conn, $topic, $event, array $exclude, array $eligible)
     {
-        print_r($topic->__toString());
-        print_r($event);
+        dump($topic->__toString());
+        dump($event);
         $topic->broadcast($event);
         
     }

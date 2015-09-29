@@ -139,10 +139,10 @@ class GroupRESTController extends VoryxController
 
                 return $entity->toGridObject();
             }
-            //var_dump($form->getData());
+            //dump($form->getData());
             return FOSView::create(array('errors' => $form->getErrors()), Codes::HTTP_INTERNAL_SERVER_ERROR);
         } catch (\Exception $e) {
-            var_dump($e->getMessage());
+            dump($e->getMessage());
             return FOSView::create($e->getMessage(), Codes::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

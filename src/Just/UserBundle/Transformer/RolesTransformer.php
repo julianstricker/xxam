@@ -11,7 +11,7 @@ class RolesTransformer implements DataTransformerInterface
     public function transform($tags)
     {
         return explode(',', $tags);
-        var_dump($tags);
+        dump($tags);
         return $tags;
         if(is_array($tags)){
             return $tags;
@@ -25,7 +25,7 @@ class RolesTransformer implements DataTransformerInterface
     public function reverseTransform($tags)
     {
         echo 'xxx';
-        var_dump($tags);
+        dump($tags);
         return explode(',', $tags);
     }
 

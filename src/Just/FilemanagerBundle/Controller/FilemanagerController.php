@@ -212,7 +212,7 @@ class FilemanagerController extends Controller {
             }
             $fs=$this->getFs($filesystem);
             $contents = $fs->listContents($path);
-            //var_dump($contents);
+            //dump($contents);
             foreach($contents as $content){
                 if ($content['type']=='dir'){
                     $returndata['children'][]=Array(
@@ -269,7 +269,7 @@ class FilemanagerController extends Controller {
             $contents = $fs->listContents($path);
             //$contents = $fs->listWith(['mimetype', 'size', 'timestamp'], $path, true);
 
-            //var_dump($contents);
+            //dump($contents);
             foreach($contents as $content){
                 
                 $returndata['children'][]=Array(
@@ -344,7 +344,7 @@ class FilemanagerController extends Controller {
                     }
                     //echo 'new';
 
-                //var_dump($thumbnaildata);
+                //dump($thumbnaildata);
                 }
             }
         }

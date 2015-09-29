@@ -29,7 +29,7 @@ class ChatWampServerService implements WampServerInterface
         $conn->Chat        = new \StdClass;
         $conn->Chat->rooms = array();
         $this->clients->attach($conn);
-        //print_r( $conn->WAMP);
+        //dump( $conn->WAMP);
         
         echo "New connection! ({$conn->resourceId}) - {$conn->WAMP->sessionId}\n";
     }
