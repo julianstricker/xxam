@@ -25,161 +25,8 @@ use League\Flysystem\RootViolationException;
 
 use Just\FilemanagerBundle\Helper\FlysystemPlugins\ThumbnailDropbox;
 
-class FilemanagerController extends Controller {
+class FilemanagerExtraController extends FilemanagerBaseController {
 
-    /**
-     * Filemanager Administration
-     *
-     * @Security("has_role('ROLE_FILEMANAGER_ADMIN')")
-     */
-    public function adminAction() {
-        $repository=$this->getDoctrine()->getManager()->getRepository('JustFilemanagerBundle:Filesystem');
-        return $this->render('JustFilemanagerBundle:Filemanager:admin.js.twig', array('modelfields'=>$repository->getModelFields(),'gridcolumns'=>$repository->getGridColumns()));
-    }
-    
-    /**
-     * Filemanager.
-     *
-     * @Security("has_role('ROLE_FILEMANAGER_LIST')")
-     */
-    public function indexAction() {
-        $fileextensionswiththumbnails=$this->container->getParameter('fileextensionswiththumbnails');
-        $fileextensiontomimetype=$this->container->getParameter('fileextensiontomimetype');
-        return $this->render('JustFilemanagerBundle:Filemanager:index.js.twig', array('fileextensiontomimetype'=>$fileextensiontomimetype,'fileextensionswiththumbnails'=>$fileextensionswiththumbnails));
-    }
-    
-    /**
-     * Show create form.
-     *
-     * @Security("has_role('ROLE_FILEMANAGER_CREATE')")
-     */
-    public function newAction() {
-        $repository=$this->getDoctrine()->getManager()->getRepository('JustFilemanagerBundle:Filesystem');
-        $entity=new Filesystem();
-        return $this->render('JustFilemanagerBundle:Filesystem:edit.js.twig', array('entity'=>$entity,'modelfields'=>$repository->getModelFields()));
-    }
-    
-    /**
-     * Show create form.
-     *
-     * @Security("has_role('ROLE_FILEMANAGER_EDIT')")
-     */
-    public function editAction($id) {
-        $em = $this->getDoctrine()->getManager();
-        $repository=$this->getDoctrine()->getManager()->getRepository('JustFilemanagerBundle:Filesystem');
-
-        $entity = $repository->find($id);
-
-        if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Filesystem entity.');
-        }
-        
-        return $this->render('JustFilemanagerBundle:Filemanager:edit.js.twig', array('entity'=>$entity,'modelfields'=>$repository->getModelFields()));
-    }
-    
-    private function removeChildrenkeys($children){
-        if (isset($children['children'])){
-            $children['children']=array_values($children['children']);
-            foreach($children['children'] as $key => $child){
-                $children['children'][$key] = $this->removeChildrenkeys($child);
-            }
-        }
-        return $children;
-    }
-    
-    private function getFilesystems(){
-        $securityContext = $this->get('security.context');
-        $user = $securityContext->getToken()->getUser();
-        
-        $filesystems=Array();
-        $fss=$user->getFilesystems();
-        if (count($fss)>0){
-            foreach($fss as $filesystem){
-                $filesystems[$filesystem->getId()]=$filesystem;
-            }
-        }
-        if (count($user->getGroups())>0){
-            foreach($user->getGroups() as $group){
-                $fss=$group->getFilesystems();
-                if (count($fss)>0){
-                    foreach($fss as $filesystem){
-                        $filesystems[$filesystem->getId()]=$filesystem;
-                    }
-                }
-            }
-        }
-        return $filesystems;
-    }
-    
-    private function createLocalAdapter($settings)
-    {
-        $adapter = new Local($settings['path'],$settings['locks']); //,constant('Local::'.$settings['links']));
-        return $adapter;
-    }
-    
-    private function createDropboxAdapter($settings)
-    {
-        $client = new DropboxClient($settings['access_token'],$settings['app_secret']); //,constant('Local::'.$settings['links']));
-        $adapter = new DropboxAdapter($client, $settings['prefix']);
-
-        return $adapter;
-    }
-    
-    private function createFtpAdapter($settings)
-    {
-        $adapter = new FtpAdapter($settings);
-        return $adapter;
-    }
-    
-    private function createSftpAdapter($settings)
-    {
-        $adapter = new SftpAdapter($settings);
-        return $adapter;
-    }
-    
-    private function getFs($filesystem){
-        $fs=false;
-        $settings=json_decode($filesystem->getSettings(),true);
-        switch ($filesystem->getAdapter()) {
-            case 'local':
-                $adapter=$this->createLocalAdapter($settings);
-                break;
-            case 'dropbox':
-                $adapter=$this->createDropboxAdapter($settings);
-                break;
-            case 'ftp':
-                $adapter=$this->createFtpAdapter($settings);
-                break;
-            case 'sftp':
-                $adapter=$this->createSftpAdapter($settings);
-                break;
-        }
-        if(!$adapter) return false;
-        if ($settings['cache']){
-            $memcached = new \Memcached;
-            $memcached->addServer('localhost', 11211);
-
-            $cadapter = new CachedAdapter(
-                $adapter,
-                new Cache($memcached, 'xxam_filemanager_'.$filesystem->getId(), 300)
-            );
-            $fs = new Filesystem($cadapter);
-        }else{
-            $fs = new Filesystem($adapter);
-        }
-        switch ($filesystem->getAdapter()) {
-            case 'local':
-                
-                break;
-            case 'dropbox':
-                $fs->addPlugin(new ThumbnailDropbox);
-                break;
-            
-        }
-        //$fs->addPlugin(new ListWith);
-        return $fs;
-    }
-    
     public function listfoldersAction(Request $request) {
         $securityContext = $this->get('security.context');
         $user = $securityContext->getToken()->getUser();
@@ -359,35 +206,6 @@ class FilemanagerController extends Controller {
         $response->headers->set('Content-Type', 'image/png; charset=UTF-8');
         $response->headers->set('Expires', gmdate('D, d M Y H:i:s', time() + $expires) . ' GMT');
         return $response;
-    }
-    
-    private function getIcon($path,$size){
-        $pathexpl=explode('.',$path);
-        $fileextension=strtolower($pathexpl[count($pathexpl)-1]);
-        $kernel = $this->get('kernel');
-        $fileextensiontomimetype=$this->container->getParameter('fileextensiontomimetype');
-        if(isset($fileextensiontomimetype[$fileextension])){
-            $iconpath = $kernel->locateResource('@JustAdminBundle/Resources/public/icons/'.(isset($this->thumbnailsizes[$size]) ? $this->thumbnailsizes[$size] : '64x64').'/mimetypes/'.$fileextensiontomimetype[$fileextension]);
-            return file_get_contents($iconpath);
-        }
-        $iconpath = $kernel->locateResource('@JustAdminBundle/Resources/public/icons/'.(isset($this->thumbnailsizes[$size]) ? $this->thumbnailsizes[$size] : '64x64').'/mimetypes/unknown.png');
-        return file_get_contents($iconpath);
-    }
-    
-    private function getImageFromCache($cachename,$timestamp) {
-        $cachefile = unserialize($this->memcached->get($cachename));
-        if ($cachefile) {
-            //ist bereits im cache:
-            $cachefile=explode('|',$cachefile,2);
-            
-            
-            if (!intval($cachefile[0]) || $timestamp>intval($cachefile[0])){
-                $this->memcached->delete($cachename);
-                return false;
-            }
-            return $cachefile;
-        }
-        return false;
     }
     
     public function deletefileAction(Request $request){
@@ -646,18 +464,5 @@ class FilemanagerController extends Controller {
         $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
         return $response;
     }
-    
-    private function throwJsonError($errormessage) {
-        $response = new Response(json_encode(Array('success'=>'false','error' => $errormessage)));
-        $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-        return $response;
-    }
-    
-    private $thumbnailsizes=Array(
-        "xxs"=>"32x32",
-        "xs"=>"32x32",
-        "s"=>"64x64",
-        "m"=>"128x128",
-    );
     
 }

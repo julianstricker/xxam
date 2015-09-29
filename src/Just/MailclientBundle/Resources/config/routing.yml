@@ -20,7 +20,7 @@ mailclient_getmailcontent:
     
 mailclient_movemails:
     path: /mailclient/movemails
-    defaults: { _controller: JustMailclientBundle:Mailclient:movemails }
+    defaults: { _controller: JustMailclientBundle:MailclientExtra:movemails }
     
 mailclient_show:
     path: /mailclient/show/{path}/{id}
@@ -28,31 +28,31 @@ mailclient_show:
     
 mailclient_trashmails:
     path: /mailclient/trashmails
-    defaults: { _controller: JustMailclientBundle:Mailclient:trashmails }
+    defaults: { _controller: JustMailclientBundle:MailclientExtra:trashmails }
  
 mailclient_junkmails:
     path: /mailclient/junkmails
-    defaults: { _controller: JustMailclientBundle:Mailclient:junkmails }
+    defaults: { _controller: JustMailclientBundle:MailclientExtra:junkmails }
 
 mailclient_markmailsasread:
     path: /mailclient/markmailsasread
-    defaults: { _controller: JustMailclientBundle:Mailclient:markmailsasread }
+    defaults: { _controller: JustMailclientBundle:MailclientExtra:markmailsasread }
 
 mailclient_markmailsasunread:
     path: /mailclient/markmailsasunread
-    defaults: { _controller: JustMailclientBundle:Mailclient:markmailsasunread }
+    defaults: { _controller: JustMailclientBundle:MailclientExtra:markmailsasunread }
 
 mailclient_markmailsasflagged:
     path: /mailclient/markmailsasflagged
-    defaults: { _controller: JustMailclientBundle:Mailclient:markmailsasflagged }
+    defaults: { _controller: JustMailclientBundle:MailclientExtra:markmailsasflagged }
     
 mailclient_markmailsasunflagged:
     path: /mailclient/markmailsasunflagged
-    defaults: { _controller: JustMailclientBundle:Mailclient:markmailsasunflagged }
+    defaults: { _controller: JustMailclientBundle:MailclientExtra:markmailsasunflagged }
     
 mailclient_getmailboxinfo:
     path: /mailclient/getmailboxinfo
-    defaults: { _controller: JustMailclientBundle:Mailclient:getmailboxinfo }
+    defaults: { _controller: JustMailclientBundle:MailclientExtra:getmailboxinfo }
     
 mailclient_write:
     path: /mailclient/write
@@ -60,11 +60,11 @@ mailclient_write:
     
 mailclient_uploadfile:
     path: /mailclient/uploadfile
-    defaults: { _controller: JustMailclientBundle:Mailclient:uploadfile }
+    defaults: { _controller: JustMailclientBundle:MailclientExtra:uploadfile }
     
 mailclient_sendmail:
     path: /mailclient/sendmail
-    defaults: { _controller: JustMailclientBundle:Mailclient:sendmail }
+    defaults: { _controller: JustMailclientBundle:MailclientExtra:sendmail }
     
 mailclient_settings:
     path: /mailclient/settings
