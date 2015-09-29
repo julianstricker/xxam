@@ -1,5 +1,6 @@
 {
     "name": "root/xxam",
+    "description": "Xxam",
     "license": "proprietary",
     "type": "project",
     "autoload": {
@@ -22,7 +23,19 @@
         "sensio/framework-extra-bundle": "~3.0,>=3.0.2",
         "incenteev/composer-parameter-handler": "~2.0",
         "friendsofsymfony/user-bundle": "~2.0@dev",
-        "friendsofsymfony/rest-bundle": "~1.5"
+        "just/thumbnailbundle": "~2.0",
+        "stof/doctrine-extensions-bundle": "~1.1@dev",
+        "voryx/restgeneratorbundle": "dev-master",
+        "league/flysystem-dropbox": "@stable",
+        "league/flysystem-sftp": "@stable",
+        "league/flysystem-webdav": "@stable",
+        "league/flysystem-ziparchive": "@stable",
+        "league/flysystem-cached-adapter": "@stable",
+        "league/flysystem-eventable-filesystem": "@stable",
+        "league/flysystem": "^1.0",
+        "voryx/thruway": "^0.3.9"
+
+
     },
     "require-dev": {
         "sensio/generator-bundle": "~2.3"
