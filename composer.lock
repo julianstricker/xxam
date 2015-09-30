@@ -923,7 +923,7 @@
                     "homepage": "http://wiedler.ch/igor/"
                 }
             ],
-            "description": "Événement is a very simple event dispatching library for PHP",
+            "description": "ï¿½vï¿½nement is a very simple event dispatching library for PHP",
             "keywords": [
                 "event-dispatcher",
                 "event-emitter"
@@ -2422,7 +2422,7 @@
                     "role": "Developer"
                 },
                 {
-                    "name": "Hans-Jürgen Petrich",
+                    "name": "Hans-Jï¿½rgen Petrich",
                     "email": "petrich@tronic-media.com",
                     "role": "Developer"
                 }
