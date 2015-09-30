@@ -30,7 +30,7 @@ class ImapMailbox {
         $this->serverEncoding = strtoupper($serverEncoding);
         if ($attachmentsDir) {
             if (!is_dir($attachmentsDir)) {
-                throw new Exception('Directory "' . $attachmentsDir . '" not found');
+                throw new \Exception('Directory "' . $attachmentsDir . '" not found');
             }
             $this->attachmentsDir = rtrim(realpath($attachmentsDir), '\\/');
         }
@@ -70,7 +70,7 @@ class ImapMailbox {
     protected function initImapStream() {
         $imapStream = @imap_open($this->imapPath, $this->imapLogin, $this->imapPassword, $this->imapOptions, $this->imapRetriesNum, $this->imapParams);
         if (!$imapStream) {
-            throw new Exception('Connection error: ' . imap_last_error());
+            throw new \Exception('Connection error: ' . imap_last_error());
         }
         return $imapStream;
     }
