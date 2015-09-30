@@ -10,10 +10,10 @@ use Just\AdminBundle\Entity\Widget;
 
 class DefaultController extends DefaultBaseController
 {
-    public function indexAction()
+    public function indexAction(Request $request)
     {
-        $securityContext = $this->get('security.context');
-        $user = $securityContext->getToken()->getUser();
+
+        $user = $this->get('security.token_storage')->getToken()->getUser();
         //generate menu:
         $menuitems=Array();
         foreach ($this->container->getParameter('kernel.bundles') as $name ) {
@@ -21,7 +21,7 @@ class DefaultController extends DefaultBaseController
                 $menuitems=array_replace_recursive($menuitems,call_user_func($name.'::getMenu'));
             }
         }
-        //dump($menuitems);
+        //var_dump($menuitems);
         $menu=$this->getMenu($menuitems);
         $menu[]=Array('xtype'=>'tbfill','stateId'=>'xxam_menu_tbfill');
         $menu[]=Array(
@@ -30,41 +30,55 @@ class DefaultController extends DefaultBaseController
             'menu'=>Array(
                 Array(
                     'text'=>       'Logout',
-                    'iconCls'=>    'defaultmenuicon',         
+                    'iconCls'=>    'defaultmenuicon',
                     'href'=>       $this->generateUrl('fos_user_security_logout')
                 )
-             )
-         );
-        return $this->render('JustAdminBundle:Default:index.html.twig', array('menu' => $menu));
+            )
+        );
+
+        //generate user token for chat:
+        $key =$this->container->getParameter('secret');
+        $userdata = array(
+            "tenant_id" => $user->getTenantId(),
+            "user_id" => $user->getId(),
+            "username" => $user->getUsername(),
+            //"authid" => $user->getTenantId().'|'.$user->getId().'|'.$user->getUsername()
+        );
+        $token=hash('sha256',rand(0,99999999999).$key);
+        $memcached=new \Memcached();
+        $memcached->addServer('localhost', 11211);
+        $memcached->add('chatid_'.$token,$userdata);
+
+        return $this->render('JustAdminBundle:Default:index.html.twig', array('menu' => $menu,'token'=>$token,'tenant_id'=>$request->getSession()->get('tenant_id') ));
     }
-    
+
     public function portalAction() {
-        $securityContext = $this->get('security.context');
-        $user = $securityContext->getToken()->getUser();
+
+        $user = $this->get('security.token_storage')->getToken()->getUser();
         $widgets=$user->getWidgets();
         return $this->render('JustAdminBundle:Default:portal.js.twig', array('widgets'=>$widgets));
     }
-    
-    
+
+
     public function uploadfileprogressAction(Request $request) {
         $progressid=$request->get('progressid','');
         //echo 'upload_progress_'.$progressid;
-        dump(session_name());
-        dump($_SESSION);
+        var_dump(session_name());
+        var_dump($_SESSION);
         $response = new Response(json_encode(Array('status'=>'OK','uploadstatus'=>$this->get('session')->get("upload_progress_".$progressid))));
         $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-        return $response; 
+        return $response;
     }
-    
+
     public function addwidgetAction() {
-        $securityContext = $this->get('security.context');
-        $user = $securityContext->getToken()->getUser();
+
+        $user = $this->get('security.token_storage')->getToken()->getUser();
         return $this->render('JustAdminBundle:Default:addwidget.js.twig', array());
     }
-    
+
     public function doaddwidgetAction(Request $request) {
-        $securityContext = $this->get('security.context');
-        $user = $securityContext->getToken()->getUser();
+
+        $user = $this->get('security.token_storage')->getToken()->getUser();
         $widget=new Widget();
         $widget->setUser($user);
         $widget->setService($request->get('service'));
@@ -80,26 +94,26 @@ class DefaultController extends DefaultBaseController
         $em->persist($widget);
         $em->flush();
         $widgetdata=Array('id'=>$widget->getId(), 'title'=>$widget->getTitle(), 'col'=>$widget->getCol(), 'sortfield'=>$widget->getSortfield(), 'params'=>$widget->getParams());
-        
+
         $response = new Response(json_encode(Array('success'=>true,'widget'=>$widgetdata)));
         $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-        return $response; 
+        return $response;
     }
-    
+
     /**
      * Loads the Widget Component.
      */
     public function removewidgetAction($id) {
-        $securityContext = $this->get('security.context');
-        $user = $securityContext->getToken()->getUser();
+
+        $user = $this->get('security.token_storage')->getToken()->getUser();
         $widget=$this->getDoctrine()->getManager()->getRepository('JustAdminBundle:Widget')->findOneBy(Array('id'=>$id,'user_id'=>$user->getId()));
         $this->getDoctrine()->getManager()->remove($widget);
         $this->getDoctrine()->getManager()->flush();
         $response = new Response(json_encode(Array('success'=>true)));
         $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-        return $response; 
+        return $response;
     }
-    
+
     /**
      * Loads the Widget Component.
      */
@@ -109,7 +123,7 @@ class DefaultController extends DefaultBaseController
         $template=$this->get($widget->getService())->getWidgetTemplate();
         return $this->render($template, array('params' => json_decode($widget->getParams()),'id'=>$widget->getId()));
     }
-    
+
     /*
      * Get list of all available Widgets:
      */
@@ -123,27 +137,27 @@ class DefaultController extends DefaultBaseController
         }
         $response = new Response(json_encode(Array('widgets'=>$returnvalue)));
         $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-        return $response; 
+        return $response;
     }
-    
-    
-    
+
+
+
     /*
      * save/load/delete Ext-Js Stateful-Settings 
      */
     public function statefulserviceAction(Request $request){
-        $securityContext = $this->get('security.context');
-        $user = $securityContext->getToken()->getUser();
+
+        $user = $this->get('security.token_storage')->getToken()->getUser();
         $em = $this->getDoctrine()->getManager();
         if($request->getMethod()=='GET'){
             $states=$user->getExtjsstates();
             $resp=Array();
             foreach($states as $state){
-              $resp[$state->getStatekey()]=$state->getStatevalue();
+                $resp[$state->getStatekey()]=$state->getStatevalue();
             }
             $response = new Response(json_encode($resp));
             $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-            return $response; 
+            return $response;
         }else if($request->getMethod()=='POST'){
             $state=$widget=$this->getDoctrine()->getManager()->getRepository('JustAdminBundle:Extjsstate')->findOneBy(Array('user_id'=>$user->getId(),'statekey'=>$request->get('key')));
             if(!$state){
@@ -155,10 +169,10 @@ class DefaultController extends DefaultBaseController
             $em->persist($state);
             $em->flush();
             $resp=Array('success'=>'true');
-            
+
             $response = new Response(json_encode($resp));
             $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-            return $response; 
+            return $response;
         }else if($request->getMethod()=='DELETE'){
             $filter=Array('user_id'=>$user->getId());
             if ($request->get('key',false)!=false) $filter['statekey']=$request->get('key');
@@ -170,11 +184,11 @@ class DefaultController extends DefaultBaseController
             }
             $em->flush();
             $resp=Array('success'=>'true');
-            
+
             $response = new Response(json_encode($resp));
             $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-            return $response; 
+            return $response;
         }
-        
+
     }
 }
