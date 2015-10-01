@@ -34,6 +34,7 @@ framework:
         name: xxamid
         cookie_lifetime:    0
         gc_probability:     0
+        save_path: "%kernel.root_dir%/sessions"
         
     fragments:       ~
     http_method_override: true

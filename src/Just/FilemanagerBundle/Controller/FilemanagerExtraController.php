@@ -285,7 +285,7 @@ class FilemanagerExtraController extends FilemanagerBaseController {
                         return $this->throwJsonError($e->getMessage());
                     } catch (RootViolationException $e) {
                         return $this->throwJsonError($e->getMessage());
-                    } catch (Exception $e) {
+                    } catch (\Exception $e) {
                         return $this->throwJsonError($e->getMessage());
                     }
                 }else{
@@ -309,7 +309,7 @@ class FilemanagerExtraController extends FilemanagerBaseController {
                         return $this->throwJsonError($e->getMessage());
                     } catch (RootViolationException $e) {
                         return $this->throwJsonError($e->getMessage());
-                    } catch (Exception $e) {
+                    } catch (\Exception $e) {
                         return $this->throwJsonError($e->getMessage());
                     }
                 }
@@ -362,7 +362,7 @@ class FilemanagerExtraController extends FilemanagerBaseController {
                         return $this->throwJsonError($e->getMessage());
                     } catch (RootViolationException $e) {
                         return $this->throwJsonError($e->getMessage());
-                    } catch (Exception $e) {
+                    } catch (\Exception $e) {
                         return $this->throwJsonError($e->getMessage());
                     }
                 }else{
