@@ -33,10 +33,8 @@ class MailclientExtraController extends MailclientBaseController {
         $mailbox = $this->getImapMailbox($mailaccount,$path);
         //$mailboxinfo=$mailbox->getMailboxInfo();
         $mailboxinfo=$mailbox->statusMailbox(); //=schneller als getMailboxInfo() aber ohne size;
-        
-        $response = new Response(json_encode(Array('mailboxinfo'=>$mailboxinfo)));
-        $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-        return $response; 
+
+        return $this->getJsonResponse(Array('mailboxinfo'=>$mailboxinfo));
     }
     
     public function movemailsAction(Request $request){
@@ -77,11 +75,7 @@ class MailclientExtraController extends MailclientBaseController {
             }
             
         }
-        
-        
-        $response = new Response(json_encode(Array('status'=>'OK','ids'=>$movedids,'from'=>$request->get('from',''),'to'=>$request->get('to',''))));
-        $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-        return $response; 
+        return $this->getJsonResponse(Array('status'=>'OK','ids'=>$movedids,'from'=>$request->get('from',''),'to'=>$request->get('to','')));
     }
     
     /**
@@ -129,11 +123,7 @@ class MailclientExtraController extends MailclientBaseController {
             }
             
         }
-        
-        
-        $response = new Response(json_encode(Array('status'=>'OK','ids'=>$movedids,'from'=>$request->get('from',''))));
-        $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-        return $response; 
+        return $this->getJsonResponse(Array('status'=>'OK','ids'=>$movedids,'from'=>$request->get('from','')));
     }
     
     /**
@@ -181,12 +171,10 @@ class MailclientExtraController extends MailclientBaseController {
             }
             
         }
-        
-        
-        $response = new Response(json_encode(Array('status'=>'OK','ids'=>$movedids,'from'=>$request->get('from',''))));
-        $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-        return $response; 
+        return $this->getJsonResponse(Array('status'=>'OK','ids'=>$movedids,'from'=>$request->get('from','')));
     }
+
+
     
     /**
      * Mailclient
@@ -196,44 +184,16 @@ class MailclientExtraController extends MailclientBaseController {
      */
     public function markmailsasreadAction(Request $request){
         $from=$request->get('from','');
-        $ids=$request->get('ids','');
-        
-        if ($from){
-            $pathexpl=explode('.',$from);
-            $mailaccountid=$pathexpl[0];
-            unset($pathexpl[0]);
-            $from=count($pathexpl)>0 ? '.'.implode('.',$pathexpl) : '';
-        }
-       
-        
-        $mailaccount=$this->getUserMailaccountForId($mailaccountid);
-        if (!$mailaccount){
-           return $this->throwJsonError('Mailaccount not found');
-        }
-        
-        $returndata=Array();
-        $totalcount=0;
-        
-        //$frommailbox = new ImapMailbox($mailaccount->getConnectionstring().($from!='' ? $from : ''), $mailaccount->getUsername(), $mailaccount->getPassword(), $this->attachments_dir, 'UTF-8');
-        $frommailbox = $this->getImapMailbox($mailaccount,$from);
-        //$tomailbox = new ImapMailbox($mailaccount->getConnectionstring().($to!='' ? $to : ''), $mailaccount->getUsername(), $mailaccount->getPassword(), $this->attachments_dir, 'UTF-8');
-        
-        
-        $idsarr=explode(',',$ids);
-        $mailsbyid=Array();
+        $idsarr=explode(',',$request->get('ids',''));
+        $frommailbox=$this->getImapMailboxForPath($from);
+        if(!$frommailbox) $this->throwJsonError('Mailaccount not found');
         $movedids=Array();
         foreach($idsarr as $id){
-            //echo "\nid: ".$id.' to: '.substr($mailaccount->getConnectionstring(),strpos($mailaccount->getConnectionstring(),'}')+1).$to.' ';
             if ($frommailbox->markMailAsRead($id)){
                 $movedids[]=$id;
             }
-            
         }
-        
-        
-        $response = new Response(json_encode(Array('status'=>'OK','ids'=>$movedids,'from'=>$request->get('from',''))));
-        $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-        return $response; 
+        return $this->getJsonResponse(Array('status'=>'OK','ids'=>$movedids,'from'=>$request->get('from','')));
     }
     
     /**
@@ -244,44 +204,19 @@ class MailclientExtraController extends MailclientBaseController {
      */
     public function markmailsasunreadAction(Request $request){
         $from=$request->get('from','');
-        $ids=$request->get('ids','');
+        $idsarr=explode(',',$request->get('ids',''));
+
+        $frommailbox=$this->getImapMailboxForPath($from);
+        if(!$frommailbox) $this->throwJsonError('Mailaccount not found');
         
-        if ($from){
-            $pathexpl=explode('.',$from);
-            $mailaccountid=$pathexpl[0];
-            unset($pathexpl[0]);
-            $from=count($pathexpl)>0 ? '.'.implode('.',$pathexpl) : '';
-        }
-       
-        
-        $mailaccount=$this->getUserMailaccountForId($mailaccountid);
-        if (!$mailaccount){
-           return $this->throwJsonError('Mailaccount not found');
-        }
-        
-        $returndata=Array();
-        $totalcount=0;
-        
-        //$frommailbox = new ImapMailbox($mailaccount->getConnectionstring().($from!='' ? $from : ''), $mailaccount->getUsername(), $mailaccount->getPassword(), $this->attachments_dir, 'UTF-8');
-        $frommailbox = $this->getImapMailbox($mailaccount,$from);
-        //$tomailbox = new ImapMailbox($mailaccount->getConnectionstring().($to!='' ? $to : ''), $mailaccount->getUsername(), $mailaccount->getPassword(), $this->attachments_dir, 'UTF-8');
-        
-        
-        $idsarr=explode(',',$ids);
-        $mailsbyid=Array();
+
         $movedids=Array();
         foreach($idsarr as $id){
-            //echo "\nid: ".$id.' to: '.substr($mailaccount->getConnectionstring(),strpos($mailaccount->getConnectionstring(),'}')+1).$to.' ';
             if ($frommailbox->markMailAsUnread($id)){
                 $movedids[]=$id;
             }
-            
         }
-        
-        
-        $response = new Response(json_encode(Array('status'=>'OK','ids'=>$movedids,'from'=>$request->get('from',''))));
-        $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-        return $response; 
+        return $this->getJsonResponse(Array('status'=>'OK','ids'=>$movedids,'from'=>$request->get('from','')));
     }
     
     /**
@@ -292,42 +227,15 @@ class MailclientExtraController extends MailclientBaseController {
      */
     public function markmailsasflaggedAction(Request $request){
         $from=$request->get('from','');
-        $ids=$request->get('ids','');
-        
-        if ($from){
-            $pathexpl=explode('.',$from);
-            $mailaccountid=$pathexpl[0];
-            unset($pathexpl[0]);
-            $from=count($pathexpl)>0 ? '.'.implode('.',$pathexpl) : '';
-        }
-       
-        
-        $mailaccount=$this->getUserMailaccountForId($mailaccountid);
-        if (!$mailaccount){
-           return $this->throwJsonError('Mailaccount not found');
-        }
-        
-        $returndata=Array();
-        $totalcount=0;
-        
-        //$frommailbox = new ImapMailbox($mailaccount->getConnectionstring().($from!='' ? $from : ''), $mailaccount->getUsername(), $mailaccount->getPassword(), $this->attachments_dir, 'UTF-8');
-        $frommailbox = $this->getImapMailbox($mailaccount,$from);
-        //$tomailbox = new ImapMailbox($mailaccount->getConnectionstring().($to!='' ? $to : ''), $mailaccount->getUsername(), $mailaccount->getPassword(), $this->attachments_dir, 'UTF-8');
-        
-        
-        $idsarr=explode(',',$ids);
+        $idsarr=explode(',',$request->get('ids',''));
+        $frommailbox=$this->getImapMailboxForPath($from);
+        if(!$frommailbox) $this->throwJsonError('Mailaccount not found');
         $mailsbyid=Array();
         $movedids=Array();
         if ($frommailbox->setFlag($idsarr, '\\Flagged')){
             $movedids=$idsarr;
         }
-            
-        
-        
-        
-        $response = new Response(json_encode(Array('status'=>'OK','ids'=>$movedids,'from'=>$request->get('from',''))));
-        $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-        return $response; 
+        return $this->getJsonResponse(Array('status'=>'OK','ids'=>$movedids,'from'=>$request->get('from','')));
     }
     
     /**
@@ -338,41 +246,14 @@ class MailclientExtraController extends MailclientBaseController {
      */
     public function markmailsasunflaggedAction(Request $request){
         $from=$request->get('from','');
-        $ids=$request->get('ids','');
-        
-        if ($from){
-            $pathexpl=explode('.',$from);
-            $mailaccountid=$pathexpl[0];
-            unset($pathexpl[0]);
-            $from=count($pathexpl)>0 ? '.'.implode('.',$pathexpl) : '';
-        }
-       
-        
-        $mailaccount=$this->getUserMailaccountForId($mailaccountid);
-        if (!$mailaccount){
-           return $this->throwJsonError('Mailaccount not found');
-        }
-        
-        $returndata=Array();
-        $totalcount=0;
-        
-        //$frommailbox = new ImapMailbox($mailaccount->getConnectionstring().($from!='' ? $from : ''), $mailaccount->getUsername(), $mailaccount->getPassword(), $this->attachments_dir, 'UTF-8');
-        $frommailbox = $this->getImapMailbox($mailaccount,$from);
-        //$tomailbox = new ImapMailbox($mailaccount->getConnectionstring().($to!='' ? $to : ''), $mailaccount->getUsername(), $mailaccount->getPassword(), $this->attachments_dir, 'UTF-8');
-        
-        
-        $idsarr=explode(',',$ids);
-        $mailsbyid=Array();
+        $idsarr=explode(',',$request->get('ids',''));
+        $frommailbox=$this->getImapMailboxForPath($from);
+        if(!$frommailbox) $this->throwJsonError('Mailaccount not found');
         $movedids=Array();
-        
         if ($frommailbox->clearFlag($idsarr, '\\Flagged')){
             $movedids=$idsarr;
         }
-        
-        
-        $response = new Response(json_encode(Array('status'=>'OK','ids'=>$movedids,'from'=>$request->get('from',''))));
-        $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-        return $response; 
+        return $this->getJsonResponse(Array('status'=>'OK','ids'=>$movedids,'from'=>$request->get('from','')));
     }
     
     /**
@@ -482,17 +363,12 @@ class MailclientExtraController extends MailclientBaseController {
         $mailbox = $this->getImapMailbox($mailaccount,$mailaccount->getSentfolder());
         $resp=$mailbox->addMail($msg,true);
         //$iares=imap_append($mailbox->getImapStream(),$folder,$msg."\r\n","\\Seen"); 
-        $llogger = $this->get('logger');
-        $llogger->info($msg);
-        $llogger->info('RESPONSE : '.intval($iares));
-        $llogger->info(imap_last_error());
-        
-        $response = new Response(json_encode(Array('status'=>'OK')));
-        $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-        return $response; 
-        
-        
-        //return $this->render('JustMailclientBundle:Mailclient:write.js.twig', array('id'=>$id,'path'=>$path,'mailaccounts'=>$mas));
+//        $llogger = $this->get('logger');
+//        $llogger->info($msg);
+//        $llogger->info('RESPONSE : '.intval($iares));
+//        $llogger->info(imap_last_error());
+
+        return $this->getJsonResponse(Array('status'=>'OK'));
     }
     
     /**
@@ -527,9 +403,7 @@ class MailclientExtraController extends MailclientBaseController {
             $this->get('kernel')->getCacheDir() . '/mailclient_fileuploads/'.$user->getId().'/'.$newfilename,
             $file
         );
-        $response = new Response(json_encode(Array('status'=>'OK','filename'=>$filename,'hash'=>$newfilename)));
-        $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-        return $response; 
+        return $this->getJsonResponse(Array('status'=>'OK','filename'=>$filename,'hash'=>$newfilename));
     }
     
 }

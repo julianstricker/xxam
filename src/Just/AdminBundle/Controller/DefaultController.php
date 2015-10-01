@@ -117,7 +117,7 @@ class DefaultController extends DefaultBaseController
     public function getwidgetAction($id) {
         $widget=$this->getDoctrine()->getManager()->getRepository('JustAdminBundle:Widget')->find($id);
         //$this->forward($widget->getService().':indexAction', array('params' => $widget->getParams()));
-        $template=$this->get($widget->getService())->getWidgetTemplate();
+        $template=$this->get($widget->getService())->getWidgetTemplateAction();
         return $this->render($template, array('params' => json_decode($widget->getParams()),'id'=>$widget->getId()));
     }
 
@@ -128,7 +128,7 @@ class DefaultController extends DefaultBaseController
         $returnvalue=Array();
         $registeredwidgets=$this->getRegisteredWidgets();
         foreach($registeredwidgets as $registeredwidget){
-            $definition=$this->get($registeredwidget)->getDefinition();
+            $definition=$this->get($registeredwidget)->getDefinitionAction();
             $definition['service']=$registeredwidget;
             $returnvalue[]=$definition;
         }

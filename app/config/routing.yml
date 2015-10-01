@@ -41,7 +41,7 @@ fos_user_group:
     
 #JS\ThumbnailBundle\Controller
 just_thumbnail:
-    pattern:  /thumbnails/{mode}/{maxx}x{maxy}/{img}
+    path:  /thumbnails/{mode}/{maxx}x{maxy}/{img}
     defaults: { _controller: JustThumbnailBundle:Thumbnail:thumbnail }
     requirements:
         #mode: ~
@@ -50,7 +50,7 @@ just_thumbnail:
         img: ".+"
 
 just_thumbnail_x:
-    pattern:  /thumbnails/{mode}/{maxx}x/{img}
+    path:  /thumbnails/{mode}/{maxx}x/{img}
     defaults: { _controller: JustThumbnailBundle:Thumbnail:thumbnail }
     requirements:
         #mode: ~
@@ -58,7 +58,7 @@ just_thumbnail_x:
         img: ".+"
 
 just_thumbnail_y:
-    pattern:  /thumbnails/{mode}/x{maxy}/{img}
+    path:  /thumbnails/{mode}/x{maxy}/{img}
     defaults: { _controller: JustThumbnailBundle:Thumbnail:thumbnail }
     requirements:
         #mode: ~

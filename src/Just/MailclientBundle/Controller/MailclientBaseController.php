@@ -29,6 +29,27 @@ class MailclientBaseController extends Controller {
         return $mailaccount;
     }
 
+    protected function getImapMailboxForPath($path){
+        if ($path){
+            $pathexpl=explode('.',$path);
+            $mailaccountid=$pathexpl[0];
+            unset($pathexpl[0]);
+            $from=count($pathexpl)>0 ? '.'.implode('.',$pathexpl) : '';
+        }
+        $mailaccount=$this->getUserMailaccountForId($mailaccountid);
+        if (!$mailaccount){
+            return false; //$this->throwJsonError('Mailaccount not found');
+        }
+        return $this->getImapMailbox($mailaccount,$from);
+    }
+
+    protected function getJsonResponse($data)
+    {
+        $response = new Response(json_encode($data));
+        $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
+        return $response;
+    }
+
     protected function removeChildrenkeys($children){
         if (isset($children['children'])){
             $children['children']=array_values($children['children']);

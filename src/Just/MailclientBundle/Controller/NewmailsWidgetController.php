@@ -26,15 +26,15 @@ class NewmailsWidgetController extends Controller
         );
         
     }*/
-    
+
     //this function is required for every portalwidget:
-    public function getWidgetTemplate(){
+    public function getWidgetTemplateAction(){
         return 'JustMailclientBundle:NewmailsWidget:index.js.twig';
     }
-    
-    
+
+
     //this function is required for every portalwidget:
-    public function getDefinition()
+    public function getDefinitionAction()
     {
         
         $user = $this->securityContext->getToken()->getUser();
