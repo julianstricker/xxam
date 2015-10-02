@@ -3,7 +3,7 @@
 namespace Just\ContactBundle\Controller;
 
 use Just\ContactBundle\Entity\Contact;
-use Just\ContactBundle\Form\ContactType;
+use Just\ContactBundle\Form\Type\ContactType;
 
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RouteResource;

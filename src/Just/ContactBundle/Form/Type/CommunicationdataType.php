@@ -1,12 +1,12 @@
 <?php
 
-namespace Just\AdminBundle\Form;
+namespace Just\ContactBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class ContactType extends AbstractType
+class CommunicationdataType extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
@@ -16,21 +16,11 @@ class ContactType extends AbstractType
     {
         $builder
             ->add('contact_id')
-            ->add('contacttype_id')
-            ->add('organizationname')
-            ->add('surname')
-            ->add('firstname')
-            ->add('nameprefix')
-            ->add('middlename')
-            ->add('namesuffix')
-            ->add('nickname')
-            ->add('vat')
-            ->add('tax')
-            ->add('birthdate')
-            ->add('photo')
-            ->add('organizationfunction')
+            ->add('communicationdatatype_id')
+            ->add('value')
             ->add('created')
             ->add('updated')
+            ->add('contact')
         ;
     }
     
@@ -40,7 +30,7 @@ class ContactType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Just\AdminBundle\Entity\Contact'
+            'data_class' => 'Just\ContactBundle\Entity\Communicationdata'
         ));
     }
 
@@ -49,6 +39,6 @@ class ContactType extends AbstractType
      */
     public function getName()
     {
-        return 'just_adminbundle_contact';
+        return 'just_contactbundle_communicationdata';
     }
 }
