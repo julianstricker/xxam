@@ -79,13 +79,13 @@ class GroupController extends Controller
         $entity=new Group('',$this->getRoles());
         return $this->render('JustUserBundle:Group:edit.js.twig', array('entity'=>$entity,'roles'=>$this->getRoles(),'modelfields'=>$repository->getModelFields()));
     }
-    
     /**
      * Show create form.
      *
      * @Route("/edit/{id}", name="group_edit")
      * @Method("GET")
      * @Template()
+     * @Security("has_role('ROLE_GROUP_EDIT')")
      */
     public function editAction($id) {
         $em = $this->getDoctrine()->getManager();

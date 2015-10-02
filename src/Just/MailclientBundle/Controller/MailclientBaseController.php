@@ -17,8 +17,7 @@ class MailclientBaseController extends Controller {
     protected $imageplaceholder='/bundles/justmailclient/images/blocked.gif';
     
     protected function getUserMailaccountForId($mailaccountid){
-        $securityContext = $this->get('security.context');
-        $user = $securityContext->getToken()->getUser();
+        $user = $this->get('security.token_storage')->getToken()->getUser();
         $mailaccount=false;
         foreach($user->getMailaccounts() as $ma){
             if($ma->getId()==$mailaccountid){

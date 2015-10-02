@@ -54,8 +54,7 @@ class MailclientController extends MailclientBaseController {
      *
      */
     public function listfoldersAction() {
-        $securityContext = $this->get('security.context');
-        $user = $securityContext->getToken()->getUser();
+        $user = $this->get('security.token_storage')->getToken()->getUser();
         $mailaccounts=$user->getMailaccounts();
         $returndata=Array();
         foreach($mailaccounts as $mailaccount){
@@ -277,8 +276,7 @@ class MailclientController extends MailclientBaseController {
         $path=$request->get('path','');
         $mailid=$request->get('mailid','');
         $type=$request->get('type','');
-        $securityContext = $this->get('security.context');
-        $user = $securityContext->getToken()->getUser();
+        $user = $this->get('security.token_storage')->getToken()->getUser();
         $params=array(
             'type'=>$type,
             'mailid'=>$mailid,
@@ -363,8 +361,7 @@ class MailclientController extends MailclientBaseController {
      *
      */
     public function settingsAction(Request $request) {
-        $securityContext = $this->get('security.context');
-        $user = $securityContext->getToken()->getUser();
+        $user = $this->get('security.token_storage')->getToken()->getUser();
         $mailaccounts=$user->getMailaccounts();
         $mas=Array();
         foreach($mailaccounts as $mailaccount){

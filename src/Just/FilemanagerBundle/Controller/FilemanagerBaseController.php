@@ -3,10 +3,8 @@
 namespace Just\FilemanagerBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
+use Just\FilemanagerBundle\Entity\Filesystem as FilesystemEntity;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Dropbox\DropboxAdapter;
@@ -15,13 +13,7 @@ use League\Flysystem\Adapter\Ftp as FtpAdapter;
 use League\Flysystem\Sftp\SftpAdapter;
 use League\Flysystem\Cached\CachedAdapter;
 use League\Flysystem\Cached\Storage\Memcached as Cache;
-use League\Flysystem\Plugin\ListWith;
-use League\Flysystem\Plugin\ListPaths;
-use League\Flysystem\MountManager;
-use League\Flysystem\FileExistsException;
-use League\Flysystem\FileNotFoundException;
-use League\Flysystem\NotSupportedException;
-use League\Flysystem\RootViolationException;
+
 
 use Just\FilemanagerBundle\Helper\FlysystemPlugins\ThumbnailDropbox;
 
@@ -33,6 +25,8 @@ class FilemanagerBaseController extends Controller {
         "s"=>"64x64",
         "m"=>"128x128",
     );
+
+    protected $memcached;
     
     protected function removeChildrenkeys($children){
         if (isset($children['children'])){
@@ -45,9 +39,7 @@ class FilemanagerBaseController extends Controller {
     }
     
     protected function getFilesystems(){
-        $securityContext = $this->get('security.context');
-        $user = $securityContext->getToken()->getUser();
-        
+        $user = $this->get('security.token_storage')->getToken()->getUser();
         $filesystems=Array();
         $fss=$user->getFilesystems();
         if (count($fss)>0){
@@ -66,6 +58,43 @@ class FilemanagerBaseController extends Controller {
             }
         }
         return $filesystems;
+    }
+
+    protected function getFilesystemForPath($path)
+    {
+        $filesystemid=$this->extractFilesystemIdFromPath($path);
+        $filesystems = $this->getFilesystems();
+        if (count($filesystems) == 0) {
+            return false;
+        }
+        $filesystem = isset($filesystems[$filesystemid]) ? $filesystems[$filesystemid] : false;
+        return $filesystem;
+    }
+
+    /*
+    * Extract Filesystem-Id from parameter "path"
+    */
+    protected function extractFilesystemIdFromPath($path)
+    {
+        if ($path != '') {
+            $pathexpl = explode('/', $path);
+            $filesystemid = $pathexpl[0];
+            return $filesystemid;
+        }
+        return false;
+    }
+
+    /*
+     * Extract Path part from parameter "path"
+     */
+    protected function extractPathFromPath($path)
+    {
+        if ($path != '') {
+            $pathexpl = explode('/', $path);
+            unset($pathexpl[0]);
+            $path = count($pathexpl) > 0 ? '/' . implode('/', $pathexpl) : '';
+        }
+        return $path;
     }
     
     protected function createLocalAdapter($settings)
@@ -94,9 +123,9 @@ class FilemanagerBaseController extends Controller {
         return $adapter;
     }
     
-    protected function getFs($filesystem){
-        $fs=false;
+    protected function getFs( $filesystem){
         $settings=json_decode($filesystem->getSettings(),true);
+        $adapter=false;
         switch ($filesystem->getAdapter()) {
             case 'local':
                 $adapter=$this->createLocalAdapter($settings);
@@ -165,7 +194,110 @@ class FilemanagerBaseController extends Controller {
         }
         return false;
     }
-    
+
+    /*
+     * Get List of Filesystem for root directory listing
+     */
+    protected function getFilesystemsFolders($filesystems){
+        $children = Array();
+        foreach ($filesystems as $filesystem) {
+            $children[] = Array(
+                'id' => (string)$filesystem->getId(),
+                'basename' => (string)$filesystem->getId(),
+                'name' => $filesystem->getFilesystemname(),
+                'icon' => $filesystem->getUser() ? '/bundles/justadmin/icons/16x16/folder_user.png' : '/bundles/justadmin/icons/16x16/folder.png',
+                'timestamp' => null,
+                'type' => $filesystem->getUser() ? 'privatefs' : 'fs',
+                'size' => null,
+                'leaf' => false
+            );
+        }
+        return $children;
+    }
+
+    /*
+     * Get List of Folders for path
+     */
+    protected function getFoldersForPath($filesystem,$path){
+        $children = Array();
+        $fs = $this->getFs($filesystem);
+        $contents = $fs->listContents($path);
+        //dump($contents);
+        foreach ($contents as $content) {
+            if ($content['type'] == 'dir') {
+                $children[] = Array(
+                    'id' => (string)$filesystem->getId() . '/' . $content['path'],
+                    'basename' => $content['basename'],
+                    'name' => $content['basename'],
+                    'icon' => '/bundles/justadmin/icons/16x16/folder.png',
+                    'timestamp' => $content['timestamp']
+                );
+            }
+        }
+        return $children;
+    }
+
+    /*
+     * Get List of Files/Folders for path
+     */
+    protected function getFilesForPath($filesystem,$path){
+        $children = Array();
+        $fs = $this->getFs($filesystem);
+        $contents = $fs->listContents($path);
+        //dump($contents);
+        foreach ($contents as $content) {
+            $children[] = Array(
+                'id' => (string)$filesystem->getId() . '/' . $content['path'],
+                'name' => $content['basename'],
+                'timestamp' => $content['timestamp'],
+                'type' => $content['type'],
+                'size' => $content['size'],
+                //'thumbnail'=>$fs->getThumbnail($content['path'],'s')
+            );
+        }
+        return $children;
+    }
+
+    protected function getThumbnailResponse($path,$fs,$size,$cachename){
+        $fileextensionswiththumbnails = $this->container->getParameter('fileextensionswiththumbnails');
+        $pathexpl = explode('.', $path);
+        $fileextension = strtolower($pathexpl[count($pathexpl) - 1]);
+        $ctime = new \DateTime();
+        if ($size == 'xxs' || !in_array($fileextension, $fileextensionswiththumbnails)) {
+            $imgdata=$this->getIcon($path, $size);
+
+        } else {
+            $timestamp = $fs->getTimestamp($path);
+            $fromcache = $this->getImageFromCache($cachename, $timestamp);
+            if ($fromcache) { //ist bereits im cache:
+                $thumbnaildata = $fromcache;
+                $ctime = new \DateTime();
+                $ctime->setTimestamp(intval($thumbnaildata[0]));
+                $imgdata=$thumbnaildata[1];
+            } else {
+                $thumbnaildata = $fs->getThumbnail($path, $size);
+                if ($thumbnaildata[1]) {
+                    $thumbnaildata[0] = $ctime->getTimestamp();
+                    $this->memcached->set($cachename, serialize($ctime->getTimestamp() . '|' . $thumbnaildata[1]));
+                    $imgdata=$thumbnaildata[1];
+
+                } else { //icon ausgeben:
+                    $imgdata=$this->getIcon($path, $size);
+                }
+            }
+        }
+        $expires = 1 * 24 * 60 * 60;
+        $response = new Response($imgdata);
+        $response->headers->set('Content-Length', strlen($imgdata));
+        $response->headers->set('Pragma', 'public');
+        $response->headers->set('Last-Modified', $ctime->format('D, d M Y H:i:s') . ' GMT');
+        $response->headers->set('Cache-Control', 'maxage=' . $expires);
+        $response->headers->set('Content-Type', 'image/png; charset=UTF-8');
+        $response->headers->set('Expires', gmdate('D, d M Y H:i:s', time() + $expires) . ' GMT');
+        return $response;
+    }
+
+
     protected function throwJsonError($errormessage) {
         $response = new Response(json_encode(Array('success'=>'false','error' => $errormessage)));
         $response->headers->set('Content-Type', 'application/json; charset=UTF-8');

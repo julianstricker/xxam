@@ -10,11 +10,11 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 class NewmailsWidgetController extends Controller
 {
     private $templating;
-    private $securityContext;
-    public function __construct($templating,$securityContext)
+    private $securityTokenStorage;
+    public function __construct($templating,$securityTokenStorage)
     {
         $this->templating = $templating;
-        $this->securityContext = $securityContext;
+        $this->securityTokenStorage = $securityTokenStorage;
     }
 
     
@@ -37,7 +37,7 @@ class NewmailsWidgetController extends Controller
     public function getDefinitionAction()
     {
         
-        $user = $this->securityContext->getToken()->getUser();
+        $user = $this->securityTokenStorage->getToken()->getUser();
         $mailaccounts=Array();
         foreach($user->getMailaccounts() as $ma){
             $mailaccounts[]=Array($ma->getId(),$ma->getAccountname());
