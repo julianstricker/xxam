@@ -12,6 +12,6 @@ services:
     #every portal-widget must start with "justportalwidget...."
     justportalwidget.mailclient.newmails:
         class: Just\MailclientBundle\Controller\NewmailsWidgetController
-        arguments: ["@templating", "@security.context"]
+        arguments: ["@templating", "@security.token_storage"]
         tags:
             -  { name: justportalwidget }

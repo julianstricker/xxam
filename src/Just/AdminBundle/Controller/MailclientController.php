@@ -24,8 +24,7 @@ class MailclientController extends Controller {
     }
     
     public function listfoldersAction() {
-        $securityContext = $this->get('security.context');
-        $user = $securityContext->getToken()->getUser();
+        $user = $this->get('security.token_storage')->getToken()->getUser();
         $mailaccounts=$user->getMailaccounts();
         $returndata=Array();
         foreach($mailaccounts as $mailaccount){
@@ -79,8 +78,7 @@ class MailclientController extends Controller {
             unset($pathexpl[0]);
             $path=count($pathexpl)>0 ? '.'.implode('.',$pathexpl) : '';
         }
-        $securityContext = $this->get('security.context');
-        $user = $securityContext->getToken()->getUser();
+        $user = $this->get('security.token_storage')->getToken()->getUser();
         $mailaccount=null;
         foreach($user->getMailaccounts() as $ma){
             if($ma->getId()==$mailaccountid){

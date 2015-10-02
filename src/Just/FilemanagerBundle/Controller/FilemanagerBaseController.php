@@ -33,6 +33,8 @@ class FilemanagerBaseController extends Controller {
         "s"=>"64x64",
         "m"=>"128x128",
     );
+
+    protected $memcached;
     
     protected function removeChildrenkeys($children){
         if (isset($children['children'])){
@@ -45,9 +47,7 @@ class FilemanagerBaseController extends Controller {
     }
     
     protected function getFilesystems(){
-        $securityContext = $this->get('security.context');
-        $user = $securityContext->getToken()->getUser();
-        
+        $user = $this->get('security.token_storage')->getToken()->getUser();
         $filesystems=Array();
         $fss=$user->getFilesystems();
         if (count($fss)>0){
@@ -66,6 +66,44 @@ class FilemanagerBaseController extends Controller {
             }
         }
         return $filesystems;
+    }
+
+    protected function getFilesystemForPath($path)
+    {
+        $filesystem_id=$this->extractFilesystemIdFromPath($path);
+        $filesystems = $this->getFilesystems();
+        if (count($filesystems) == 0) {
+            return false;
+        }
+        $filesystem = isset($filesystems[$filesystemid]) ? $filesystems[$filesystemid] : false;
+        return $filesystem;
+    }
+
+    /*
+    * Extract Filesystem-Id from parameter "path"
+    */
+    protected function extractFilesystemIdFromPath($path)
+    {
+        if ($path != '') {
+            $pathexpl = explode('/', $path);
+            $filesystemid = $pathexpl[0];
+            return $filesystemid;
+        }
+        return false;
+    }
+
+    /*
+     * Extract Path part from parameter "path"
+     */
+    protected function extractPathFromPath($path)
+    {
+        if ($path != '') {
+            $pathexpl = explode('/', $path);
+            $filesystemid = $pathexpl[0];
+            unset($pathexpl[0]);
+            $path = count($pathexpl) > 0 ? '/' . implode('/', $pathexpl) : '';
+        }
+        return $path;
     }
     
     protected function createLocalAdapter($settings)

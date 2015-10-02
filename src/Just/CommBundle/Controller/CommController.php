@@ -28,8 +28,7 @@ class CommController extends Controller
         $sessionid=$request->get('sessionid');
         $memcached = new \Memcached;
         $memcached->addServer('localhost', 11211);
-        $securityContext = $this->get('security.context');
-        $user = $securityContext->getToken()->getUser();
+        $user = $this->get('security.token_storage')->getToken()->getUser();
         $memcached->add('chatsessionid_'.$sessionid,array(
             'tenant_id'=>$user->getTenantId(),
             'user_id'>$user->getId(),

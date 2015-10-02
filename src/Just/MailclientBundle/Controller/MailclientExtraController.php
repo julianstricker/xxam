@@ -264,8 +264,7 @@ class MailclientExtraController extends MailclientBaseController {
      */
     public function sendmailAction(Request $request) {
         $fieldfrom=$request->get('fieldfrom',0);
-        $securityContext = $this->get('security.context');
-        $user = $securityContext->getToken()->getUser();
+        $user = $this->get('security.token_storage')->getToken()->getUser();
         $mailaccounts=$user->getMailaccounts();
         $mailaccount=false;
         foreach($mailaccounts as $ma){
@@ -380,8 +379,7 @@ class MailclientExtraController extends MailclientBaseController {
     public function uploadfileAction(Request $request) {
         $filename=preg_replace("([^\w\s\d\-_~,;:\[\]\(\).])", '', $request->headers->get('X_FILENAME'));
         $file=file_get_contents('php://input');
-        $securityContext = $this->get('security.context');
-        $user = $securityContext->getToken()->getUser();
+        $user = $this->get('security.token_storage')->getToken()->getUser();
         if (!is_dir($this->get('kernel')->getCacheDir() . '/mailclient_fileuploads')) {
             mkdir($this->get('kernel')->getCacheDir() . '/mailclient_fileuploads');
         }

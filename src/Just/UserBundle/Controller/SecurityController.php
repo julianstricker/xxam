@@ -1,24 +1,36 @@
 <?php
 namespace Just\UserBundle\Controller;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use FOS\UserBundle\Controller\SecurityController as SecurityControllerOrig;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
 class SecurityController extends SecurityControllerOrig
 {
-   public function loginAction(Request $request)
-   {
+    /**
+     * Show login form
+     *
+     * @Method("GET")
+     */
+    public function loginAction(Request $request)
+    {
         /** @var $session \Symfony\Component\HttpFoundation\Session\Session */
         $session = $request->getSession();
-        
+
+        if (class_exists('\Symfony\Component\Security\Core\Security')) {
+            $authErrorKey = Security::AUTHENTICATION_ERROR;
+            $lastUsernameKey = Security::LAST_USERNAME;
+        }
+
         // get the error if any (works with forward and redirect -- see below)
-        if ($request->attributes->has(SecurityContextInterface::AUTHENTICATION_ERROR)) {
-            $error = $request->attributes->get(SecurityContextInterface::AUTHENTICATION_ERROR);
-        } elseif (null !== $session && $session->has(SecurityContextInterface::AUTHENTICATION_ERROR)) {
-            $error = $session->get(SecurityContextInterface::AUTHENTICATION_ERROR);
-            $session->remove(SecurityContextInterface::AUTHENTICATION_ERROR);
+        if ($request->attributes->has($authErrorKey)) {
+            $error = $request->attributes->get($authErrorKey);
+        } elseif (null !== $session && $session->has($authErrorKey)) {
+            $error = $session->get($authErrorKey);
+            $session->remove($authErrorKey);
         } else {
             $error = null;
         }
@@ -28,18 +40,16 @@ class SecurityController extends SecurityControllerOrig
         }
 
         // last username entered by the user
-        $lastUsername = (null === $session) ? '' : $session->get(SecurityContextInterface::LAST_USERNAME);
+        $lastUsername = (null === $session) ? '' : $session->get($lastUsernameKey);
 
-        $csrfToken = $this->has('form.csrf_provider')
-            ? $this->get('form.csrf_provider')->generateCsrfToken('authenticate')
-            : null;
-        
-        
+        if ($this->has('security.csrf.token_manager')) {
+            $csrfToken = $this->get('security.csrf.token_manager')->getToken('authenticate')->getValue();
+        }
+
         return $this->renderLogin(array(
             'last_username' => $lastUsername,
-            'error'         => $error,
+            'error' => $error,
             'csrf_token' => $csrfToken,
-            
         ));
-   }
+    }
 }
