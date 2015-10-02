@@ -4,6 +4,7 @@ namespace Just\FilemanagerBundle\Controller;
 
 
 use Just\FilemanagerBundle\Entity\Filesystem;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 
 class FilemanagerController extends FilemanagerBaseController {

@@ -64,14 +64,11 @@ class FilemanagerExtraController extends FilemanagerBaseController
     {
         $this->memcached = new \Memcached;
         $this->memcached->addServer('localhost', 11211);
-
         $tenant_id = $request->getSession()->get('tenant_id', 1);
         $originalpath = $request->get('path', '');
         $filesystemid = $this->extractFilesystemIdFromPath($request->get('path', ''));
         $path = $this->extractPathFromPath($request->get('path', ''));
-        $size = $request->get('size', 's');
-
-        $cachename = 'JustFilemanagerBundleThumbnails' . $tenant_id . $size . md5($originalpath);
+        $cachename = 'JustFilemanagerBundleThumbnails' . $tenant_id . $request->get('size', 's') . md5($originalpath);
         //$this->memcached->delete($cachename);
         $filesystems = $this->getFilesystems();
         if (count($filesystems) == 0) {
@@ -81,8 +78,7 @@ class FilemanagerExtraController extends FilemanagerBaseController
             if (!$filesystem) {
                 return $this->throwJsonError('Filesystem not found');
             }else {
-                $fs = $this->getFs($filesystem);
-                $response = $this->getThumbnailResponse($path, $fs, $size, $cachename);
+                $response = $this->getThumbnailResponse($path,  $this->getFs($filesystem), $request->get('size', 's'), $cachename);
                 return $response;
             }
         }
