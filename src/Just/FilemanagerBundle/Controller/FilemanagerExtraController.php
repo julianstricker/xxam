@@ -2,77 +2,35 @@
 
 namespace Just\FilemanagerBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use League\Flysystem\Filesystem;
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Dropbox\DropboxAdapter;
-use Dropbox\Client as DropboxClient;
-use League\Flysystem\Adapter\Ftp as FtpAdapter;
-use League\Flysystem\Sftp\SftpAdapter;
-use League\Flysystem\Cached\CachedAdapter;
-use League\Flysystem\Cached\Storage\Memcached as Cache;
-use League\Flysystem\Plugin\ListWith;
-use League\Flysystem\Plugin\ListPaths;
 use League\Flysystem\MountManager;
 use League\Flysystem\FileExistsException;
 use League\Flysystem\FileNotFoundException;
 use League\Flysystem\NotSupportedException;
 use League\Flysystem\RootViolationException;
 
-use Just\FilemanagerBundle\Helper\FlysystemPlugins\ThumbnailDropbox;
 
 class FilemanagerExtraController extends FilemanagerBaseController
 {
 
-
-
     public function listfoldersAction(Request $request)
     {
-         $path = $request->get('path', '');
         $filesystemid = $this->extractFilesystemIdFromPath($request->get('path', ''));
         $path = $this->extractPathFromPath($request->get('path', ''));
-
         $returndata = Array('success' => true, 'children' => Array());
         $filesystems = $this->getFilesystems();
         if (count($filesystems) == 0) {
             return $this->throwJsonError('No Filesystem found');
         } elseif ($filesystemid == false) {
-            foreach ($filesystems as $filesystem) {
-                $returndata['children'][] = Array(
-                    'id' => (string)$filesystem->getId(),
-                    'basename' => (string)$filesystem->getId(),
-                    'name' => $filesystem->getFilesystemname(),
-                    'icon' => $filesystem->getUser() ? '/bundles/justadmin/icons/16x16/folder_user.png' : '/bundles/justadmin/icons/16x16/folder.png',
-                    'leaf' => false
-                );
-            }
+            $returndata['children']=$this->getFilesystemsFolders($filesystems);
         } else {
             $filesystem = isset($filesystems[$filesystemid]) ? $filesystems[$filesystemid] : false;
             if (!$filesystem) {
                 return $this->throwJsonError('Filesystem not found');
             }
-            $fs = $this->getFs($filesystem);
-            $contents = $fs->listContents($path);
-            //dump($contents);
-            foreach ($contents as $content) {
-                if ($content['type'] == 'dir') {
-                    $returndata['children'][] = Array(
-                        'id' => (string)$filesystem->getId() . '/' . $content['path'],
-                        'basename' => $content['basename'],
-                        'name' => $content['basename'],
-                        'icon' => '/bundles/justadmin/icons/16x16/folder.png',
-                        'timestamp' => $content['timestamp']
-                    );
-                }
-            }
-
+            $returndata['children']=$this->getFoldersForPath($filesystem,$path);
         }
-
-
         $response = new Response(json_encode($returndata));
         $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
         return $response;
@@ -80,7 +38,6 @@ class FilemanagerExtraController extends FilemanagerBaseController
 
     public function listfilesAction(Request $request)
     {
-        $refresh = $request->get('refresh', false);
         $filesystemid = $this->extractFilesystemIdFromPath($request->get('path', ''));
         $path = $this->extractPathFromPath($request->get('path', ''));
         $returndata = Array('success' => true, 'children' => Array());
@@ -88,59 +45,32 @@ class FilemanagerExtraController extends FilemanagerBaseController
         if (count($filesystems) == 0) {
             return $this->throwJsonError('No Filesystem found');
         } elseif ($filesystemid == false) {
-            foreach ($filesystems as $filesystem) {
-
-                $returndata['children'][] = Array(
-                    'id' => (string)$filesystem->getId(),
-                    'name' => $filesystem->getFilesystemname(),
-                    'timestamp' => null,
-                    'type' => $filesystem->getUser() ? 'privatefs' : 'fs',
-                    'size' => null
-                );
-            }
+            $returndata['children']=$this->getFilesystemsFolders($filesystems);
         } else {
             $filesystem = isset($filesystems[$filesystemid]) ? $filesystems[$filesystemid] : false;
             if (!$filesystem) {
                 return $this->throwJsonError('Filesystem not found');
             }
-            $fs = $this->getFs($filesystem);
-            //if ($refresh) $fs->getAdapter()->flush();
-            $contents = $fs->listContents($path);
-            //$contents = $fs->listWith(['mimetype', 'size', 'timestamp'], $path, true);
-
-            //dump($contents);
-            foreach ($contents as $content) {
-
-                $returndata['children'][] = Array(
-                    'id' => (string)$filesystem->getId() . '/' . $content['path'],
-                    'name' => $content['basename'],
-                    'timestamp' => $content['timestamp'],
-                    'type' => $content['type'],
-                    'size' => $content['size'],
-                    //'thumbnail'=>$fs->getThumbnail($content['path'],'s')
-                );
-
-            }
-
+            $returndata['children']=$this->getFilesForPath($filesystem,$path);
         }
-
-
         $response = new Response(json_encode($returndata));
         $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
         return $response;
     }
 
+
+
     public function getThumbnailAction(Request $request)
     {
         $this->memcached = new \Memcached;
         $this->memcached->addServer('localhost', 11211);
-        $fileextensionswiththumbnails = $this->container->getParameter('fileextensionswiththumbnails');
+
         $tenant_id = $request->getSession()->get('tenant_id', 1);
         $originalpath = $request->get('path', '');
         $filesystemid = $this->extractFilesystemIdFromPath($request->get('path', ''));
         $path = $this->extractPathFromPath($request->get('path', ''));
         $size = $request->get('size', 's');
-        $ctime = new \DateTime();
+
         $cachename = 'JustFilemanagerBundleThumbnails' . $tenant_id . $size . md5($originalpath);
         //$this->memcached->delete($cachename);
         $filesystems = $this->getFilesystems();
@@ -150,55 +80,19 @@ class FilemanagerExtraController extends FilemanagerBaseController
             $filesystem = isset($filesystems[$filesystemid]) ? $filesystems[$filesystemid] : false;
             if (!$filesystem) {
                 return $this->throwJsonError('Filesystem not found');
-            }
-            $fs = $this->getFs($filesystem);
-            $pathexpl = explode('.', $path);
-            $fileextension = strtolower($pathexpl[count($pathexpl) - 1]);
-            if ($size == 'xxs' || !in_array($fileextension, $fileextensionswiththumbnails)) {
-                $response = new Response($this->getIcon($path, $size));
-            } else {
-                $timestamp = $fs->getTimestamp($path);
-                $fromcache = $this->getImageFromCache($cachename, $timestamp);
-                if ($fromcache) { //ist bereits im cache:
-                    $thumbnaildata = $fromcache;
-                    $ctime = new \DateTime();
-                    $ctime->setTimestamp(intval($thumbnaildata[0]));
-                    $response = new Response($thumbnaildata[1]);
-                } else {
-                    $thumbnaildata = $fs->getThumbnail($path, $size);
-                    if ($thumbnaildata[1]) {
-                        $thumbnaildata[0] = $ctime->getTimestamp();
-                        $this->memcached->set($cachename, serialize($ctime->getTimestamp() . '|' . $thumbnaildata[1]));
-                        $response = new Response($thumbnaildata[1]);
-                    } else { //icon ausgeben:
-                        $response = new Response($this->getIcon($path, $size));
-
-
-                    }
-                    //echo 'new';
-
-                    //dump($thumbnaildata);
-                }
+            }else {
+                $fs = $this->getFs($filesystem);
+                $response = $this->getThumbnailResponse($path, $fs, $size, $cachename);
+                return $response;
             }
         }
 
-
-        $expires = 1 * 24 * 60 * 60;
-
-        $response->headers->set('Content-Length', strlen($thumbnaildata[1]));
-        $response->headers->set('Pragma', 'public');
-        $response->headers->set('Last-Modified', $ctime->format('D, d M Y H:i:s') . ' GMT');
-        $response->headers->set('Cache-Control', 'maxage=' . $expires);
-        $response->headers->set('Content-Type', 'image/png; charset=UTF-8');
-        $response->headers->set('Expires', gmdate('D, d M Y H:i:s', time() + $expires) . ' GMT');
-        return $response;
     }
 
     public function deletefileAction(Request $request)
     {
         $filesystemid = $this->extractFilesystemIdFromPath($request->get('path', ''));
         $path = $this->extractPathFromPath($request->get('path', ''));
-        $returndata = Array('success' => false);
         $filesystems = $this->getFilesystems();
         if (count($filesystems) == 0) {
             return $this->throwJsonError('No Filesystem found');
@@ -206,21 +100,26 @@ class FilemanagerExtraController extends FilemanagerBaseController
             $filesystem = isset($filesystems[$filesystemid]) ? $filesystems[$filesystemid] : false;
             if (!$filesystem) {
                 return $this->throwJsonError('Filesystem not found');
-            }
-            $fs = $this->getFs($filesystem);
-            if ($fs->has($path)) {
-                $metadata = $fs->getMetadata($path);
-                if ($metadata['type'] == 'dir') {
-                    $fs->deleteDir($path);
-                } else {
-                    $fs->delete($path);
+            }else {
+                $fs = $this->getFs($filesystem);
+                if ($fs->has($path)) {
+                    $metadata = $fs->getMetadata($path);
+                    if ($metadata['type'] == 'dir') {
+                        $fs->deleteDir($path);
+                    } else {
+                        $fs->delete($path);
+                    }
+                    $returndata = Array('success' => true, 'metadata' => $metadata);
+                    $response = new Response(json_encode($returndata));
+                    $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
+                    return $response;
+                }else{
+                    return $this->throwJsonError('File not found');
                 }
-                $returndata = Array('success' => true, 'metadata' => $metadata);
+
             }
         }
-        $response = new Response(json_encode($returndata));
-        $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-        return $response;
+
     }
 
     public function movefileAction(Request $request)
@@ -240,10 +139,10 @@ class FilemanagerExtraController extends FilemanagerBaseController
             }
             $fs = $this->getFs($filesystem);
             if ($fs->has($path)) {
-                $metadata = $fs->getMetadata($path);
+                //$metadata = $fs->getMetadata($path);
                 if ($filesystemid == $filesystemid2) {
                     try {
-                        $resp = $fs->rename($path, $newname);
+                        $fs->rename($path, $newname);
                     } catch (FileExistsException $e) {
                         return $this->throwJsonError($e->getMessage());
                     } catch (FileNotFoundException $e) {
@@ -280,7 +179,7 @@ class FilemanagerExtraController extends FilemanagerBaseController
                         return $this->throwJsonError($e->getMessage());
                     }
                 }
-                $returndata = Array('success' => true, 'resp' => $resp);
+                $returndata = Array('success' => true);
             }
         }
         $response = new Response(json_encode($returndata));
@@ -305,10 +204,10 @@ class FilemanagerExtraController extends FilemanagerBaseController
             }
             $fs = $this->getFs($filesystem);
             if ($fs->has($path)) {
-                $metadata = $fs->getMetadata($path);
+                //$metadata = $fs->getMetadata($path);
                 if ($filesystemid == $filesystemid2) {
                     try {
-                        $resp = $fs->copy($path, $newname);
+                        $fs->copy($path, $newname);
                     } catch (FileExistsException $e) {
                         return $this->throwJsonError($e->getMessage());
                     } catch (FileNotFoundException $e) {
@@ -345,7 +244,7 @@ class FilemanagerExtraController extends FilemanagerBaseController
                         return $this->throwJsonError($e->getMessage());
                     }
                 }
-                $returndata = Array('success' => true, 'resp' => $resp);
+                $returndata = Array('success' => true);
             }
         }
         $response = new Response(json_encode($returndata));
@@ -359,7 +258,6 @@ class FilemanagerExtraController extends FilemanagerBaseController
         $content = $request->get('content', '');
         $filesystemid = $this->extractFilesystemIdFromPath($request->get('path', ''));
         $path = $this->extractPathFromPath($request->get('path', ''));
-        $returndata = Array('success' => false);
         $filesystems = $this->getFilesystems();
         if (count($filesystems) == 0) {
             return $this->throwJsonError('No Filesystem found');
@@ -370,7 +268,7 @@ class FilemanagerExtraController extends FilemanagerBaseController
             }
             $fs = $this->getFs($filesystem);
             $fs->put($path, $content);
-            $returndata = Array('success' => true, 'metadata' => $metadata);
+            $returndata = Array('success' => true);
 
         }
         $response = new Response(json_encode($returndata));

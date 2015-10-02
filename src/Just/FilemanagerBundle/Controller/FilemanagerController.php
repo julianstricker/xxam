@@ -2,28 +2,9 @@
 
 namespace Just\FilemanagerBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use League\Flysystem\Filesystem;
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Dropbox\DropboxAdapter;
-use Dropbox\Client as DropboxClient;
-use League\Flysystem\Adapter\Ftp as FtpAdapter;
-use League\Flysystem\Sftp\SftpAdapter;
-use League\Flysystem\Cached\CachedAdapter;
-use League\Flysystem\Cached\Storage\Memcached as Cache;
-use League\Flysystem\Plugin\ListWith;
-use League\Flysystem\Plugin\ListPaths;
-use League\Flysystem\MountManager;
-use League\Flysystem\FileExistsException;
-use League\Flysystem\FileNotFoundException;
-use League\Flysystem\NotSupportedException;
-use League\Flysystem\RootViolationException;
+use Just\FilemanagerBundle\Entity\Filesystem;
 
-use Just\FilemanagerBundle\Helper\FlysystemPlugins\ThumbnailDropbox;
 
 class FilemanagerController extends FilemanagerBaseController {
 
@@ -66,7 +47,7 @@ class FilemanagerController extends FilemanagerBaseController {
      */
     public function editAction($id) {
         $em = $this->getDoctrine()->getManager();
-        $repository=$this->getDoctrine()->getManager()->getRepository('JustFilemanagerBundle:Filesystem');
+        $repository=$em->getRepository('JustFilemanagerBundle:Filesystem');
 
         $entity = $repository->find($id);
 
