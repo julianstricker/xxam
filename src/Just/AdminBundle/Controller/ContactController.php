@@ -8,7 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Just\AdminBundle\Entity\Contact;
-use Just\AdminBundle\Form\ContactType;
+use Just\AdminBundle\Form\Type\ContactType;
 
 /**
  * Contact controller.

@@ -172,7 +172,7 @@
                                             // reader configs
                                             fields: ['value']
                                         }),*/
-                                        value: [{% if mail.to %}{% for addr,name in mail.to %}{% if not loop.first %},{% endif %}'{% if name !='' %}{{name}} <{{addr}}>{% else %}{{addr}}{% endif %}'{% endfor %}{% endif %}]
+                                        value: [{% if mail is defined and mail.to %}{% for addr,name in mail.to %}{% if not loop.first %},{% endif %}'{% if name !='' %}{{name}} <{{addr}}>{% else %}{{addr}}{% endif %}'{% endfor %}{% endif %}]
                                     },{
                                         xtype: 'button',
                                         margin: '0 0 0 5',
@@ -207,7 +207,7 @@
                                     itemId: 'fieldcc',
                                     name: 'fieldcc',
                                     hidden: true,
-                                    value: [{% if mail.cc is defined %}{% for addr,name in mail.cc %}{% if not loop.first %},{% endif %}'{% if name !='' %}{{name}} <{{addr}}>{% else %}{{addr}}{% endif %}'{% endfor %}{% endif %}]
+                                    value: [{% if mail is defined and mail.cc is defined %}{% for addr,name in mail.cc %}{% if not loop.first %},{% endif %}'{% if name !='' %}{{name}} <{{addr}}>{% else %}{{addr}}{% endif %}'{% endfor %}{% endif %}]
                                 },
                                 {
                                     xtype: 'xxamtagfield',
@@ -215,7 +215,7 @@
                                     itemId: 'fieldbcc',
                                     name: 'fieldbcc',
                                     hidden: true,
-                                    value: [{% if mail.bcc is defined %}{% for addr,name in mail.bcc %}{% if not loop.first %},{% endif %}'{% if name !='' %}{{name}} <{{addr}}>{% else %}{{addr}}{% endif %}'{% endfor %}{% endif %}]
+                                    value: [{% if mail is defined and mail.bcc is defined %}{% for addr,name in mail.bcc %}{% if not loop.first %},{% endif %}'{% if name !='' %}{{name}} <{{addr}}>{% else %}{{addr}}{% endif %}'{% endfor %}{% endif %}]
                                 },
                                 {
                                     xtype: 'xxamtagfield',
@@ -223,7 +223,7 @@
                                     itemId: 'fieldreplyto',
                                     name: 'fieldreplyto',
                                     hidden: true,
-                                    value: [{% if mail.replyTo is defined %}{% for addr,name in mail.replyTo %}{% if not loop.first %},{% endif %}'{% if name !='' %}{{name}} <{{addr}}>{% else %}{{addr}}{% endif %}'{% endfor %}{% endif %}]
+                                    value: [{% if mail is defined and mail.replyTo is defined %}{% for addr,name in mail.replyTo %}{% if not loop.first %},{% endif %}'{% if name !='' %}{{name}} <{{addr}}>{% else %}{{addr}}{% endif %}'{% endfor %}{% endif %}]
                                 },
                                 {
                                     xtype: 'textfield',
@@ -231,7 +231,7 @@
                                     itemId: 'fieldsubject',
                                     name: 'fieldsubject',
                                     padding: '4 2 4 2',
-                                    value: '{% if mail.subject is defined %}{{ mail.subject }}{% endif %}'
+                                    value: '{% if mail is defined and mail.subject is defined %}{{ mail.subject }}{% endif %}'
                                 }
                             ]
                         },
@@ -274,14 +274,14 @@
                                             xtype: 'htmleditor',
                                             name: 'fieldhtml',
                                             fieldLabel: '',
-                                            value: '{% if mail.textHtml is defined and mail.textHtml!='' %}{{ mail.textHtml }}{% endif %}'
+                                            value: '{% if mail is defined and mail.textHtml is defined and mail.textHtml!='' %}{{ mail.textHtml }}{% endif %}'
                                         },
                                         {
                                             xtype: 'textareafield',
                                             name: 'fieldtext',
                                             fieldLabel: '',
                                             hidden: true,
-                                            value: '{% if mail.textPlain is defined and mail.textPlain!='' %}{{ mail.textPlain }}{% endif %}'
+                                            value: '{% if mail is defined and mail.textPlain is defined and mail.textPlain!='' %}{{ mail.textPlain }}{% endif %}'
                                         },
                                     ]
                                 },
@@ -435,7 +435,7 @@
             listeners:{
                 afterrender: function(tab){
                   ttt=tab;
-                   /*{% if mail.to %}{% for key, val in mail.to %}
+                   /*{% if mail is defined and mail.to %}{% for key, val in mail.to %}
                       Ext.getCmp('writeemailform'){{ val }}<{{key}}>
                    {% endfor %}{% endif %}*/
                                     
