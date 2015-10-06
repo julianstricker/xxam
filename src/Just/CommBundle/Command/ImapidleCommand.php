@@ -81,6 +81,10 @@ class ImapidleCommand extends ContainerAwareCommand {
         if (!$user) return false;
         return $user->getMailaccounts();
     }
+
+    private function notifychanges(&$imapaccount){
+        $this->client->getSession()->publish("com.xxam.imap", ['updates'],$imapaccount['users']);
+    }
     
     private function createImapstream(&$imapaccount){
         //$loop = \React\EventLoop\Factory::create();
@@ -118,7 +122,13 @@ class ImapidleCommand extends ContainerAwareCommand {
                     if ($status=='IDLE'){
                         if(preg_match("/^\* (\d+) RECENT/", $dexpl,$countrecent)){ //login OK:
                             $countrecent=$countrecent[1];
-                            echo $countrecent;
+                            echo 'RECENT:'.$countrecent;
+                            $this->notifychanges($imapaccount);
+                        }
+                        if(preg_match("/^\* (\d+) EXISTS/", $dexpl,$countrecent)){ //login OK:
+                            $countrecent=$countrecent[1];
+                            echo 'EXISTS'.$countrecent;
+                            $this->notifychanges($imapaccount);
                         }
                     }
                     
@@ -196,10 +206,10 @@ class ImapidleCommand extends ContainerAwareCommand {
         $this->loop = \React\EventLoop\Factory::create();
         
 
-        $client = new Client("realm1",$this->loop);
-        $client->addClientAuthenticator(new ChattokenClientAuth());
-        $client->addTransportProvider(new PawlTransportProvider("ws://127.0.0.1:1337/"));
-        $client->on('open', function (ClientSession $session) {
+        $this->client = new Client("realm1",$this->loop);
+        $this->client->addClientAuthenticator(new ChattokenClientAuth());
+        $this->client->addTransportProvider(new PawlTransportProvider("ws://127.0.0.1:1337/"));
+        $this->client->on('open', function (ClientSession $session) {
             // 1) subscribe to a topic
             $onevent = function ($args) {
                 echo "Event \n";
@@ -237,7 +247,7 @@ class ImapidleCommand extends ContainerAwareCommand {
                 }
             );
         });
-        $client->start(true);
+        $this->client->start(true);
         //$loop->run();
 
         

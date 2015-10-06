@@ -35,7 +35,9 @@ class SecurityController extends SecurityControllerOrig
         }
         // last username entered by the user
         $lastUsername = (null === $session) ? '' : $session->get($lastUsernameKey);
-        $csrfToken = $this->get('security.csrf.token_manager')->getToken('authenticate')->getValue();
+        if ($this->has('security.csrf.token_manager')) {
+            $csrfToken = $this->get('security.csrf.token_manager')->getToken('authenticate')->getValue();
+        }
         return $this->renderLogin(array(
             'last_username' => $lastUsername,
             'error' => $error,
