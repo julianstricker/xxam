@@ -355,4 +355,18 @@ class MailclientBaseController extends Controller {
         return $message;
 
     }
+
+    protected function sendmail($mailer,$message){
+        try {
+            $response = $mailer->send($message);
+        } catch (\Swift_TransportException $e) {
+            // Catch exceptions of type Swift_TransportException
+            return $this->throwJsonError($e->getMessage());
+        } catch (\Exception $e) {
+            return $this->throwJsonError($e->getMessage());
+        }
+        if (!$response){
+            return $this->throwJsonError('Error sending mail');
+        }
+    }
 }

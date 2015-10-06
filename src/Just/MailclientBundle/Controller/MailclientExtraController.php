@@ -74,9 +74,6 @@ class MailclientExtraController extends MailclientBaseController {
         }
         $to=$mailaccount->getTrashfolder();
         $folders=$frommailbox->getListingFolders();
-        if (!in_array($to,$folders)){
-            //create 'Trash'-folder:
-        }
         $movedids=Array();
         foreach($idsarr as $id){
             if ($frommailbox->moveMail($id, $mailaccount->getImappathprefix().$to)){
@@ -93,25 +90,16 @@ class MailclientExtraController extends MailclientBaseController {
      *
      */
     public function junkmailsAction(Request $request){
-        $from=$request->get('from','');
         $idsarr=explode(',',$request->get('ids',''));
-        $frommailbox=$this->getImapMailboxForPath($from);
+        $frommailbox=$this->getImapMailboxForPath($request->get('from',''));
         if(!$frommailbox) $this->throwJsonError('Mailaccount not found');
-
-        if ($from){
-            $pathexpl=explode('.',$from);
-            $mailaccountid=$pathexpl[0];
-        }
+        $mailaccountid=$this->getMailaccountidFromPath($request->get('from',''));
         $mailaccount=$this->getUserMailaccountForId($mailaccountid);
         if (!$mailaccount){
            return $this->throwJsonError('Mailaccount not found');
         }
         $to=$mailaccount->getJunkfolder();
-
         $folders=$frommailbox->getListingFolders();
-        if (!in_array($to,$folders)){
-            //create 'Trash'-folder:
-        }
         $movedids=Array();
         foreach($idsarr as $id){
             if ($frommailbox->moveMail($id, $mailaccount->getImappathprefix().$to)){
@@ -217,20 +205,13 @@ class MailclientExtraController extends MailclientBaseController {
         }
         $mailer = $this->getMailerForMailaccount($mailaccount);
         $message=$this->generateMailForRequest($request);
-        if (get_class($message)=='Response'){
+        if (get_class($message)=='Response'){ //on Error:
             return $message;
         }
 
-        try {
-            $response = $mailer->send($message);
-        } catch (\Swift_TransportException $e) {
-            // Catch exceptions of type Swift_TransportException        
-            return $this->throwJsonError($e->getMessage());
-        } catch (\Exception $e) {
-            return $this->throwJsonError($e->getMessage());
-        }
-        if (!$response){
-            return $this->throwJsonError('Error sending mail');
+        $resp=$this->sendmail($mailer,$message);
+        if (get_class($resp)=='Response'){ //on Error:
+            return $resp;
         }
         //move into sent folder:
         $msg = $message->toString(); 
