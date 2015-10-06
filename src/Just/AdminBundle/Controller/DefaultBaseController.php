@@ -39,6 +39,51 @@ class DefaultBaseController extends Controller
         }
 	return $menu;
     }
-    
-    
+
+    protected function statefulGetResponse($user){
+        $states=$user->getExtjsstates();
+        $resp=Array();
+        foreach($states as $state){
+            $resp[$state->getStatekey()]=$state->getStatevalue();
+        }
+        $response = new Response(json_encode($resp));
+        $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
+        return $response;
+    }
+
+    protected function statefulPostResponse($user,$key,$value){
+        $em = $this->getDoctrine()->getManager();
+        $state=$widget=$this->getDoctrine()->getManager()->getRepository('JustAdminBundle:Extjsstate')->findOneBy(Array('user_id'=>$user->getId(),'statekey'=>$key));
+        if(!$state){
+            $state=new Extjsstate();
+            $state->setUser($user);
+            $state->setStatekey($key);
+        }
+        $state->setStatevalue($value);
+        $em->persist($state);
+        $em->flush();
+        $resp=Array('success'=>'true');
+
+        $response = new Response(json_encode($resp));
+        $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
+        return $response;
+    }
+
+    protected function statefulDeleteResponse($user,$key){
+        $em = $this->getDoctrine()->getManager();
+        $filter=Array('user_id'=>$user->getId());
+        if ($key!=false) $filter['statekey']=$key;
+        $states=$widget=$this->getDoctrine()->getManager()->getRepository('JustAdminBundle:Extjsstate')->findBy($filter);
+        if($states){
+            foreach($states as $state){
+                $em->remove($state);
+            }
+        }
+        $em->flush();
+        $resp=Array('success'=>'true');
+
+        $response = new Response(json_encode($resp));
+        $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
+        return $response;
+    }
 }

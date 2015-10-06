@@ -28,13 +28,25 @@ class MailclientBaseController extends Controller {
         return $mailaccount;
     }
 
-    protected function getImapMailboxForPath($path){
+    protected function getMailaccountidFromPath( $path){
         if ($path){
             $pathexpl=explode('.',$path);
-            $mailaccountid=$pathexpl[0];
-            unset($pathexpl[0]);
-            $from=count($pathexpl)>0 ? '.'.implode('.',$pathexpl) : '';
+            return $pathexpl[0];
         }
+        return false;
+    }
+
+    protected function removeMailaccountidFromPath( $path){
+        $pathexpl=explode('.',$path);
+        $mailaccountid=$pathexpl[0];
+        unset($pathexpl[0]);
+        $path=count($pathexpl)>0 ? '.'.implode('.',$pathexpl) : '';
+        return $path;
+    }
+
+    protected function getImapMailboxForPath( $path){
+        $mailaccountid=$this->getMailaccountidFromPath($path);
+        $from=$this->removeMailaccountidFromPath($path);
         $mailaccount=$this->getUserMailaccountForId($mailaccountid);
         if (!$mailaccount){
             return false; //$this->throwJsonError('Mailaccount not found');
@@ -42,7 +54,7 @@ class MailclientBaseController extends Controller {
         return $this->getImapMailbox($mailaccount,$from);
     }
 
-    protected function getJsonResponse($data)
+    protected function getJsonResponse( $data)
     {
         $response = new Response(json_encode($data));
         $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
@@ -60,7 +72,7 @@ class MailclientBaseController extends Controller {
     }
     
     
-    protected function cleanEmailaddress($emails){
+    protected function cleanEmailaddress(Array $emails){
         $return=Array();
         if (!is_array($emails)){
             $emails=Array($emails);
@@ -82,7 +94,7 @@ class MailclientBaseController extends Controller {
      * @Security("has_role('ROLE_MAILCLIENT_LIST')")
      *
      */
-    protected function getImapMailbox(Mailaccount $mailaccount,$path='')
+    protected function getImapMailbox(Mailaccount $mailaccount, $path='')
     {
         $securitystring='/imap';
         //0=off, 1=ssl/tls, 2=ssl/tls alle zertifikate akzeptieren, 3=starttls, 4 starttls alle zertifikate akzeptieren
@@ -104,7 +116,7 @@ class MailclientBaseController extends Controller {
         return new ImapMailbox($connectionstring, $mailaccount->getImapusername(), $mailaccount->getImappassword(), $this->attachments_dir, 'UTF-8');
     }
     
-    protected function removeHtmltag(&$doc,$tagname){
+    protected function removeHtmltag(&$doc, $tagname){
         $tags=$doc->getElementsByTagName($tagname);
         $length = $tags->length;
         // for each tag, remove it from the DOM
@@ -252,5 +264,95 @@ class MailclientBaseController extends Controller {
         $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
         $response->setStatusCode(500);
         return $response;
+    }
+
+    /*
+     * Create Swiftmailer-Class for Mailaccount
+     */
+    protected function getMailerForMailaccount(Mailaccount $mailaccount){
+        // switch to new settings
+        $transport = \Swift_SmtpTransport::newInstance($mailaccount->getSmtpserver(), $mailaccount->getSmtpport() != '' ? $mailaccount->getSmtpport() : 25)->setUsername($mailaccount->getSmtpusername())->setPassword($mailaccount->getSmtppassword());
+        if ($mailaccount->getSmtpsecurity()!=0) $transport->setEncryption($mailaccount->getSmtpsecurity()==1 || $mailaccount->getSmtpsecurity()==2 ? 'ssl' : 'tls');
+
+        $mailer = \Swift_Mailer::newInstance($transport);
+        $logger = new \Swift_Plugins_Loggers_ArrayLogger();
+        $mailer->registerPlugin(new \Swift_Plugins_LoggerPlugin($logger));
+        return $mailer;
+    }
+
+    protected function addInlineImagesToMessage(\Swift_Message &$message, $fieldhtml){
+        $regex = '~data:[^;]+;[A-Za-z0-9]+,[^")\'\s]+~';
+        preg_match_all($regex, $fieldhtml, $treffers, PREG_OFFSET_CAPTURE);
+        $treffers=$treffers[0];
+        foreach($treffers as $treffer){
+            $trefferexpl=explode(',',$treffer[0],2);
+            $data=explode(';',$trefferexpl[0]);
+            $data=explode(':',$data[0]);
+            $mimetype=$data[1];
+
+            $decoded=base64_decode($trefferexpl[1]);
+            $image=new \Swift_Image();
+            $image->setBody($decoded,$mimetype);
+            $cid=$message->embed($image);
+            $fieldhtml=str_replace($treffer[0],$cid,$fieldhtml);
+        }
+
+        $message->setContentType("text/html")->setBody($fieldhtml, 'text/html');
+        return true;
+    }
+
+    protected function addAttachmentsToMessage(\Swift_Message &$message, $fieldattachments){
+        if ($fieldattachments != ''){
+            $attachments=json_decode($fieldattachments);
+            $user = $this->get('security.token_storage')->getToken()->getUser();
+            $session  = $this->get("session");
+            $fileuploads=$session->get('mailclient_fileuploads',Array());
+            if (count($attachments)>0){
+                foreach($attachments as $attachment){
+                    $file=$this->get('kernel')->getCacheDir() . '/mailclient_fileuploads/'.$user->getId().'/'.$attachment;
+                    $filename=isset($fileuploads[$attachment]) ? $fileuploads[$attachment] : $attachment;
+                    $message->attach(\Swift_Attachment::fromPath($file)->setFilename($filename));
+                }
+            }
+        }
+        return true;
+    }
+
+    protected function generateMailForRequest(Request $request){
+        $fieldfrom=$request->get('fieldfrom',0);
+        $mailaccount=$this->getUserMailaccountForId($fieldfrom);
+        if (!$mailaccount){
+            return $this->throwJsonError('Mailaccount not found');
+        }
+
+
+        $message = \Swift_Message::newInstance()
+            ->setSubject($request->get('fieldsubject',''))
+            ->setFrom(array($mailaccount->getAccountemail()=>$mailaccount->getName()));
+        try {
+            if ($request->get('fieldreplyto',false)) $message->setReplyto($this->cleanEmailaddress($request->get('fieldreplyto',false)));
+            //dump($this->cleanEmailaddress($request->get('fieldto',false)));
+            if ($request->get('fieldto',false)) $message->setTo($this->cleanEmailaddress($request->get('fieldto',false)));
+            if ($request->get('fieldbcc',false)) $message->setBcc($this->cleanEmailaddress($request->get('fieldbcc',false)));
+            if ($request->get('fieldcc',false)) $message->setCc($this->cleanEmailaddress($request->get('fieldcc',false)));
+        } catch (\Swift_RfcComplianceException $e) {
+            // Catch exceptions of type Swift_TransportException
+            return $this->throwJsonError($e->getMessage());
+        } catch (\Exception $e) {
+            // Catch default PHP exceptions
+            return $this->throwJsonError($e->getMessage());
+        }
+        if ($request->get('fieldhtml','') != ''){
+            $fieldhtml=$request->get('fieldhtml','');
+            $this->addInlineImagesToMessage($message,$fieldhtml);
+            if ($request->get('fieldtext','') != '') $message->addPart($request->get('fieldtext',''), 'text/plain');
+        }else{
+            if ($request->get('fieldtext','') != '') $message->setContentType("text/plain")->setBody($request->get('fieldtext',''), 'text/plain');
+        }
+        //attachments:
+        $this->addAttachmentsToMessage($message,$request->get('fieldattachments',''));
+
+        return $message;
+
     }
 }

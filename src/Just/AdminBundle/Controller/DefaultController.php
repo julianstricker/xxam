@@ -139,52 +139,19 @@ class DefaultController extends DefaultBaseController
 
 
 
+
     /*
      * save/load/delete Ext-Js Stateful-Settings 
      */
     public function statefulserviceAction(Request $request){
 
         $user = $this->get('security.token_storage')->getToken()->getUser();
-        $em = $this->getDoctrine()->getManager();
         if($request->getMethod()=='GET'){
-            $states=$user->getExtjsstates();
-            $resp=Array();
-            foreach($states as $state){
-                $resp[$state->getStatekey()]=$state->getStatevalue();
-            }
-            $response = new Response(json_encode($resp));
-            $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-            return $response;
+            return $this->statefulGetResponse($user);
         }else if($request->getMethod()=='POST'){
-            $state=$widget=$this->getDoctrine()->getManager()->getRepository('JustAdminBundle:Extjsstate')->findOneBy(Array('user_id'=>$user->getId(),'statekey'=>$request->get('key')));
-            if(!$state){
-                $state=new Extjsstate();
-                $state->setUser($user);
-                $state->setStatekey($request->get('key'));
-            }
-            $state->setStatevalue($request->get('value'));
-            $em->persist($state);
-            $em->flush();
-            $resp=Array('success'=>'true');
-
-            $response = new Response(json_encode($resp));
-            $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-            return $response;
+            return $this->statefulPostResponse($user,$request->get('key',false),$request->get('value'));
         }else if($request->getMethod()=='DELETE'){
-            $filter=Array('user_id'=>$user->getId());
-            if ($request->get('key',false)!=false) $filter['statekey']=$request->get('key');
-            $states=$widget=$this->getDoctrine()->getManager()->getRepository('JustAdminBundle:Extjsstate')->findBy($filter);
-            if($states){
-                foreach($states as $state){
-                    $em->remove($state);
-                }
-            }
-            $em->flush();
-            $resp=Array('success'=>'true');
-
-            $response = new Response(json_encode($resp));
-            $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-            return $response;
+            return $this->statefulDeleteResponse($user,$request->get('key',false));
         }
 
     }
