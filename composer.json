@@ -35,7 +35,16 @@
         "league/flysystem": "^1.0",
         "voryx/thruway": "^0.3.9",
         "jackalope/jackalope-doctrine-dbal": "^1.2",
-        "doctrine/phpcr-bundle": "^1.2"
+        "doctrine/phpcr-bundle": "^1.2",
+        "symfony-cmf/symfony-cmf": "^1.2",
+        "doctrine/phpcr-odm": "^1.2",
+        "doctrine/doctrine-cache-bundle": "^1.0",
+        "lunetics/locale-bundle": "^2.4",
+        "symfony-cmf/routing-auto-bundle": "^1.0",
+        "doctrine/data-fixtures": "^1.1",
+        "jms/serializer": "^1.0",
+        "jms/serializer-bundle": "^1.0",
+        "symfony-cmf/create-bundle": "dev-master"
 
 
     },
@@ -47,6 +56,7 @@
             "SymfonyStandard\\Composer::hookRootPackageInstall"
         ],
         "post-install-cmd": [
+            "Symfony\\Cmf\\Bundle\\CreateBundle\\Composer\\ScriptHandler::downloadCreateAndCkeditor",
             "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
@@ -56,6 +66,7 @@
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::prepareDeploymentTarget"
         ],
         "post-update-cmd": [
+            "Symfony\\Cmf\\Bundle\\CreateBundle\\Composer\\ScriptHandler::downloadCreateAndCkeditor",
             "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",

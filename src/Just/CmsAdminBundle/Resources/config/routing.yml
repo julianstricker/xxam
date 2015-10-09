@@ -1,0 +1,3 @@
+cmsadmin:
+    resource: "@JustCmsAdminBundle/Controller/CmsAdminController.php"
+    type: annotation
