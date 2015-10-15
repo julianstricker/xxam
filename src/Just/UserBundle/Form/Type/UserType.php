@@ -16,7 +16,7 @@ class UserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         parent::buildForm($builder ,$options);
-        
+
         $rds=$this->roledefinitions;
         $roledefinitions=Array();
         if ($rds){
