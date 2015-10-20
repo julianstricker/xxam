@@ -2,12 +2,8 @@
 
 namespace Just\MailclientBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Just\MailclientBundle\Helper\Imap\ImapMailbox;
-use Just\MailclientBundle\Entity\Mailaccount;
-use Symfony\Component\HttpFoundation\Response;
+
 use Symfony\Component\HttpFoundation\Request;
-//use Symfony\Component\HttpFoundation\Session;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 class MailclientExtraController extends MailclientBaseController {

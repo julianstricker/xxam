@@ -4,8 +4,7 @@ namespace Just\MailclientBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+
 
 class NewmailsWidgetController extends Controller
 {
@@ -16,16 +15,6 @@ class NewmailsWidgetController extends Controller
         $this->templating = $templating;
         $this->securityTokenStorage = $securityTokenStorage;
     }
-
-    
-    /*public function indexAction($params)
-    {
-        return $this->templating->renderResponse(
-                'JustMailclientBundle:FeedWidget:index.js.twig', 
-                array('params' => $params)
-        );
-        
-    }*/
 
     //this function is required for every portalwidget:
     public function getWidgetTemplateAction(){
