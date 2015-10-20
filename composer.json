@@ -1,11 +1,9 @@
 {
     "name": "xxam/xxam",
-    "description": "Xxam",
     "license": "proprietary",
     "type": "project",
     "description": "The Xxam core distribution",
     "homepage": "https://github.com/julianstricker/ThumbnailBundle",
-    "type" : "symfony-bundle",
     "authors" : [{
         "name" : "Julian Stricker",
         "email" : "julian@julianstricker.com",
