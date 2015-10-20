@@ -2,7 +2,7 @@ parameters:
     menu:
 #        logo:
 #            xtype: 'box'
-#            autoEl: { tag: 'img', src:'/bundles/justadmin/images/logoxxam.png', width: 67, height: 26 }
+#            autoEl: { tag: 'img', src:'/bundles/xxamcore/images/logoxxam.png', width: 67, height: 26 }
         hauptmenu_1:
             text:       'Portal'
             iconCls:    'defaultmenuicon'            

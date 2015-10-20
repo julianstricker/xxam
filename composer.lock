@@ -2021,7 +2021,7 @@
             "time": "2015-06-23 19:27:08"
         },
         {
-            "name": "just/thumbnailbundle",
+            "name": "xxam/thumbnailbundle",
             "version": "2.0.4",
             "source": {
                 "type": "git",

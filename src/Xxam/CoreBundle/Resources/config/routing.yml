@@ -1,0 +1,41 @@
+xxam_core_homepage:
+    path:     /
+    defaults: { _controller: XxamCoreBundle:Default:index }
+    
+xxam_core_portal:
+    path:     /portal
+    defaults: { _controller: XxamCoreBundle:Default:portal }
+    
+xxam_core_getwidget:
+    path:     /portal/getwidget/{id}
+    defaults: { _controller: XxamCoreBundle:Default:getwidget }
+    
+xxam_core_addwidget:
+    path:     /portal/addwidget
+    defaults: { _controller: XxamCoreBundle:Default:addwidget }
+    
+xxam_core_doaddwidget:
+    path:     /portal/doaddwidget
+    defaults: { _controller: XxamCoreBundle:Default:doaddwidget }
+    
+xxam_core_getwidgets:
+    path:     /portal/getwidgets
+    defaults: { _controller: XxamCoreBundle:Default:getwidgets }
+    
+xxam_core_removewidget:
+    path:     /portal/removewidget/{id}
+    defaults: { _controller: XxamCoreBundle:Default:removewidget }
+
+    
+xxam_core_feedwidget_loadfeed:
+    path:     /portal/feedwidget/loadfeed/{url}
+    defaults: { _controller: XxamCoreBundle:FeedWidget:loadfeed }
+    
+xxam_core_statefulservice:
+    path:     /statefulservice
+    defaults: { _controller: XxamCoreBundle:Default:statefulservice }
+
+
+uploadfileprogress:
+    path: /uploadfileprogress
+    defaults: { _controller: XxamCoreBundle:Default:uploadfileprogress }

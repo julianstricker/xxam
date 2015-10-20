@@ -1,5 +1,0 @@
-
-    
-just_comm_setchatid:
-    path:   /setchatid
-    defaults: { _controller: JustCommBundle:Comm:setchatid }

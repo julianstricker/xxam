@@ -1,0 +1,17 @@
+user:
+    resource: "@XxamUserBundle/Controller/UserController.php"
+    type: annotation
+
+xxam_user_user_api:
+    resource: "@XxamUserBundle/Controller/UserRESTController.php"
+    type:   rest
+    prefix:   /api
+    
+group:
+    resource: "@XxamUserBundle/Controller/GroupController.php"
+    type: annotation
+    
+xxam_user_group_api:
+    resource: "@XxamUserBundle/Controller/GroupRESTController.php"
+    type:   rest
+    prefix:   /api

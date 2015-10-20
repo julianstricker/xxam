@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>Xxam</title>
+        <!-- Ext -->
+        <link rel="stylesheet" type="text/css" href="/bundles/xxamcore/css/layout.css">
+        <link rel="stylesheet" type="text/css" href="/bundles/xxammailclient/css/layout.css">
+        <link rel="stylesheet" type="text/css" href="/bundles/xxamcalendar/css/layout.css">
+        {% set themename = 'ext-theme-' ~ exttheme %}
+        {% if exttheme == "carbon" %}{% set themename = 'codaxy-theme-carbon' %}{% endif %}
+        <!--<link rel="stylesheet" type="text/css" href="/ext-5.1.1/build/packages/ext-theme-crisp/build/resources/ext-theme-crisp-all.css">-->
+        <link rel="stylesheet" type="text/css" href="/ext-5.1.1/build/packages/ext-theme-{{ exttheme }}/build/resources/{{ themename }}-all.css">
+         
+        <script type="text/javascript" src="/ext-5.1.1/build/ext-all{%if app.environment == 'dev' %}-debug{%endif%}.js"></script>
+        <!--<script type="text/javascript" src="/ext-5.1.1/build/packages/ext-theme-crisp/build/ext-theme-crisp.js"></script>-->
+        <script type="text/javascript" src="/ext-5.1.1/build/packages/ext-theme-{{ exttheme }}/build/{{ themename }}.js"></script>
+        <script type="text/javascript" src="/ext-5.1.1/build/packages/sencha-charts/build/sencha-charts{%if app.environment == 'dev' %}-debug{%endif%}.js"></script>
+        <script type="text/javascript">
+           var menu={{ menu|json_encode|raw }}
+           var xxam_core_homepage='{{path('xxam_core_homepage')}}';
+           var statefulservicepath= '{{path('xxam_core_statefulservice')}}';
+           var setchatidurl= '{{path('xxam_comm_setchatid')}}';
+           var chattoken='{{token}}';
+           var realm='realm{{tenant_id}}';
+        </script>
+        <script type="text/javascript" src="/bundles/xxamcore/js/layout.js"></script>
+        <!--<script src="http://autobahn.s3.amazonaws.com/js/autobahn.min.js"></script>-->
+        <script src="/bundles/xxamcore/js/autobahn.min.js"></script>
+        
+    </head>
+    <body>
+    </body>
+</html>

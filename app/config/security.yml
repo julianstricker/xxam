@@ -25,8 +25,8 @@ security:
         main:
             pattern: ^/
             form_login:
-                success_handler: just_user.login_success_handler
-                failure_handler: just_user.login_failure_handler
+                success_handler: xxam_user.login_success_handler
+                failure_handler: xxam_user.login_failure_handler
                 provider: fos_userbundle
                 #csrf_provider: form.csrf_provider
             logout:       true

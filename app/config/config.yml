@@ -58,13 +58,13 @@ twig:
       resources:
         #- SimpleThingsFormExtraBundle:Form:translation_domain.html.twig
         #- SimpleThingsFormExtraBundle:Form:field_type_help.html.twig
-        #- JustAdminBundle:Form:extformfields.js.twig
+        #- XxamCoreBundle:Form:extformfields.js.twig
 
 # Assetic Configuration
 assetic:
     debug:          "%kernel.debug%"
     use_controller: false
-    bundles:        [ 'JustCmsAdminBundle', CmfCreateBundle ]
+    bundles:        [ 'XxamCmsAdminBundle', CmfCreateBundle ]
     #java: /usr/bin/java
     filters:
         cssrewrite: ~
@@ -100,7 +100,7 @@ doctrine:
                         class: Gedmo\SoftDeleteable\Filter\SoftDeleteableFilter
                         enabled: true
                     tenant_filter:
-                        class: Just\AdminBundle\Filter\TenantFilter 
+                        class: Xxam\CoreBundle\Filter\TenantFilter
                         enabled: true
                     
                 mappings:
@@ -160,7 +160,7 @@ cmf_routing:
             cmf_routing.dynamic_router: 100
     dynamic:
         controllers_by_class:
-            Just\CmsAdminBundle\Document\Page: Just\CmsAdminBundle\Controller\CmsAdminController::pageAction
+            Xxam\CmsAdminBundle\Document\Page: Xxam\CmsAdminBundle\Controller\CmsAdminController::pageAction
         persistence:
             phpcr:
                 enabled: true
@@ -222,16 +222,16 @@ swiftmailer:
 fos_user:
     db_driver: orm # other valid values are 'mongodb', 'couchdb' and 'propel'
     firewall_name: main
-    user_class: Just\UserBundle\Entity\User
+    user_class: Xxam\UserBundle\Entity\User
     group:
-        group_class: Just\UserBundle\Entity\Group
+        group_class: Xxam\UserBundle\Entity\Group
         
 stof_doctrine_extensions:
     default_locale: %locale% 
     translation_fallback: true
     #class:
-    #    timestampable: AdminBundle\TimestampableListener
-    #    translatable:  AdminBundle\TranlationListener
+    #    timestampable: CoreBundle\TimestampableListener
+    #    translatable:  CoreBundle\TranlationListener
     orm:
         default: 
           timestampable: true
@@ -289,7 +289,7 @@ stof_doctrine_extensions:
 #        port: 1337
 #    listeners:
 #        listener1:
-#          class: Just\AdminBundle\Services\ChatWampServerService
+#          class: Xxam\CoreBundle\Services\ChatWampServerService
             
 #voryx_thruway:
 #    realm: 'realm1'
@@ -300,9 +300,9 @@ stof_doctrine_extensions:
 #        trusted_port: '1338' # Bypasses all authentication.  Use this for trusted clients.
 ##        authentication: false # true will load the AuthenticationManager
 #    locations:
-#        bundles: ["JustCommBundle"]
+#        bundles: ["XxamCommBundle"]
 #        files:
-#            - "Just\\CommBundle\\Controller\\CommController"     
+#            - "Xxam\\CommBundle\\Controller\\CommController"
           
 fos_rest:
     routing_loader:

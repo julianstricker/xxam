@@ -1,8 +1,17 @@
 {
-    "name": "root/xxam",
+    "name": "xxam/xxam",
     "description": "Xxam",
     "license": "proprietary",
     "type": "project",
+    "description": "The Xxam core distribution",
+    "homepage": "https://github.com/julianstricker/ThumbnailBundle",
+    "type" : "symfony-bundle",
+    "authors" : [{
+        "name" : "Julian Stricker",
+        "email" : "julian@julianstricker.com"
+        "homepage": "https://github.com/julianstricker/xxam/contributors"
+    }],
+    "keywords" : ["xxam", "symfony2", "framework"],
     "autoload": {
         "psr-0": {
             "": "src/",
@@ -44,7 +53,9 @@
         "doctrine/data-fixtures": "^1.1",
         "jms/serializer": "^1.0",
         "jms/serializer-bundle": "^1.0",
-        "symfony-cmf/create-bundle": "dev-master"
+        "symfony-cmf/create-bundle": "dev-master",
+        "phpunit/phpunit": "^4.8"
+
 
 
     },

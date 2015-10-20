@@ -1,6 +1,0 @@
-securitytypes:
-    0: Off
-    1: SSL/TLS
-    2: SSL/TLS accept all certificates
-    3: STARTTLS 
-    4: STARTTLS accept all certificates

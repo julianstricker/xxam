@@ -1,0 +1,8 @@
+contact:
+    resource: "@XxamContactBundle/Controller/ContactController.php"
+    type: annotation
+
+xxam_contact_contact_api:
+    resource: "@XxamContactBundle/Controller/ContactRESTController.php"
+    type:   rest
+    prefix:   /api

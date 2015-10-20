@@ -1,0 +1,56 @@
+filemanager:
+    path: /filemanager
+    defaults: { _controller: XxamFilemanagerBundle:Filemanager:index }
+
+filemanager_listfolders:
+    path: /filemanager/listfolders
+    defaults: { _controller: XxamFilemanagerBundle:FilemanagerExtra:listfolders }
+
+filemanager_listfiles:
+    path: /filemanager/listfiles
+    defaults: { _controller: XxamFilemanagerBundle:FilemanagerExtra:listfiles }
+
+filemanager_deletefile:
+    path: /filemanager/deletefile
+    defaults: { _controller: XxamFilemanagerBundle:FilemanagerExtra:deletefile }
+     
+filemanager_movefile:
+    path: /filemanager/movefile
+    defaults: { _controller: XxamFilemanagerBundle:FilemanagerExtra:movefile }
+    
+filemanager_copyfile:
+    path: /filemanager/copyfile
+    defaults: { _controller: XxamFilemanagerBundle:FilemanagerExtra:copyfile }
+    
+filemanager_writefile:
+    path: /filemanager/writefile
+    defaults: { _controller: XxamFilemanagerBundle:FilemanagerExtra:writefile }
+    
+filemanager_readfile:
+    path: /filemanager/readfile
+    defaults: { _controller: XxamFilemanagerBundle:FilemanagerExtra:readfile }
+    
+    
+    
+    
+    
+filemanager_admin:
+    path: /filemanager/admin
+    defaults: { _controller: XxamFilemanagerBundle:Filemanager:admin }
+    
+filemanager_new:
+    path: /filemanager/edit
+    defaults: { _controller: XxamFilemanagerBundle:Filemanager:new }
+
+filemanager_edit:
+    path: /filemanager/edit/{id}
+    defaults: { _controller: XxamFilemanagerBundle:Filemanager:edit }
+
+filemanager_getthumbnail:
+    path: /filemanager/getthumbnail
+    defaults: { _controller: XxamFilemanagerBundle:FilemanagerExtra:getThumbnail }
+    
+xxam_filemanager_filemanager_api:
+    resource: "@XxamFilemanagerBundle/Controller/FilemanagerRESTController.php"
+    type:   rest
+    prefix:   /api

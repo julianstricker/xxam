@@ -1,3 +1,0 @@
-calendar:
-    path: /calendar
-    defaults: { _controller: JustCalendarBundle:Calendar:index }

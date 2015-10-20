@@ -1,3 +1,0 @@
-coding:
-    path: /coding
-    defaults: { _controller: JustCodingBundle:Coding:index }

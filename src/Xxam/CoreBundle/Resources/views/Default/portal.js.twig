@@ -1,0 +1,209 @@
+{% set iconsize = '16x16' %}
+{% set buttonsize = 'medium' %}
+{% if buttonsize == 'large' %}
+    {% set iconsize = '32x32' %}
+{% endif %}
+{
+    tabtitle: 'Portal',
+    getitems: function (){
+    
+        loadwidget=function(id, title, params) {
+           var portlet=Ext.create('Portal.view.Portlet',{
+                'title': title,
+                //closable: true,
+                //layout: 'fit',
+                //columnIndex: col,
+                stateful: true,
+                stateId: 'portal_portlet_'+id,
+                id: 'portal_portlet_'+id,
+                height: typeof(params.height) != 'undefined' ? params.height : 300,
+                items: [{
+                    xtype: 'panel',
+                    border: 0,
+                    layout: 'fit',
+                    loader: {
+                        url: '{{path('xxam_core_portal')}}/getwidget/' + id,
+                        autoLoad: false,
+                        loadOnRender: true,
+                        loadMask: true,
+                        renderer: function(loader, response, active){
+                            var success = true,
+                                target = loader.getTarget(),
+                                items = [];
+
+                            //<debug>
+                            if (!target.isContainer) {
+                                Ext.Error.raise({
+                                    target: target,
+                                    msg: 'Components can only be loaded into a container'
+                                });
+                            }
+                            //</debug>
+
+                            try {
+                                items = Ext.decode(response.responseText);
+                            } catch (e) {
+                                success = false;
+                            }
+
+                            if (success) {
+                                //target.suspendLayouts();
+                                //if (typeof (items.tabicon) != 'undefined') loader.getTarget().setIcon(items.tabicon);
+                                if (active.removeAll) {
+                                    target.removeAll();
+                                }
+                                if (typeof (items.getitems) != 'undefined') target.add(items.getitems());
+
+                                //target.resumeLayouts(true);
+                            }
+                            return success;
+                        },
+                        failure: function(loader,response){
+                            Ext.Msg.alert('Failed', response ? response : 'No response');
+                            //loader.target.close();
+                        }
+                    }
+                }],
+                listeners: {
+                    close:function(){
+                        Ext.Ajax.request({
+                            url: '{{path('xxam_core_portal')}}/removewidget/' + this.stateId.substring(15),
+                            success: function(response){
+                                var text = response.responseText;
+                                // process server response here
+                            }
+                        });
+                    }
+                }
+           });
+           var portletstate=Ext.state.Manager.get('portal_portlet_'+id);
+           
+           if (typeof(portletstate)!='undefined' && portletstate.column=='col-2'){
+               portalpanelcol2.add(portlet);
+           }else{
+               portalpanelcol1.add(portlet);
+           }
+        }
+    
+    
+    
+    
+    
+    
+       portalpanelcol1=Ext.create('Portal.view.PortalColumn',{
+            id: 'col-1',
+            defaults :{
+                padding: 0,
+                //margin: 8,
+                border: 0,
+                minHeight: 200,
+                bodyBorder: false,
+                stateEvents: ["collapse","expand","columnresize","resize"],
+                stateful:true,
+                //stateId: 'portalpanelcol1',
+                getState: function(){
+                    sssss=this;
+                    var portalcolumn=this.up('portalcolumn');
+                    var pos=0;
+                    for(var i=0; i<portalcolumn.items.items.length; i++){
+                        if (portalcolumn.items.items[i].stateId==this.stateId){
+                            pos=i;
+                            break;
+                        }
+                    }
+                    return {collapsed:this.collapsed, column:portalcolumn.id, position: pos, height: this.height};
+                }
+            },
+            
+            items: []
+        });
+        portalpanelcol2=Ext.create('Portal.view.PortalColumn',{
+            id: 'col-2',
+            defaults :{
+                padding: 0,
+                //margin: 8,
+                border: 0,
+                minHeight: 200,
+                bodyBorder: false,
+                stateEvents: ["move","position","drop","hide","show","collapse","expand","columnmove","columnresize","sortchange"],
+                stateful:true,
+                //stateId: 'portalpanelcol2',
+                getState: function(){
+                    sssss=this;
+                    var portalcolumn=this.up('portalcolumn');
+                    var pos=0;
+                    for(var i=0; i<portalcolumn.items.items.length; i++){
+                        if (portalcolumn.items.items[i].stateId==this.stateId){
+                            pos=i;
+                            break;
+                        }
+                    }
+                    return {collapsed:this.collapsed, column:portalcolumn.id, position: pos, height: this.height};
+                }
+            },
+            items: []
+        });
+
+        portalpanel = Ext.createWidget('portalpanel',{
+            id: 'xxam-portal',
+            bodyStyle: {
+                //background: '#EBEBEB'
+            },
+            border: 0,
+            defaults :{
+                bodyStyle: {
+                    //background: '#EBEBEB'
+                }
+            },
+            layout: 'column',
+            items: [portalpanelcol1,portalpanelcol2],
+            listeners:{
+                    drop: function(source){
+                        ss=source;
+                        Ext.Array.each(source.column.items.items,function(portlet){
+                            portlet.saveState();
+                        });
+                    }
+            }
+        });
+        
+        return {
+    
+            tbar: [{ 
+                xtype: 'button', 
+                text: '{%trans%}Add Widgets{%endtrans%}',
+                icon: '/bundles/xxamcore/icons/{{iconsize}}/application_add.png',
+                handler: function(){
+                        window.location.href='#portal/addwidget';
+                    }
+              }],
+            layout: 'fit',
+            listeners: {
+                afterrender: function(){
+                    var widgets=[];
+                    {% for widget in widgets %}
+                        widgets.push({id:{{widget.id}}, title:'{{widget.title}}', params:{{widget.params|raw}}});
+                    {% endfor %}
+                    Ext.Array.sort(widgets,function(a,b){
+                        var astate = Ext.state.Manager.get('portal_portlet_'+a.id);
+                        var bstate = Ext.state.Manager.get('portal_portlet_'+b.id);
+                        var apos = typeof (astate) == 'undefined' ? 0 : astate.position;
+                        var bpos = typeof (bstate) == 'undefined' ? 0 : bstate.position;
+                        if (apos<bpos){
+                            return -1;
+                        }else if (apos>bpos){
+                            return 1;
+                        }
+                        return 0;
+                    });
+                    Ext.Array.each(widgets,function(widget){
+                        loadwidget(widget.id, widget.title, widget.params);
+                    });
+                }
+            },
+            items: [
+               portalpanel
+            ]
+        }
+    }
+}

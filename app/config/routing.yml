@@ -1,35 +1,35 @@
-just_comm:
-    resource: "@JustCommBundle/Resources/config/routing.yml"
+xxam_comm:
+    resource: "@XxamCommBundle/Resources/config/routing.yml"
     prefix:   /
 
 
 
-just_contact:
-    resource: "@JustContactBundle/Resources/config/routing.yml"
+xxam_contact:
+    resource: "@XxamContactBundle/Resources/config/routing.yml"
     prefix:   /
 
-just_admin:
-    resource: "@JustAdminBundle/Resources/config/routing.yml"
+xxam_core:
+    resource: "@XxamCoreBundle/Resources/config/routing.yml"
     prefix:   /
     
-just_emailclient:
-    resource: "@JustMailclientBundle/Resources/config/routing.yml"
+xxam_emailclient:
+    resource: "@XxamMailclientBundle/Resources/config/routing.yml"
     prefix:   /
     
-just_calendar:
-    resource: "@JustCalendarBundle/Resources/config/routing.yml"
+xxam_calendar:
+    resource: "@XxamCalendarBundle/Resources/config/routing.yml"
     prefix:   /
     
-just_coding:
-    resource: "@JustCodingBundle/Resources/config/routing.yml"
+xxam_coding:
+    resource: "@XxamCodingBundle/Resources/config/routing.yml"
     prefix:   /
     
-just_filemanager:
-    resource: "@JustFilemanagerBundle/Resources/config/routing.yml"
+xxam_filemanager:
+    resource: "@XxamFilemanagerBundle/Resources/config/routing.yml"
     prefix:   /
     
-just_user:
-    resource: "@JustUserBundle/Resources/config/routing.yml"
+xxam_user:
+    resource: "@XxamUserBundle/Resources/config/routing.yml"
     prefix:   /
 
 fos_user:
@@ -39,8 +39,8 @@ fos_user:
 #    resource: "@FOSUserBundle/Resources/config/routing/group.xml"
 #    prefix: /group
     
-#JS\ThumbnailBundle\Controller
-just_thumbnail:
+#Just\ThumbnailBundle\Controller
+xxam_thumbnail:
     path:  /thumbnails/{mode}/{maxx}x{maxy}/{img}
     defaults: { _controller: JustThumbnailBundle:Thumbnail:thumbnail }
     requirements:
@@ -49,7 +49,7 @@ just_thumbnail:
         #maxy: ~
         img: ".+"
 
-just_thumbnail_x:
+xxam_thumbnail_x:
     path:  /thumbnails/{mode}/{maxx}x/{img}
     defaults: { _controller: JustThumbnailBundle:Thumbnail:thumbnail }
     requirements:
@@ -57,7 +57,7 @@ just_thumbnail_x:
         #maxx: ~
         img: ".+"
 
-just_thumbnail_y:
+xxam_thumbnail_y:
     path:  /thumbnails/{mode}/x{maxy}/{img}
     defaults: { _controller: JustThumbnailBundle:Thumbnail:thumbnail }
     requirements:

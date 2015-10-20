@@ -1,0 +1,520 @@
+{% set iconsize = '16x16' %}
+{% set buttonsize = 'medium' %}
+{% if buttonsize == 'large' %}
+    {% set iconsize = '32x32' %}
+{% endif %}
+{
+    tabtitle: 'Calendar',
+    tabicon: '/bundles/xxamcalendar/icons/16x16/calendar.png',
+    getitems: function (){
+         
+        var startwithmonday=true;
+        if (startwithmonday){
+            var weekdays=['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        }else{
+            var weekdays=Ext.Date.dayNames;
+        }
+        var gotonextmonth = function (e) {
+            var actualmonth=Ext.Date.add(startdate, Ext.Date.DAY, 15);
+            var nextmonth= new Date(actualmonth.getFullYear(),actualmonth.getMonth()+1,1);
+            var firstdayofmonth=Ext.Date.getFirstDayOfMonth(nextmonth);
+            
+            if (startwithmonday){
+                firstdayofmonth--;
+                if (firstdayofmonth==-1){
+                    firstdayofmonth=6;
+                }
+            }
+            startdate= Ext.Date.subtract(nextmonth, Ext.Date.DAY, firstdayofmonth);
+            var drawcontainer=Ext.getCmp('drawcontainer'); 
+            drawmonth(drawcontainer);
+        }
+        
+        var gotopreviousmonth = function (e) {
+            var actualmonth=Ext.Date.add(startdate, Ext.Date.DAY, 15);
+            var nextmonth= new Date(actualmonth.getFullYear(),actualmonth.getMonth()-1,1);
+            var firstdayofmonth=Ext.Date.getFirstDayOfMonth(nextmonth);
+            
+            if (startwithmonday){
+                firstdayofmonth--;
+                if (firstdayofmonth==-1){
+                    firstdayofmonth=6;
+                }
+            }
+            startdate= Ext.Date.subtract(nextmonth, Ext.Date.DAY, firstdayofmonth);
+            var drawcontainer=Ext.getCmp('drawcontainer'); 
+            drawmonth(drawcontainer);
+        }
+        
+        
+        var onCalendarBackgroundAnimationEnd=function(){
+            var drawcontainer=Ext.getCmp('drawcontainer'); 
+            drawmonth(drawcontainer);
+        }
+        var doCalendarScroll = function (e) {
+            e.preventDefault();
+            e = window.event || e;
+            var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+            var drawcontainer=Ext.getCmp('drawcontainer'); //Xxam.findComponentByElement(e.target);
+            
+            if(iscalendarscrolling) {
+                //drawmonth(drawcontainer);
+                return false;
+            }
+            iscalendarscrolling=true;
+            startdate= Ext.Date.add(startdate, Ext.Date.DAY, -delta*7);
+            
+            var surface=drawcontainer.getSurface('main');
+            var background=surface.getItems()[0];
+            //var eventslayer=surface.getItems()[1];
+            var dcheight=drawcontainer.getHeight();
+            background.setAttributes({translateY: ((dcheight-35)/6)*delta});
+            eventslayer.setAttributes({translateY: ((dcheight-35)/6)*delta});
+            for(i=0; i<eventsprites.length; i++){
+                eventsprites[i].setAttributes({translateY: ((dcheight-35)/6)*delta});
+            }
+            surface.renderFrame();
+            //drawmonth(drawcontainer);
+        };
+        
+        var today = new Date();
+        var firstdayofmonth=Ext.Date.getFirstDayOfMonth(today);
+        if (startwithmonday){
+            firstdayofmonth--;
+            if (firstdayofmonth==-1){
+                firstdayofmonth=6;
+            }
+        }
+        var startdate= Ext.Date.subtract(Ext.Date.getFirstDateOfMonth(today), Ext.Date.DAY, firstdayofmonth);
+        var calendarevents=[
+            {'calendar':'default','fromdate':'2015-09-03','todate':'2015-09-20','title':'Lei a test'},
+            {'fromdate':'2015-09-15','todate':'2015-09-15','title':'No a test2'},
+            {'calendar':'default','fromdate':'2015-09-05','todate':'2015-09-23','title':'No a test'},
+            {'fromdate':'2015-09-15','todate':'2015-09-15','title':'No a test2'}];
+        var eventsperday=[];
+        var drawevents=function(drawcontainer){
+            var surface=drawcontainer.getSurface('main');
+            var dcwidth=drawcontainer.getWidth();
+            var dcheight=drawcontainer.getHeight();
+            eventsprites=[];
+            eventslayer=Ext.create('Ext.draw.sprite.Composite',{
+                id: 'eventslayer',
+                itemId: 'eventslayer',
+                x: 0,
+                y: 0,
+                translationY: 0.5,
+                translationX: 0.5
+            });
+            eventslayer.fx.setEasing('easeOut');
+            eventslayer.fx.setDuration(500);
+            slotsperday={};
+            for(var i=0; i<calendarevents.length; i++){
+                var pos=findfreeslot(calendarevents[i].fromdate,calendarevents[i].todate);
+                drawevent(drawcontainer,pos,calendarevents[i].fromdate,calendarevents[i].todate,calendarevents[i].title,'lightblue',null);
+            }
+            surface.add(eventslayer);
+            
+        }
+        
+        var findfreeslot=function(fromdate,todate){
+            var fromdateobj=new Date(fromdate);
+            var todateobj=new Date(todate);
+            var freeslot=-1;
+            var slot=0;
+            while(freeslot==-1){
+                var slotisfree=true;
+                for (var i=0; i<=Ext.Date.diff(fromdateobj,todateobj,Ext.Date.DAY); i++){
+                    var thedate=Ext.Date.add(fromdateobj, Ext.Date.DAY, i);
+                    if (typeof slotsperday[Ext.Date.format(thedate,'Y.m.d')] != 'undefined'){
+                        if (Ext.Array.contains(slotsperday[Ext.Date.format(thedate,'Y.m.d')],slot)){
+                            slotisfree=false;
+                            break;
+                        }
+                    }
+                }
+                if (slotisfree) return slot;
+                slot++;
+
+            }
+            return false;
+        }
+        
+        var drawevent=function(drawcontainer,pos,fromdate,todate,text,color,icon){
+            var surface=drawcontainer.getSurface('main');
+            var startdatedraw=Ext.Date.subtract(startdate, Ext.Date.DAY, 7);
+            var enddatedraw=Ext.Date.add(startdatedraw, Ext.Date.DAY, 7*8);
+            console.log(startdate,startdatedraw,enddatedraw);
+            var surface=drawcontainer.getSurface('main');
+            var dcwidth=drawcontainer.getWidth();
+            var dcheight=drawcontainer.getHeight();
+            var fromdateobj=new Date(fromdate);
+            var todateobj=new Date(todate);
+            var startposx=false;
+            var startposy=false;
+            var startarrow=false;
+            var width = ((dcwidth-40)/7);
+            var height = ((dcheight-35)/6);
+            
+            var path='M 1,1 L 1,1 '; //fix wegen nicht gerenderter events ausserhalb Sichtbarkeit
+            for (var i=0; i<=Ext.Date.diff(fromdateobj,todateobj,Ext.Date.DAY); i++){
+              
+              var thedate=Ext.Date.add(fromdateobj, Ext.Date.DAY, i);
+             
+              if (thedate>=startdatedraw && thedate<enddatedraw){
+                if (typeof slotsperday[Ext.Date.format(thedate,'Y.m.d')] == 'undefined') slotsperday[Ext.Date.format(thedate,'Y.m.d')]=[];
+                slotsperday[Ext.Date.format(thedate,'Y.m.d')].push(pos);
+                var daysfromstart=Ext.Date.diff(startdatedraw,thedate,Ext.Date.DAY)
+                var thedateposx= Math.round(30+((dcwidth-40)/7)*(daysfromstart%7));
+                var thedateposy= Math.round(25+((dcheight-35)/6)*(Math.floor(daysfromstart/7)-1));
+                if (startposx==false){
+                    startposx=thedateposx;
+                    startposy=thedateposy;
+                    
+                    eventslayer.add({
+                        type: 'text',
+                        x: (startposx+5),
+                        y: (startposy+20+13+(pos*17)),
+                        text: text+' ('+Ext.Date.format(fromdateobj,'d.m.Y')+' - '+Ext.Date.format(todateobj,'d.m.Y')+')',
+                        fontSize: 12,
+                        fillStyle: 'black'
+                    });
+                    
+                    //Spitze am Anfrang?
+                    startarrow=(Ext.Date.format(thedate, 'Y-m-d')!=Ext.Date.format(fromdateobj, 'Y-m-d'));
+                    if (startarrow){
+                        path+=' M '+(startposx+5)+','+(startposy+20+15+(pos*17))+
+                            ' L '+(startposx+1)+','+(startposy+20+7.5+(pos*17))+
+                            ' L '+(startposx+5)+','+(startposy+20+(pos*17));
+                     }else{
+                        path+=' M '+(startposx+1)+','+(startposy+20+15+(pos*17))+
+                            ' L '+(startposx+1)+','+(startposy+20+(pos*17));
+                     }
+                }
+                if(daysfromstart%7==6){
+                 
+                 if(Ext.Date.format(thedate, 'Y-m-d')!=Ext.Date.format(todateobj, 'Y-m-d')){
+                    path+=' L '+Math.round(thedateposx+((dcwidth-40)/7)-5)+','+(startposy+20+(pos*17))+
+                        ' L '+Math.round(thedateposx+((dcwidth-40)/7))+','+(startposy+20+7.5+(pos*17))+
+                        ' L '+Math.round(thedateposx+((dcwidth-40)/7)-5)+','+(startposy+20+15+(pos*17));
+                 }else{
+                     path+=' L '+Math.round(thedateposx+((dcwidth-40)/7)-1)+','+(startposy+20+(pos*17))+
+                        ' L '+Math.round(thedateposx+((dcwidth-40)/7)-1)+','+(startposy+20+15+(pos*17));
+                 }
+                 if (startarrow){
+                    path+=' L '+(startposx+5)+','+(startposy+20+15+(pos*17));
+                 }else{
+                    path+=' L '+(startposx+1)+','+(startposy+20+15+(pos*17));
+                 }
+                  
+                  startposx=false;
+                  startposy=false;
+                }
+              }
+            }
+            if (startposx!=false){
+                  var daysfromstart=Ext.Date.diff(startdatedraw,thedate,Ext.Date.DAY)
+                  var thedateposx= Math.round(30+((dcwidth-40)/7)*(daysfromstart%7));
+                  var thedateposy= Math.round(25+((dcheight-35)/6)*(Math.floor(daysfromstart/7)-1));
+                  path+=' L '+Math.round(thedateposx+((dcwidth-40)/7)-1)+','+(startposy+20+(pos*17))+
+                        ' L '+Math.round(thedateposx+((dcwidth-40)/7)-1)+','+(startposy+20+15+(pos*17));
+                        
+                 if (startarrow){
+                    path+=' L '+(startposx+5)+','+(startposy+20+15+(pos*17));
+                 }else{
+                    path+=' L '+(startposx+1)+','+(startposy+20+15+(pos*17));
+                 }
+            }
+            var eventspritescount=eventsprites.length;
+            if (path!=''){
+                console.log(path);
+                eventsprites[eventspritescount]=Ext.create('Ext.draw.Sprite',{
+                    type: 'path',
+                    stroke: 'blue',     
+                    'stroke-width': 1,
+                    opacity: 1,          
+                    path: path,
+                    globalAlpha: 0.5,
+                    fillStyle: 'lightblue',
+                    //shadowBlur: 2,
+                    //shadowColor: 'gray',
+                    //shadowOffsetY: 1,
+                    /*plugins: [{
+                        ptype: 'spriteevents'
+                    }],
+                    listeners: {
+                        mouseover: function(ele){ 
+                            console.log('over');
+                            ele.setAttributes({
+                                'stroke-width': 3
+                            },true)
+                        },
+                        mouseout: function(ele){ 
+                            console.log('out');
+                            ele.setAttributes({
+                                'stroke-width': 1
+                            },true)
+                        },
+                        spriteclick: {
+                            fn: function () {
+                                console.log('click');
+                             }
+                        }
+                        
+
+                    },    */
+                    translationY: 0.5,
+                    translationX: 0.5
+                });
+                eventsprites[eventspritescount].fx.setEasing('easeOut');
+                eventsprites[eventspritescount].fx.setDuration(500);
+                
+                
+                
+                //eventslayer.add(sprite);
+                surface.add(eventsprites[eventspritescount]);
+                eventsprites[eventspritescount].show(true);
+                
+                
+
+
+
+
+            }
+            
+        }
+        var drawmonth=function(drawcontainer){
+            
+            var surface=drawcontainer.getSurface('main');
+            surface.removeAll(true);
+            
+            
+            d=drawcontainer;
+            s=surface;
+            
+  
+
+
+
+
+            var dcwidth=drawcontainer.getWidth();
+            var dcheight=drawcontainer.getHeight();
+            var background=Ext.create('Ext.draw.sprite.Composite',{
+                id: 'calendarbackground',
+                itemId: 'calendarbackground',
+                x: 0,
+                y: 0,
+                translationY: 0.5,
+                translationX: 0.5
+            });
+            background.fx.setEasing('easeOut');
+            background.fx.setDuration(500);
+            background.fx.on('animationend', onCalendarBackgroundAnimationEnd, this);
+            //background.fx.setDurationOn('height', 250);
+            //background.fx.setEasingOn('width', 'elasticIn');
+            b=background;
+            var actualmonth=Ext.Date.add(startdate, Ext.Date.DAY, 15);
+            var actualmonthnumber=Ext.Date.format(actualmonth, 'Y-m');
+            
+            var startdatedraw=Ext.Date.subtract(startdate, Ext.Date.DAY, 7);
+            var todayformat=Ext.Date.format(today, 'Y-m-d');
+            for(var i=0; i<7*8; i++){
+                var theday=Ext.Date.add(startdatedraw, Ext.Date.DAY, i);
+                if (Ext.Date.format(theday, 'Y-m-d')==todayformat){
+                    
+                    background.add({
+                        type: 'rect',
+                        x: Math.round(30+((dcwidth-40)/7)*(i%7)),
+                        y: Math.round(25+((dcheight-35)/6)*(Math.floor(i/7)-1)),
+                        width: Math.round((dcwidth-40)/7),
+                        height: Math.round((dcheight-35)/6),
+                        fillStyle: 'whitesmoke',
+                        //strokeStyle: 'black',
+                        //lineWidth: 1,
+                        translationX: 0.5,
+                        translationY: 0.5
+                    });
+                }
+                background.add({
+                    type: 'text',
+                    x: Math.round(34+((dcwidth-40)/7)*(i%7)),
+                    y: Math.round(40+((dcheight-35)/6)*(Math.floor(i/7)-1)),
+                    text: Ext.Date.format(theday,'j')=='1' ? Ext.Date.format(theday,'j. M') : Ext.Date.format(theday,'j'),
+                    fontSize: 12,
+                    fillStyle: actualmonthnumber==Ext.Date.format(theday, 'Y-m') ? 'black' : 'lightgray'
+                });
+            }
+            for(var i=0; i<8; i++){
+                
+                background.add({
+                    type: 'line',
+                    fromX: 10,
+                    fromY: Math.round(25+((dcheight-35)/6)*(i)),
+                    toX: dcwidth-10,
+                    toY: Math.round(25+((dcheight-35)/6)*(i)),
+                    strokeStyle: 'lightgray',
+                    lineWidth: 1 //,
+                    //translationX: 0.5,
+                    //translationY: 0.5
+                });
+                
+                var theday=Ext.Date.add(startdatedraw, Ext.Date.DAY, i*7);
+                background.add({
+                    type: 'text',
+                    x: 14,
+                    y: Math.round(40+((dcheight-35)/6)*(i-1)),
+                    text: Ext.Date.format(theday,'W'),
+                    fontSize: 12,
+                    fillStyle: 'lightgray'
+                });
+            }
+            
+            
+            var foreground=Ext.create('Ext.draw.sprite.Composite',{
+                x: 0,
+                y: 0
+            });
+            
+            f=foreground;
+            
+            
+            foreground.add({
+                type: 'rect',
+                x: 0,
+                y: 0,
+                width: dcwidth,
+                height: 25,
+                fillStyle: 'white'
+            });
+            foreground.add({
+                type: 'rect',
+                x: 0,
+                y: dcheight-10,
+                width: dcwidth,
+                height: 10,
+                fillStyle: 'white'
+            });
+            
+            var hlinespath=['M 10,25 H '+(dcwidth-10)];
+            hlinespath.push('M 10,'+(dcheight-10)+' H '+(dcwidth-10));
+            hlinespath.push('M 10,25 V '+(dcheight-10));
+            hlinespath.push('M '+(dcwidth-10)+',25 V '+(dcheight-10));
+            for(var i=0; i<weekdays.length; i++){
+                var weekday=weekdays[i];
+                if (dcwidth<600) weekday=weekday.substring(0,3);
+                if (dcwidth<300) weekday=weekday.substring(0,2);
+                foreground.add({
+                    type: 'text',
+                    x: Math.round(34+((dcwidth-40)/7)*i),
+                    y: 20,
+                    text: weekday,
+                    fontSize: 12,
+                    fillStyle: 'gray'
+                });
+                
+                hlinespath.push('M '+Math.round(((dcwidth-40)/7)*i+30)+',25 V '+(dcheight-10)); 
+                
+            }
+            
+            foreground.add({
+                    type: 'path',
+                    path: hlinespath.join(' '),
+                    
+                    strokeStyle: 'lightgray',
+                    lineWidth: 1,
+                    translationX: 0.5,
+                    translationY: 0.5
+                });
+            surface.add(background);
+            drawevents(drawcontainer);
+            surface.add(foreground);
+            
+            
+            surface.renderFrame();
+            var firstitem=surface.getItems()[0];
+            
+            iscalendarscrolling=false;
+            donotdrawmonth=true;
+            Ext.getCmp('calendartbmonthtext').setHtml(Ext.Date.format(actualmonth, 'F Y'));
+            donotdrawmonth=false;
+            
+
+
+
+
+        }
+        return {
+            layout: 'border',
+            items: [{
+                region: 'west',
+                title: ' ',
+                //width: 300,
+                split: true,
+                collapsible: true,
+                minSize: 75,
+                maxSize: 450,
+                layout: 'vbox',
+                margins: '0 2 2 2',
+                autoScroll: true,
+                items: [{
+                    xtype: 'datepicker'
+                }]
+            },{
+                region: 'center',
+                layout: 'fit',
+                margins: '2 2 0 0',
+                dockedItems: [{
+                    xtype: 'toolbar',
+                    dock: 'top',
+                    items: [
+                        {icon: '/bundles/xxamcalendar/icons/{{iconsize}}/bullet_arrow_left.png', handler: gotopreviousmonth},
+                        {icon: '/bundles/xxamcalendar/icons/{{iconsize}}/bullet_arrow_right.png',handler: gotonextmonth},
+                        { xtype: 'tbtext', id: 'calendartbmonthtext',html: ' ' },
+                        '->',
+                        {xtype: 'button', text: '{%trans%}Day{%endtrans%}',toggleGroup: 'calendardisplaytype',icon: '/bundles/xxamcalendar/icons/{{iconsize}}/outlook_calendar_day.png'},
+                        {xtype: 'button', text: '{%trans%}Week{%endtrans%}',toggleGroup: 'calendardisplaytype',icon: '/bundles/xxamcalendar/icons/{{iconsize}}/outlook_calendar_week.png'},
+                        {xtype: 'button', text: '{%trans%}Month{%endtrans%}',toggleGroup: 'calendardisplaytype',icon: '/bundles/xxamcalendar/icons/{{iconsize}}/outlook_calendar_month.png',pressed: true}
+                    ]
+                }],
+                items: [{
+                    xtype: 'draw',
+                    id: 'drawcontainer',
+                    plugins: [{
+                        ptype: 'spriteevents'
+                    }],
+                    //engine: 'Ext.draw.engine.Svg',
+                    autoShow: true,
+                    
+                    listeners:{
+                        layout: function(drawcontainer){
+                            
+                        },
+                        afterlayout: function(drawcontainer){
+                            if (typeof donotdrawmonth == 'undefined' || !donotdrawmonth) drawmonth(drawcontainer);
+                        },
+                        afterrender: function(){
+                            if (window.addEventListener) {
+                                this.el.dom.addEventListener("mousewheel", doCalendarScroll, false);
+                                this.el.dom.addEventListener("DOMMouseScroll", doCalendarScroll, false);
+                            } else {
+                                this.el.dom.attachEvent("onmousewheel", doCalendarScroll);
+                            }
+                        },
+                        spriteclick: function(sprite, event){ 
+                            console.log('spriteclick',sprite,event); 
+                        },
+                        spritemouseover: function(sprite, event){ 
+                            ssprite=sprite;
+                            sprite.sprite.setAttributes({globalAlpha:1});
+                            console.log('spritemouseover',sprite,event); 
+                        },
+                        
+                        spritemouseout: function(sprite, event){ 
+                            ssprite=sprite;
+                            sprite.sprite.setAttributes({globalAlpha:0.5});
+                        }
+                    }
+                }]
+            }]
+        }
+    }
+}

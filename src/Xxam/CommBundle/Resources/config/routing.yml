@@ -1,0 +1,5 @@
+
+    
+xxam_comm_setchatid:
+    path:   /setchatid
+    defaults: { _controller: XxamCommBundle:Comm:setchatid }
