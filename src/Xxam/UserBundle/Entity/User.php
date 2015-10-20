@@ -53,11 +53,6 @@ class User extends BaseUser implements Base\TenantInterface
      */
     protected $groups;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="Xxam\MailclientBundle\Entity\Mailaccount", inversedBy="users")
-     * @ORM\JoinTable(name="user_mailaccount")
-     * */
-    private $mailaccounts;
 
     /**
      * @ORM\OneToMany(targetEntity="Xxam\CoreBundle\Entity\Widget", mappedBy="user", cascade={"persist", "remove"})
@@ -89,36 +84,6 @@ class User extends BaseUser implements Base\TenantInterface
      */
     public function getId() {
         return $this->id;
-    }
-
-    /**
-     * Add mailaccounts
-     *
-     * @param \Xxam\MailclientBundle\Entity\Mailaccount $mailaccounts
-     * @return User
-     */
-    public function addMailaccount(\Xxam\MailclientBundle\Entity\Mailaccount $mailaccounts) {
-        $this->mailaccounts[] = $mailaccounts;
-
-        return $this;
-    }
-
-    /**
-     * Remove mailaccounts
-     *
-     * @param \Xxam\MailclientBundle\Entity\Mailaccount $mailaccounts
-     */
-    public function removeMailaccount(\Xxam\MailclientBundle\Entity\Mailaccount $mailaccounts) {
-        $this->mailaccounts->removeElement($mailaccounts);
-    }
-
-    /**
-     * Get mailaccounts
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getMailaccounts() {
-        return $this->mailaccounts;
     }
 
     /**
