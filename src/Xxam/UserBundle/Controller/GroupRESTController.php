@@ -3,7 +3,7 @@
 namespace Xxam\UserBundle\Controller;
 
 use Xxam\UserBundle\Entity\Group;
-use Xxam\UserBundle\Form\GroupType;
+use Xxam\UserBundle\Form\Type\GroupType;
 
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RouteResource;

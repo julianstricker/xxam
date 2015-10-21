@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "9f382dc3587e38f034c3d9a3f3184ff8",
+    "hash": "07c05bd94ad920ee17dfe5eae1f1fc66",
     "content-hash": "6727f30a9d66983cf54dc745b0a93ec1",
     "packages": [
         {
@@ -1683,16 +1683,16 @@
         },
         {
             "name": "jackalope/jackalope-doctrine-dbal",
-            "version": "1.2.3",
+            "version": "1.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jackalope/jackalope-doctrine-dbal.git",
-                "reference": "f9aceb22f894be32b1bbc9a1b7405f8464af8f07"
+                "reference": "5bea74335a1c6e2ad82b258ee6c78c1896d42ec9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jackalope/jackalope-doctrine-dbal/zipball/f9aceb22f894be32b1bbc9a1b7405f8464af8f07",
-                "reference": "f9aceb22f894be32b1bbc9a1b7405f8464af8f07",
+                "url": "https://api.github.com/repos/jackalope/jackalope-doctrine-dbal/zipball/5bea74335a1c6e2ad82b258ee6c78c1896d42ec9",
+                "reference": "5bea74335a1c6e2ad82b258ee6c78c1896d42ec9",
                 "shasum": ""
             },
             "require": {
@@ -1743,7 +1743,7 @@
                 "phpcr",
                 "transport implementation"
             ],
-            "time": "2015-10-18 16:25:32"
+            "time": "2015-10-20 14:39:49"
         },
         {
             "name": "jdorn/sql-formatter",
@@ -6559,12 +6559,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/julianstricker/XxamMailclientBundle.git",
-                "reference": "b1663a88a2f2e294dfc6a3d01487a20f51cef8a1"
+                "reference": "9331d260b2e132c649e717198be143c48dc44576"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/julianstricker/XxamMailclientBundle/zipball/b1663a88a2f2e294dfc6a3d01487a20f51cef8a1",
-                "reference": "b1663a88a2f2e294dfc6a3d01487a20f51cef8a1",
+                "url": "https://api.github.com/repos/julianstricker/XxamMailclientBundle/zipball/9331d260b2e132c649e717198be143c48dc44576",
+                "reference": "9331d260b2e132c649e717198be143c48dc44576",
                 "shasum": ""
             },
             "require": {
@@ -6580,7 +6580,7 @@
                 }
             },
             "autoload": {
-                "psr-0": {
+                "psr-4": {
                     "Xxam\\MailclientBundle\\": ""
                 }
             },
@@ -6602,7 +6602,7 @@
                 "mailclient",
                 "xxam"
             ],
-            "time": "2015-10-20 13:58:34"
+            "time": "2015-10-21 14:34:04"
         }
     ],
     "packages-dev": [],

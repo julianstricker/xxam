@@ -56,7 +56,6 @@
         "xxam/mailclientbundle": "dev-master"
 
 
-
     },
     "require-dev": {
         "sensio/generator-bundle": "~2.3"
