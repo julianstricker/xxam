@@ -12,7 +12,7 @@
         {% if exttheme == "carbon" %}{% set themename = 'codaxy-theme-carbon' %}{% endif %}
         <!--<link rel="stylesheet" type="text/css" href="/ext-5.1.1/build/packages/ext-theme-crisp/build/resources/ext-theme-crisp-all.css">-->
         <link rel="stylesheet" type="text/css" href="/ext-5.1.1/build/packages/ext-theme-{{ exttheme }}/build/resources/{{ themename }}-all.css">
-         
+
         <script type="text/javascript" src="/ext-5.1.1/build/ext-all{%if app.environment == 'dev' %}-debug{%endif%}.js"></script>
         <!--<script type="text/javascript" src="/ext-5.1.1/build/packages/ext-theme-crisp/build/ext-theme-crisp.js"></script>-->
         <script type="text/javascript" src="/ext-5.1.1/build/packages/ext-theme-{{ exttheme }}/build/{{ themename }}.js"></script>

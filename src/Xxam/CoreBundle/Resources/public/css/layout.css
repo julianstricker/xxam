@@ -72,3 +72,7 @@ html {
     padding: 10px;
     font-size: 11px;
 }
+.x-tree-icon, .x-tree-icon-parent{
+    background-position: 0 0 !important;
+
+}

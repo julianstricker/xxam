@@ -1,0 +1,15 @@
+<type
+        xmlns:schema="http://schema.org/"
+        typeof="schema:WebPage"
+        >
+    <children>
+        <property property="schema:headline" identifier="title"/>
+        <property property="schema:text" identifier="content" />
+        <property property="schema:headline" identifier="box1title"/>
+        <property property="schema:text" identifier="box1content" />
+        <property property="schema:headline" identifier="box2title"/>
+        <property property="schema:text" identifier="box2content" />
+        <property property="schema:headline" identifier="box3title"/>
+        <property property="schema:text" identifier="box3content" />
+    </children>
+</type>

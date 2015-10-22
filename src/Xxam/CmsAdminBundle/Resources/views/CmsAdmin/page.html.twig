@@ -69,8 +69,8 @@
         <div class="col-md-4">
             {% createphp page as="rdf" noautotag %}
             <div {{ createphp_attributes(rdf) }}>
-                <h2 {{ createphp_attributes( rdf.title ) }}>{{ createphp_content( rdf.title ) }}</h2>
-                <p {{ createphp_attributes( rdf.content ) }}>{{ createphp_content( rdf.content ) }}</p>
+                <h2 {{ createphp_attributes( rdf.box1title ) }}>{{ createphp_content( rdf.box1title ) }}</h2>
+                <p {{ createphp_attributes( rdf.box1content ) }}>{{ createphp_content( rdf.box1content ) }}</p>
                 <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
             </div>
             {% endcreatephp %}

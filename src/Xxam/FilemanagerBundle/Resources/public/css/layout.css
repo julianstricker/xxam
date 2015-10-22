@@ -20,7 +20,7 @@
     float: left;
     margin: 4px;
     margin-right: 0;
-    padding: 5px;
+    padding: 6px;
 }
 #xxamfilemanager_files .thumb-wrap span {
     
@@ -33,13 +33,13 @@
 #xxamfilemanager_files .x-item-over{
     border:1px solid #dddddd;
     /*background: #efefef url(over.gif) repeat-x left top;*/
-    padding: 4px;
+    padding: 4px 5px;
 }
 
 #xxamfilemanager_files .x-item-selected{
     /*background: #eff5fb url(selected.gif) no-repeat right bottom;*/
     border:1px solid #99bbe8;
-    padding: 4px;
+    padding: 4px 5px;
 }
 #xxamfilemanager_files .x-item-selected .thumb{
     background:transparent;

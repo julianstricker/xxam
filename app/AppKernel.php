@@ -17,7 +17,7 @@ class AppKernel extends Kernel
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
             new Xxam\CoreBundle\XxamCoreBundle(),
-            new Xxam\MailclientBundle\XxamMailclientBundle(),
+            new XxamMailclientBundle\XxamMailclientBundle(),
             new Xxam\CalendarBundle\XxamCalendarBundle(),
             new Xxam\ContactBundle\XxamContactBundle(),
             new Xxam\CodingBundle\XxamCodingBundle(),
