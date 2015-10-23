@@ -53,9 +53,12 @@
         "jms/serializer-bundle": "^1.0",
         "symfony-cmf/create-bundle": "dev-master",
         "phpunit/phpunit": "^4.8",
+        "fxp/composer-asset-plugin": "~1.0",
+        "npm-asset/extjs": "5.1.1",
 
 
         "php-imap/php-imap": "~2.0"
+
     },
     "require-dev": {
         "sensio/generator-bundle": "~2.3"
@@ -97,6 +100,16 @@
         },
         "branch-alias" : {
             "dev-master" : "2.0.x-dev"
+        },
+        "asset-repositories": [
+            {
+                "type": "npm-github",
+                "url": "https://github.com/bjornharrtell/extjs.git",
+                "name": "npm-asset/extjs"
+            }
+        ],
+        "asset-installer-paths": {
+            "npm-asset-library": "web/assets/vendor"
         }
     }
 }

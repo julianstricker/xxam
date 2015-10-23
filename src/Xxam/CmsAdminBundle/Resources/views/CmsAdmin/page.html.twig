@@ -11,13 +11,14 @@
 {% endblock %}
 
 {% block content %}
+
     <div class="row">
         <div id="breadcrumbs" class="col-md-12">
             {% include 'XxamCmsAdminBundle::breadcrumbs.html.twig' %}
         </div>
     </div>
-
-
+    {% createphp page as="rdf" noautotag %}
+<div  {{ createphp_attributes(rdf) }}>
     <div class="row">
         <div class="col-md-3">
             <!--<div class="xxam-sidebar hidden-print affix" role="complementary">
@@ -50,12 +51,12 @@
                 </ul>
             </div>-->
         </div>
-        {% createphp page as="rdf" noautotag %}
-        <div {{ createphp_attributes(rdf) }}>
+
+        <div>
             <h1 class="my-title" {{ createphp_attributes( rdf.title ) }}>{{ createphp_content( rdf.title ) }}</h1>
             <div {{ createphp_attributes( rdf.content ) }}>{{ createphp_content( rdf.content ) }}</div>
         </div>
-        {% endcreatephp %}
+
         {#<div class="col-md-9" role="main">
             <h2>{{ page.title }}</h2>
             {{ page.content|raw }}
@@ -67,24 +68,27 @@
     <!-- Example row of columns -->
     <div class="row">
         <div class="col-md-4">
-            {% createphp page as="rdf" noautotag %}
-            <div {{ createphp_attributes(rdf) }}>
+            <div>
                 <h2 {{ createphp_attributes( rdf.box1title ) }}>{{ createphp_content( rdf.box1title ) }}</h2>
                 <p {{ createphp_attributes( rdf.box1content ) }}>{{ createphp_content( rdf.box1content ) }}</p>
                 <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
             </div>
-            {% endcreatephp %}
-
         </div>
         <div class="col-md-4">
-            <h2>Heading</h2>
-            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa xxamo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-            <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+            <div>
+                <h2 {{ createphp_attributes( rdf.box2title ) }}>{{ createphp_content( rdf.box2title ) }}</h2>
+                <p {{ createphp_attributes( rdf.box2content ) }}>{{ createphp_content( rdf.box2content ) }}</p>
+                <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+            </div>
         </div>
         <div class="col-md-4">
-            <h2>Heading</h2>
-            <p>Donec sed odio dui. Cras xxamo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa xxamo sit amet risus.</p>
-            <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+            <div>
+                <h2 {{ createphp_attributes( rdf.box3title ) }}>{{ createphp_content( rdf.box3title ) }}</h2>
+                <p {{ createphp_attributes( rdf.box3content ) }}>{{ createphp_content( rdf.box3content ) }}</p>
+                <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+            </div>
         </div>
     </div>
+</div>
+    {% endcreatephp %}
 {% endblock %}

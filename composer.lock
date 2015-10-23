@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "07c05bd94ad920ee17dfe5eae1f1fc66",
-    "content-hash": "6727f30a9d66983cf54dc745b0a93ec1",
+    "hash": "8255317217fe6f495c0390e2d9a676ea",
+    "content-hash": "29f91b75c934b2b2704490bc8768a16f",
     "packages": [
         {
             "name": "aferrandini/urlizer",
@@ -1402,6 +1402,62 @@
                 "User management"
             ],
             "time": "2015-09-15 13:15:07"
+        },
+        {
+            "name": "fxp/composer-asset-plugin",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/francoispluchino/composer-asset-plugin.git",
+                "reference": "8e22c18bbe6a5b7831a9b8488e02b85398048c04"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/francoispluchino/composer-asset-plugin/zipball/8e22c18bbe6a5b7831a9b8488e02b85398048c04",
+                "reference": "8e22c18bbe6a5b7831a9b8488e02b85398048c04",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^1.0",
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "composer/composer": "~1.0@dev"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Fxp\\Composer\\AssetPlugin\\FxpAssetPlugin",
+                "branch-alias": {
+                    "dev-master": "1.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Fxp\\Composer\\AssetPlugin\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "François Pluchino",
+                    "email": "francois.pluchino@gmail.com"
+                }
+            ],
+            "description": "NPM/Bower Dependency Manager for Composer",
+            "homepage": "https://github.com/francoispluchino/composer-asset-plugin",
+            "keywords": [
+                "asset",
+                "bower",
+                "composer",
+                "dependency manager",
+                "nodejs",
+                "npm",
+                "package"
+            ],
+            "time": "2015-10-17 09:47:56"
         },
         {
             "name": "gedmo/doctrine-extensions",
@@ -2924,6 +2980,22 @@
             "time": "2015-01-13 17:53:27"
         },
         {
+            "name": "npm-asset/extjs",
+            "version": "5.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bjornharrtell/extjs.git",
+                "reference": "d8dc337d5e9b1c878c46b3273a9912864d2a5ef3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bjornharrtell/extjs/zipball/d8dc337d5e9b1c878c46b3273a9912864d2a5ef3",
+                "reference": "d8dc337d5e9b1c878c46b3273a9912864d2a5ef3",
+                "shasum": ""
+            },
+            "type": "npm-asset-library"
+        },
+        {
             "name": "php-imap/php-imap",
             "version": "2.0.3",
             "source": {
@@ -3641,16 +3713,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "4.8.14",
+            "version": "4.8.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "b4900675926860bef091644849305399b986efa2"
+                "reference": "be8f7b9eacf8243940f8412f8b4a9a434c73dd7b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/b4900675926860bef091644849305399b986efa2",
-                "reference": "b4900675926860bef091644849305399b986efa2",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/be8f7b9eacf8243940f8412f8b4a9a434c73dd7b",
+                "reference": "be8f7b9eacf8243940f8412f8b4a9a434c73dd7b",
                 "shasum": ""
             },
             "require": {
@@ -3709,7 +3781,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2015-10-17 15:03:30"
+            "time": "2015-10-22 09:05:37"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -6552,57 +6624,6 @@
                 "negotiation"
             ],
             "time": "2015-10-01 07:42:40"
-        },
-        {
-            "name": "xxam/mailclientbundle",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/julianstricker/XxamMailclientBundle.git",
-                "reference": "9331d260b2e132c649e717198be143c48dc44576"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/julianstricker/XxamMailclientBundle/zipball/9331d260b2e132c649e717198be143c48dc44576",
-                "reference": "9331d260b2e132c649e717198be143c48dc44576",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3",
-                "php-imap/php-imap": "~2.0",
-                "symfony/symfony": "2.7.*",
-                "xxam/xxam": "*"
-            },
-            "type": "symfony-bundle",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Xxam\\MailclientBundle\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Julian Stricker",
-                    "email": "julian@julianstricker.com"
-                }
-            ],
-            "description": "A complete mailclient bundle for Xxam",
-            "homepage": "https://github.com/julianstricker/XxamMailclientBundle",
-            "keywords": [
-                "Symfony2",
-                "bundle",
-                "mailclient",
-                "xxam"
-            ],
-            "time": "2015-10-21 14:34:04"
         }
     ],
     "packages-dev": [],
@@ -6618,8 +6639,7 @@
         "league/flysystem-ziparchive": 0,
         "league/flysystem-cached-adapter": 0,
         "league/flysystem-eventable-filesystem": 0,
-        "symfony-cmf/create-bundle": 20,
-        "xxam/mailclientbundle": 20
+        "symfony-cmf/create-bundle": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
