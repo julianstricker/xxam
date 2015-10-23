@@ -20,6 +20,11 @@ trait ContentTrait
     protected $title;
 
     /**
+     * @PHPCR\Children()
+     */
+    private $children;
+
+    /**
      * @PHPCR\String(nullable=true)
      */
     protected $content;
@@ -55,6 +60,11 @@ trait ContentTrait
     public function setTitle($title)
     {
         $this->title = $title;
+    }
+
+    public function getChildren()
+    {
+        return $this->children;
     }
 
     public function getContent()

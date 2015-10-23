@@ -8,13 +8,17 @@
         <link rel="stylesheet" type="text/css" href="/bundles/xxammailclient/css/layout.css">
         <link rel="stylesheet" type="text/css" href="/bundles/xxamcalendar/css/layout.css">
         {% set themename = 'ext-theme-' ~ exttheme %}
-        {% if exttheme == "carbon" %}{% set themename = 'codaxy-theme-carbon' %}{% endif %}
-        <!--<link rel="stylesheet" type="text/css" href="/ext-5.1.1/build/packages/ext-theme-crisp/build/resources/ext-theme-crisp-all.css">-->
-        <link rel="stylesheet" type="text/css" href="/ext-5.1.1/build/packages/ext-theme-{{ exttheme }}/build/resources/{{ themename }}-all.css">
-         
-        <script type="text/javascript" src="/ext-5.1.1/build/ext-all{%if app.environment == 'dev' %}-debug{%endif%}.js"></script>
-        <!--<script type="text/javascript" src="/ext-5.1.1/build/packages/ext-theme-crisp/build/ext-theme-crisp.js"></script>-->
-        <script type="text/javascript" src="/ext-5.1.1/build/packages/ext-theme-{{ exttheme }}/build/{{ themename }}.js"></script>
+        {% if exttheme == "carbon" %}
+            <link rel="stylesheet" type="text/css" href="/ext-theme-carbon/resources/codaxy-theme-carbon-all.css">
+        {% else %}
+            <link rel="stylesheet" type="text/css" href="/assets/vendor/extjs/build/packages/ext-theme-{{ exttheme }}/build/resources/{{ themename }}-all.css">
+        {% endif %}
+        <script type="text/javascript" src="/assets/vendor/extjs/build/ext-all{%if app.environment == 'dev' %}-debug{%endif%}.js"></script>
+        {% if exttheme == "carbon" %}
+            <script type="text/javascript" src="/ext-theme-carbon/codaxy-theme-carbon.js"></script>
+        {% else %}
+            <script type="text/javascript" src="/assets/vendor/extjs/build/packages/ext-theme-{{ exttheme }}/build/{{ themename }}.js"></script>
+        {% endif %}
     </head>
     <body>
         {% if app.request.hasPreviousSession %}

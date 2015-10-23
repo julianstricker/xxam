@@ -159,6 +159,7 @@ cmf_routing:
             router.default: 200
             cmf_routing.dynamic_router: 100
     dynamic:
+        enabled: true
         controllers_by_class:
             Xxam\CmsAdminBundle\Document\Page: Xxam\CmsAdminBundle\Controller\CmsAdminController::pageAction
         persistence:
@@ -173,7 +174,7 @@ cmf_routing_auto:
 cmf_block:
     persistence:
         phpcr:
-            block_basepath: /cms
+            block_basepath: /cms/content
 cmf_create:
     security:
         role:   ROLE_ADMIN

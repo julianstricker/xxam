@@ -9,7 +9,6 @@
        if (typeof(CmsAdminlistModel)=='undefined'){
             Ext.define('CmsAdminlistModel',{
                  extend: 'Ext.data.Model',
-                 fields: {{modelfields|json_encode()|raw}},
                  idProperty: 'id',
                  proxy: {
                      type: 'rest',
@@ -17,62 +16,7 @@
                  }
              });
         }
-        var gridcolumns= {{gridcolumns|json_encode()|raw}};
-        gridcolumns.push({
-            menuDisabled: true,
-            sortable: false,
-            xtype: 'actioncolumn',
-            width: 100,
-            items: [{
-                icon: '/bundles/xxamcmsadmin/icons/16x16/user_edit.png',
-                tooltip: '{%trans%}Edit{%endtrans%}',
-                handler: function(grid, rowIndex, colIndex) {
-                    var rec = grid.getStore().getAt(rowIndex);
-                    rrr=rec;
-                    window.location.href='#cmsadmin/edit/'+rec.get('id');
-                }
-            },{
-                icon: '/bundles/xxamcmsadmin/icons/16x16/card_export.png',
-                tooltip: '{%trans%}Export{%endtrans%}',
-                handler: function(grid, rowIndex, colIndex) {
-                    var rec = grid.getStore().getAt(rowIndex);
-                    Ext.Msg.alert('{%trans%}Export{%endtrans%}', '{%trans%}Export{%endtrans%} ' + rec.get('firstname')+' ' + rec.get('lastname')+'?');
-                }
-            },{
-                icon: '/bundles/xxamcmsadmin/icons/16x16/user_delete.png',
-                tooltip: '{%trans%}Remove{%endtrans%}',
-                handler: function(grid, rowIndex, colIndex) {
-                    var rec = grid.getStore().getAt(rowIndex);
-                    console.log(rec);
-                    
-                    rrr=rec;
-                    ggg=grid;
-                    Ext.Msg.confirm('{%trans%}Remove{%endtrans%}', '{%trans%}Remove{%endtrans%} ' + rec.get('firstname')+' ' + rec.get('lastname')+'?',function(btn){
-                        if (btn=='yes'){
-                            //grid.getStore().remove(rec);//
-                            this.erase({
-                                success: function(cmsadmin) {
-                                   console.log('success',cmsadmin,this);
-                                   grid.getStore().load({
-                                        callback: function(records, operation, success) {
-                                            //Ext.getCmp('mailclient_maillist').view.scrollTo(0,scrollpos);
-                                        }
-                                    });
-                                },
-                                failure: function(cmsadmin) {
-                                    console.log('failed',cmsadmin);
-                                    Ext.Msg.alert('Failed', 'Deletion failed');
-                                }
-                            });
-                        }
-                    },rec);
-                    
-                    
-                    
-                    
-                }
-            }]
-        });
+
         
         return {
     

@@ -49,6 +49,7 @@
 {% block bottom_scripts %}
     {% include 'XxamCmsAdminBundle::javascripts.html.twig' %}
 {% endblock %}
-{% render(controller("cmf_create.jsloader.controller:includeJSFilesAction")) %}
+{% render(controller("cmf_create.jsloader.controller:includeJSFilesAction",
+{'editor': 'hallo' })) %}
 </body>
 </html>

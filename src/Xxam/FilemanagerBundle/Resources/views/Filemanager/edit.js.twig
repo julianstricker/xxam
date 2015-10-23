@@ -4,7 +4,7 @@
     {% set iconsize = '32x32' %}
 {% endif %}
 {
-    tabtitle: '{% if entity.id %}{% trans with {'%firstname%': entity.firstname, '%lastname%': entity.lastname} %}Edit %firstname% %lastname%{% endtrans %}{% else %}{% trans %}Create new filesystem{% endtrans %}{% endif %}',
+    tabtitle: '{% if entity.id %}{% trans with {'%filesystemname%': entity.filesystemname} %}Edit %filesystemname%{% endtrans %}{% else %}{% trans %}Create new filesystem{% endtrans %}{% endif %}',
     getitems: function (){
         if (typeof(FilemanagerModel)=='undefined'){
           Ext.define('FilemanagerModel',{
@@ -13,7 +13,7 @@
              idProperty: 'id',
              proxy: {
                 type: 'rest',
-                url : '{{path('post_filesystem')}}',
+                url : '{{path('post_filemanager')}}',
                 writer: {
                     type: "json",
                     writeAllFields: true
@@ -21,9 +21,15 @@
             }
           });
         }
-        var filesystemtypesStore = Ext.create('Ext.data.Store', {
+        var filesystemadapters={{filesystemadapters|json_encode()|raw}};
+        var filesystemadaptersdata=[];
+        Ext.Object.each(filesystemadapters, function(key,value){
+            filesystemadaptersdata.push({'id':key,'value':key});
+        });
+
+        var filesystemadaptersStore = Ext.create('Ext.data.Store', {
             fields: ['id', 'value'],
-            data : {{filesystemtypes|json_encode()|raw}}
+            data : filesystemadaptersdata
         });
         
         return {
@@ -40,120 +46,32 @@
             },{
                 xtype: 'combo',
                 fieldLabel: 'Type',
-                name: 'filesystemtype_id',
-                store: filesystemtypesStore,
+                name: 'Adapter',
+                store: filesystemadaptersStore,
                 queryMode: 'local',
                 displayField: 'value',
                 valueField: 'id',
-                value: '{{entity.getFilemanagertypeId}}'
+                value: '{{entity.getAdapter()}}'
             },{
-                fieldLabel: 'Organisation',
-                name: 'organizationname',
-                value: '{{entity.organizationname}}'
-            },{
-                fieldLabel: 'Name',
-                xtype: 'fieldcontainer',
-                layout: {
-                    type: 'hbox'
-                },
-                shrinkWrap: 2,
+                // Fieldset in Column 1 - collapsible via toggle button
+                xtype:'fieldset',
+                //columnWidth: 0.5,
+                title: 'Settings',
+                collapsible: false,
                 defaultType: 'textfield',
-                defaults: {
-                    labelAlign: 'top'
-                },
-                items: [{
-                     fieldLabel: 'Prefix',
-                     name: 'nameprefix',
-                     allowBlank:true,
-                     flex: 1,
-                     value: '{{entity.nameprefix}}'
-                 },{
-                    xtype: 'splitter'
-                 },{
-                     fieldLabel: 'First',
-                     name: 'firstname',
-                     allowBlank:false,
-                     flex: 4,
-                     value: '{{entity.firstname}}'
-                 },{
-                    xtype: 'splitter'
-                 },{
-                     fieldLabel: 'Last',
-                     name: 'lastname',
-                     flex: 5,
-                     value: '{{entity.lastname}}'
-                 }]
-            },{
-                fieldLabel: 'Nickname/Initials',
-                xtype: 'fieldcontainer',
+                //defaults: {anchor: '100%'},
+                //layout: 'anchor',
+                width: '800',
                 layout: {
-                    type: 'hbox'
+                    type: 'vbox'
                 },
-                shrinkWrap: 2,
-                defaultType: 'textfield',
-                defaults: {
-                    labelAlign: 'top'
-                },
-                items: [{
-                     fieldLabel: 'Nickname',
-                     name: 'nickname',
-                     allowBlank:true,
-                     flex: 1,
-                     value: '{{entity.nickname}}'
-                 },{
-                     xtype: 'splitter'
-                 },{
-                     fieldLabel: 'Initials',
-                     name: 'initials',
-                     allowBlank:true,
-                     flex: 1,
-                     value: '{{entity.initials}}'
-                 }]
-                
-            },{
-                fieldLabel: 'VAT/Tax Number',
-                xtype: 'fieldcontainer',
-                layout: {
-                    type: 'hbox'
-                    //align: 'middle'
-                },
-                shrinkWrap: 2,
-                defaultType: 'textfield',
-                defaults: {
-                    labelAlign: 'top'
-                },
-                items: [{
-                    fieldLabel: 'VAT',
-                    name: 'vat',
-                    allowBlank:true,
-                    flex: 1,
-                    value: '{{entity.vat}}'
-                 },{
-                    xtype: 'splitter'
-                 },{
-                    fieldLabel: 'Tax',
-                    name: 'tax',
-                    allowBlank:true,
-                    flex: 1,
-                    value: '{{entity.tax}}'
+                items :[{
+                    fieldLabel: 'Field 1',
+                    name: 'field1'
+                }, {
+                    fieldLabel: 'Field 2',
+                    name: 'field2'
                 }]
-            },{
-                fieldLabel: 'Organisation function',
-                name: 'organizationfunction',
-                allowBlank:true,
-                value: '{{entity.organizationfunction}}'
-            }, {
-                fieldLabel: 'Birthday',
-                name: 'birthday',
-                xtype: 'datefield',
-                maxValue: new Date(),
-                format: 'Y-m-d',
-                value: '{{entity.birthday|date('Y-m-d')}}'
-            }, {
-                fieldLabel: 'Email',
-                name: 'email',
-                vtype:'email',
-                value: ''
             }],
             buttons: [{
                 text: '{%trans%}Save{%endtrans%}',

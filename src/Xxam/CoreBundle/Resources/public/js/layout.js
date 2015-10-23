@@ -1,5 +1,5 @@
 Ext.Loader.setConfig({enabled: true});
-Ext.Loader.setPath('Ext.ux', '/ext-5.1.1/examples/ux');
+Ext.Loader.setPath('Ext.ux', '/assets/vendor/extjs/examples/ux');
 Ext.Loader.setPath('Portal.view', '/js/portal');
 Ext.Loader.setPath('widget.xxam', '/bundles');
 Ext.require([

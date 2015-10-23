@@ -75,3 +75,16 @@ parameters:
             default: 30
             help: Connection timeout in seconds
         
+    webdav:
+        baseuri:
+            type: text
+            help: The WebDAV URI
+        username:
+            type: text
+            help: The WebDAV-Username
+        password:
+            type: password
+            help: The WebDAV-Password
+        proxy:
+            type: text
+            help: The Proxy URL, eg. "localhost:8888"

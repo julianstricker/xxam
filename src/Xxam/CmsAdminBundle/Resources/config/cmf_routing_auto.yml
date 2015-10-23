@@ -1,5 +1,5 @@
 Xxam\CmsAdminBundle\Document\Page:
-    uri_schema: /page/{title}
+    uri_schema: /{title}
     token_providers:
         title: [content_method, { method: getTitle }]
 
@@ -8,3 +8,5 @@ Xxam\CmsAdminBundle\Document\Post:
     token_providers:
         date: [content_datetime, { method: getDate }]
         title: [content_method, { method: getTitle }]
+
+
