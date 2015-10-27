@@ -5,7 +5,10 @@
 {% endif %}
 {
     tabtitle: '{% if entity.id %}{% trans with {'%filesystemname%': entity.filesystemname} %}Edit %filesystemname%{% endtrans %}{% else %}{% trans %}Create new filesystem{% endtrans %}{% endif %}',
-    getitems: function (){
+    getitems: function(){
+        Xxam.appendHead({
+            css: ['/bundles/xxamfilemanager/css/layout.css']
+        });
         if (typeof(FilemanagerModel)=='undefined'){
           Ext.define('FilemanagerModel',{
              extend: 'Ext.data.Model',
@@ -31,13 +34,69 @@
             fields: ['id', 'value'],
             data : filesystemadaptersdata
         });
+
+        var generateField=function(filesystemadapterfield,name){
+            var fieldconf={'name':name,'fieldLabel':formatLabel(name)};
+            var field={};
+            if (filesystemadapterfield.help) fieldconf.afterBodyEl= '<span class="x-form-helptext">'+filesystemadapterfield.help+'</span>';
+            switch(filesystemadapterfield.type){
+                case 'text':
+                    field=new Ext.form.TextField(fieldconf);
+                    break;
+                case 'password':
+                    fieldconf.inputType='password';
+                    field=new Ext.form.TextField(fieldconf);
+                    break;
+                case 'number':
+                    fieldconf.inputType='number';
+                    field=new Ext.form.TextField(fieldconf);
+                    break;
+                case 'checkbox':
+                    fieldconf.inputType='checkbox';
+                    field=new Ext.form.TextField(fieldconf);
+                    break;
+                case 'select':
+                    fieldconfdata=[];
+                    Ext.Object.each(filesystemadapterfield.values,function(key,value){
+                        fieldconfdata.push({value:key,name:value});
+                    })
+                    var valuesstore = Ext.create('Ext.data.Store', {
+                        fields: ['value', 'name'],
+                        data : fieldconfdata
+                    });
+                    fieldconf.store=valuesstore;
+                    fieldconf.valueField= 'value';
+                    fieldconf.displayField= 'name';
+                    field=new Ext.form.field.ComboBox(fieldconf);
+                    break;
+            }
+            return field;
+        }
+        var generateFields=function(filesystemadaptername){
+            var adapterfields=filesystemadapters[filesystemadaptername];
+            var formconfig=[];
+            Ext.Object.each(adapterfields,function(key,value){
+                formconfig.push(generateField(value,key));
+            });
+            return formconfig;
+        }
+        var formatLabel=function(fieldname){
+            fieldnamearr=Ext.String.splitWords(fieldname.replace(/_/,' '));
+            Ext.Array.each(fieldnamearr,function(name,index,fieldnamearr){
+                fieldnamearr[index]=Ext.String.capitalize(name);
+            });
+
+            return fieldnamearr.join(' ');
+        }
         
         return {
             xtype: 'form',
             layout: 'form',
             defaultType: 'textfield',
             defaults: {
-                labelWidth: 120
+                labelWidth: 200,
+                layout: 'fit',
+                flex: 1
             },
             items: [{
                 xtype: 'hiddenfield',
@@ -51,27 +110,46 @@
                 queryMode: 'local',
                 displayField: 'value',
                 valueField: 'id',
-                value: '{{entity.getAdapter()}}'
+                value: '{{entity.getAdapter()}}',
+                listeners: {
+                    'select': function(){
+                        var fields=generateFields(this.getValue());
+                        ttt=this;
+                        console.log(fields);
+                        fff=fields;
+                        this.up().down('fieldcontainer').down('fieldset').removeAll();
+                        for(var i=0; i<fields.length; i++){
+                            this.up().down('fieldcontainer').down('fieldset').add(fields[i]);
+                        }
+
+                    }
+                }
             },{
-                // Fieldset in Column 1 - collapsible via toggle button
-                xtype:'fieldset',
-                //columnWidth: 0.5,
-                title: 'Settings',
-                collapsible: false,
-                defaultType: 'textfield',
-                //defaults: {anchor: '100%'},
-                //layout: 'anchor',
-                width: '800',
-                layout: {
-                    type: 'vbox'
-                },
-                items :[{
-                    fieldLabel: 'Field 1',
-                    name: 'field1'
-                }, {
-                    fieldLabel: 'Field 2',
-                    name: 'field2'
-                }]
+                xtype: 'fieldcontainer',
+                fieldLabel: 'Settings',
+                items: {
+                    // Fieldset in Column 1 - collapsible via toggle button
+                    xtype: 'fieldset',
+                    border: false,
+                    collapsible: false,
+                    defaultType: 'textfield',
+                    flex: 1,
+                    layout: {
+                        type: 'form'
+                    },
+                    defaults: {
+                        labelWidth: 200,
+                        layout: 'fit',
+                        flex: 1
+                    },
+                    items: [{
+                        fieldLabel: 'Field 1',
+                        name: 'field1'
+                    }, {
+                        fieldLabel: 'Field 2',
+                        name: 'field2'
+                    }]
+                }
             }],
             buttons: [{
                 text: '{%trans%}Save{%endtrans%}',
