@@ -27,6 +27,7 @@
            var setchatidurl= '{{path('xxam_comm_setchatid')}}';
            var chattoken='{{token}}';
            var realm='realm{{tenant_id}}';
+           var groups=[{% for group in app.user.groups %}{% if not loop.first %},{% endif %}'{{ group.name }}'{% endfor %}];
         </script>
         <script type="text/javascript" src="/bundles/xxamcore/js/layout.js"></script>
         <!--<script src="http://autobahn.s3.amazonaws.com/js/autobahn.min.js"></script>-->

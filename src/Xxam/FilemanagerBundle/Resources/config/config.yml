@@ -19,10 +19,13 @@ parameters:
             help: The root path
         access_token:
             type: text
-            help: Visit https://www.dropbox.com/developers/apps and get your “App secret”.
+            help: Visit https://www.dropbox.com/developers/apps and get your "App key" and "App secret".
         app_secret:
             type: text
-            help: Use Memcached to cache file system meta-data to boost performance. 
+            help: Visit https://www.dropbox.com/developers/apps and get your "App key" and "App secret".
+        cache:
+            type: checkbox
+            help: Use Memcached to cache file system meta-data to boost performance.
     ftp:
         host:
             type: text
@@ -50,6 +53,9 @@ parameters:
             type: number
             default: 30
             help: Connection timeout in seconds
+        cache:
+            type: checkbox
+            help: Use Memcached to cache file system meta-data to boost performance.
     sftp:
         host:
             type: text
@@ -74,6 +80,9 @@ parameters:
             type: number
             default: 30
             help: Connection timeout in seconds
+        cache:
+            type: checkbox
+            help: Use Memcached to cache file system meta-data to boost performance.
         
     webdav:
         baseuri:
@@ -88,3 +97,6 @@ parameters:
         proxy:
             type: text
             help: The Proxy URL, eg. "localhost:8888"
+        cache:
+            type: checkbox
+            help: Use Memcached to cache file system meta-data to boost performance.

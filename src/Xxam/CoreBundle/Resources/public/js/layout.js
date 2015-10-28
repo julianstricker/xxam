@@ -252,55 +252,51 @@ Ext.onReady(function() {
             Ext.create('Ext.Viewport', {
                 layout: 'border',
                 //style: 'background-color: lightgray;',
-                items: [/*{
-                 //xtype: 'box',
-                 id: 'header',
-                 region: 'north',
-                 html: '<div class="headerbar"></div>',
-                 
-                 plain: true,
-                 height: 100,
-                 tbar: {
-                 weight: -100,
-                 items: menu
-                 }
-                 },*/
-                    {
-                        tbar: {
-                            weight: -100,
-                            defaults: {
-                                reorderable: true,
-                                getState: function() {
 
-                                    var toolbar = this.up('toolbar');
-                                    var pos = 0;
-                                    for (var i = 0; i < toolbar.items.items.length; i++) {
-                                        if (toolbar.items.items[i].stateId == this.stateId) {
-                                            pos = i;
-                                            break;
-                                        }
-                                    }
-                                    return {
-                                        position: pos
-                                    };
-                                },
-                                stateful: true
-                            },
-                            id: 'xxam_menu',
-                            plugins: Ext.create('Ext.ux.BoxReorderer', {
-                                listeners: {
-                                    drop: function(source, container, dragCmp, startIdx, idx, eOpts) {
-                                        Ext.Array.each(container.items.items, function(item) {
-                                            item.saveState();
-                                        });
+                items: [{
 
+                         id: 'header',
+                         region: 'north',
+                         tbar: {
+                        weight: -100,
+                        defaults: {
+                            reorderable: true,
+                            getState: function() {
 
+                                var toolbar = this.up('toolbar');
+                                var pos = 0;
+                                for (var i = 0; i < toolbar.items.items.length; i++) {
+                                    if (toolbar.items.items[i].stateId == this.stateId) {
+                                        pos = i;
+                                        break;
                                     }
                                 }
-                            }),
-                            items: []
-
+                                return {
+                                    position: pos
+                                };
+                            },
+                            stateful: true
                         },
+                        id: 'xxam_menu',
+                        plugins: Ext.create('Ext.ux.BoxReorderer', {
+                            listeners: {
+                                drop: function(source, container, dragCmp, startIdx, idx, eOpts) {
+                                    Ext.Array.each(container.items.items, function(item) {
+                                        item.saveState();
+                                    });
+
+
+                                }
+                            }
+                        }),
+                        items: []
+
+                    },
+                         plain: true,
+
+                    },
+                    {
+
                         region: 'center',
                         xtype: 'tabpanel', // TabPanel itself has no title
                         id: 'contenttabpanel',
@@ -310,6 +306,20 @@ Ext.onReady(function() {
                         items: []
 
 
+                    },
+                    {
+                        region: 'east',
+                        layout: {
+                            type: 'accordion',
+                            multi: true
+                        },
+                        title: 'Comm Panel',
+                        id: 'commpanel',
+                        collapsible: true,
+                        split: true,
+                        width: 150,
+
+                        items: []
                     }
                 ],
                 renderTo: Ext.getBody()
@@ -337,22 +347,94 @@ Ext.onReady(function() {
             params: {
                 sessionid: chatsession._id
             },
+
             success: function() {
                chatsession.subscribe("com.xxam.imap", function (topic, data) {
                    console.log('success',topic, data);
                    /*notify('Chat',data.message);*/
                }).then(function (subscription) {
-                    sub1 = subscription;
+                    //sub1 = subscription;
                });
+                for(var i=0; i<groups.length; i++){
+                    subscribeChat(groups[i].toLowerCase());
+                }
             }
-        });
+    });
      };
+
 
      connection.open(); 
     
     
     
 });
+
+function subscribeChat(chatroom){
+    console.log('subscribeChat',chatroom);
+    var chatroomuri="com.xxam.chat."+chatroom.toLowerCase();
+    var subscriptions=chatsession.subscriptions;
+    var found=false;
+    for(var i=0; i<subscriptions.length; i++){
+        if (subscriptions[i].topic==chatroomuri){
+            found=true;
+            break;
+        }
+    }
+    if (!found){
+        chatsession.subscribe(chatroomuri, function (topic, data,options) {
+            console.log('success',topic, data,options);
+        }).then(function (subscription) {
+            createChatWindows();
+        });
+    }
+}
+function createChatWindows(){
+    console.log('createChatWindows');
+    var subscriptions=chatsession.subscriptions;
+    console.log(subscriptions);
+    var found=false;
+    for(var i=0; i<subscriptions.length; i++){
+        if (subscriptions[i][0].topic.substr(0,14)=="com.xxam.chat."){
+            var chatroom=subscriptions[i][0].topic.substr(14);
+            var commpanel=Ext.getCmp('commpanel');
+            if (commpanel.down('#commpanel_chatroom_'+chatroom)==null){
+                //create new chatroom-panel:
+                var chatroompanel=Ext.create('Ext.panel.Panel', {
+                    title: Ext.String.capitalize(chatroom),
+                    id: 'commpanel_chatroom_'+chatroom,
+                    html: '',
+                    chatroom: subscriptions[i][0].topic,
+                    bbar: [ {
+                        xtype: 'textfield',
+                        flex: 1,
+                        enableKeyEvents: true,
+
+                        listeners: {
+                            keyup: function(field,e){
+                                if (e.event.keyCode == 13){
+                                    sendChatMessage(field,e);
+                                }
+
+                            }
+                        } },{ xtype: 'button', text: 'Send', handler: sendChatMessage }]
+                });
+                commpanel.add(chatroompanel);
+
+            }
+
+        }
+    }
+}
+function sendChatMessage(ele,e){
+    console.log('sendChatMessage');
+    tttt=ele;
+    var message=ele.up().down('textfield').getValue();
+    var chatroom=ele.up().up().getInitialConfig().chatroom;
+    chatsession.publish(chatroom, [], { text: message });
+    ele.up().down('textfield').setValue('');
+
+
+}
 
 function loadtab() {
     var token = window.location.hash.substr(1);
@@ -367,8 +449,8 @@ function loadtab() {
         Ext.getCmp('contenttabpanel').setActiveTab(tabfound);
         return true;
     }
-    if (token == '')
-        return false;
+    if (token == '') return false;
+
     Ext.getCmp('contenttabpanel').add({
         'title': 'Loading...',
         closable: true,
