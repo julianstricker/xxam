@@ -12,7 +12,9 @@ use Doctrine\ORM\Query\ResultSetMapping;
 use Thruway\Peer\Router;
 use Xxam\CommBundle\Provider\XxamInternalClient;
 use Xxam\CommBundle\Provider\ChattokenAuthenticationProvider;
+//use Xxam\CommBundle\Provider\XxamChatAuthenticationManager;
 use Thruway\Transport\RatchetTransportProvider;
+//use Thruway\Transport\PawlTransportProvider;
 
 class XxamchatCommand extends ContainerAwareCommand {
 
@@ -40,9 +42,10 @@ class XxamchatCommand extends ContainerAwareCommand {
         
         $router = new Router();
         $router->registerModule(new \Thruway\Authentication\AuthenticationManager());
+        //$router->registerModule(new XxamChatAuthenticationManager());
         
-        
-        $transportProvider = new RatchetTransportProvider("localhost", 1337,$container);
+        $transportProvider = new RatchetTransportProvider("localhost", 1337);
+        //$transportProvider = new PawlTransportProvider("wss://localhost:1337");
         $router->addTransportProvider($transportProvider);
         $key = $container->getParameter('secret');
         $tenants=$container->getParameter('tenants');

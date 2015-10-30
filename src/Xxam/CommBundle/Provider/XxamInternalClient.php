@@ -24,10 +24,12 @@ class XxamInternalClient extends Client
         // TODO: now that the session has started, setup the stuff
         echo "--------------- Hello from InternalClient ------------\n";
         //$session->register('com.xxam.setchattoken', [$this, 'setChattoken']);
-        $session->register('com.xxam.getonline',     [$this, 'getOnline']);
-        
+        $session->register('com.xxam.getonline',     [$this, 'getOnline'],['disclose_caller' => true]);
+        $session->register( 'com.xxam.chat..publish', [$this, 'callPublish']);
+
         $session->subscribe('wamp.metaevent.session.on_join',  [$this, 'onSessionJoin']);
         $session->subscribe('wamp.metaevent.session.on_leave', [$this, 'onSessionLeave']);
+
     }
    /**
      * Get list online
@@ -50,6 +52,7 @@ class XxamInternalClient extends Client
     public function onSessionJoin($args, $kwArgs, $options)
     {
         echo "Session  joinned\n";
+        dump($args);
         $this->_sessions[] = $args[0];
     }
     
@@ -74,5 +77,23 @@ class XxamInternalClient extends Client
                 }
             }
         }
+    }
+
+    public function callPublish($args)
+    {
+        $deferred = new \React\Promise\Deferred();
+
+        $this->getPublisher()->publish($this->session, "com.xxam.publish", [$args[0]], ["key1" => "test1", "key2" => "test2"],
+            ["acknowledge" => true])
+            ->then(
+                function () use ($deferred) {
+                    $deferred->resolve('ok');
+                },
+                function ($error) use ($deferred) {
+                    $deferred->reject("failed: {$error}");
+                }
+            );
+
+        return $deferred->promise();
     }
 }

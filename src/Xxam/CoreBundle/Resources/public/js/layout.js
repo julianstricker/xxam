@@ -220,7 +220,7 @@ Ext.define('Xxam.util.HttpStateProvider', {
     }
 });
 
-
+AUTOBAHN_DEBUG = true;
 
 //
 // This is the main layout definition.
@@ -327,10 +327,17 @@ Ext.onReady(function() {
             loadtab();
             Ext.getCmp('xxam_menu').add(menu);
         }}));
-    
-    
-    
-    var connection = new autobahn.Connection({
+
+
+    var Event = function (publication, publisher, topic) {
+
+        var self = this;
+
+        self.publication = publication;
+        self.publisher = publisher;
+        self.topic = topic;
+    };
+    connection = new autobahn.Connection({
         url: 'wss://xxam.com/websocket',
         realm: realm,
         authmethods: ["chattoken"],
@@ -352,7 +359,7 @@ Ext.onReady(function() {
                chatsession.subscribe("com.xxam.imap", function (topic, data) {
                    console.log('success',topic, data);
                    /*notify('Chat',data.message);*/
-               }).then(function (subscription) {
+               },{'disclose_publisher': false,'disclose_me':false}).then(function (subscription) {
                     //sub1 = subscription;
                });
                 for(var i=0; i<groups.length; i++){
@@ -381,9 +388,13 @@ function subscribeChat(chatroom){
         }
     }
     if (!found){
-        chatsession.subscribe(chatroomuri, function (topic, data,options) {
-            console.log('success',topic, data,options);
-        }).then(function (subscription) {
+        chatsession.subscribe(chatroomuri, function (args, kwargs, details) {
+            aargs=args;
+            kkwargs=kwargs;
+            ddetails=details;
+            tttt=this;
+            console.log('success',args, kwargs, details);
+        },{'disclose_publisher': true,'disclose_me':true}).then(function (subscription) {
             createChatWindows();
         });
     }
@@ -430,7 +441,7 @@ function sendChatMessage(ele,e){
     tttt=ele;
     var message=ele.up().down('textfield').getValue();
     var chatroom=ele.up().up().getInitialConfig().chatroom;
-    chatsession.publish(chatroom, [], { text: message });
+    chatsession.publish(chatroom, [message], {}, {disclose_me: true,disclose_publisher:true} );
     ele.up().down('textfield').setValue('');
 
 
