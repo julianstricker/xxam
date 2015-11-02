@@ -64,7 +64,8 @@ class XxamInternalClient extends Client
 
             }
         }
-        $this->getSession()->publish('com.xxam.chat.*', [$args[0]->session.' joined'], [], ["acknowledge" => true])->then(
+        //$this->client->getSession()->publish("com.xxam.imap", ['updates'],[]);
+        $this->getSession()->publish('com.xxam.imap', [$args[0]->session.' joined'], [], ["acknowledge" => true])->then(
             function () {
                 echo "Publish Acknowledged!\n";
             },
