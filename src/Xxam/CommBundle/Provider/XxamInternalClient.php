@@ -25,7 +25,7 @@ class XxamInternalClient extends Client
         echo "--------------- Hello from InternalClient ------------\n";
         //$session->register('com.xxam.setchattoken', [$this, 'setChattoken']);
         $session->register('com.xxam.getonline',     [$this, 'getOnline'],['disclose_caller' => true]);
-        $session->register( 'com.xxam.chat..publish', [$this, 'callPublish']);
+
 
         $session->subscribe('wamp.metaevent.session.on_join',  [$this, 'onSessionJoin']);
         $session->subscribe('wamp.metaevent.session.on_leave', [$this, 'onSessionLeave']);
@@ -51,9 +51,30 @@ class XxamInternalClient extends Client
      */
     public function onSessionJoin($args, $kwArgs, $options)
     {
-        echo "Session  joinned\n";
+        echo "Session  joined\n";
         dump($args);
         $this->_sessions[] = $args[0];
+
+
+
+
+        foreach ($this->_sessions as $key => $details) {
+            if ($args[0]->session != $details->session) {
+
+
+            }
+        }
+        $this->getSession()->publish('com.xxam.chat.*', [$args[0]->session.' joined'], [], ["acknowledge" => true])->then(
+            function () {
+                echo "Publish Acknowledged!\n";
+            },
+            function ($error) {
+                // publish failed
+                echo "Publish Error {$error}\n";
+            }
+        );
+
+
     }
     
     /**
@@ -77,23 +98,8 @@ class XxamInternalClient extends Client
                 }
             }
         }
+
     }
 
-    public function callPublish($args)
-    {
-        $deferred = new \React\Promise\Deferred();
 
-        $this->getPublisher()->publish($this->session, "com.xxam.publish", [$args[0]], ["key1" => "test1", "key2" => "test2"],
-            ["acknowledge" => true])
-            ->then(
-                function () use ($deferred) {
-                    $deferred->resolve('ok');
-                },
-                function ($error) use ($deferred) {
-                    $deferred->reject("failed: {$error}");
-                }
-            );
-
-        return $deferred->promise();
-    }
 }

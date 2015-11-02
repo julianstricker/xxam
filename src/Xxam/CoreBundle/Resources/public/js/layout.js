@@ -394,7 +394,7 @@ function subscribeChat(chatroom){
             ddetails=details;
             tttt=this;
             console.log('success',args, kwargs, details);
-        },{'disclose_publisher': true,'disclose_me':true}).then(function (subscription) {
+        },{'disclose_publisher': true /*,'disclose_me':true*/}).then(function (subscription) {
             createChatWindows();
         });
     }
