@@ -1,4 +1,10 @@
-Ext.Loader.setConfig({enabled: true});
+Ext.Loader.setConfig({
+    enabled: true,
+    paths: {
+        'Ext.ux.WebSocket': '/bundles/xxamcore/js/WebSocket.js' ,
+        'Ext.ux.WebSocketManager': '/bundles/xxamcore/js/WebSocketManager.js'
+    }
+});
 Ext.Loader.setPath('Ext.ux', '/assets/vendor/extjs/examples/ux');
 Ext.Loader.setPath('Portal.view', '/js/portal');
 Ext.Loader.setPath('widget.xxam', '/bundles');
@@ -329,92 +335,136 @@ Ext.onReady(function() {
         }}));
 
 
-    var Event = function (publication, publisher, topic) {
 
-        var self = this;
+    xxamws={
+        subscriptions:[],
+        online:{},
+        websocket: Ext.create ('Ext.ux.WebSocket', {
+            url: 'wss://xxam.com/websocket' ,
+            listeners: {
+                open: function (ws) {
+                    console.log ('The websocket is ready to use');
+                    xxamws.subscriptions=[];
+                    //ws.send ('This is a simple text');
+                } ,
+                close: function (ws) {
+                    console.log ('The websocket is closed!');
+                } ,
+                error: function (ws, error) {
+                    Ext.Error.raise (error);
+                } ,
+                message: function (ws, message) {
+                    console.log ('A new message arrived: ' + message);
+                    var message=Ext.JSON.decode(message);
+                    var messagetype=message[0];
+                    var messagedata=message[1];
+                    var messagefrom=message[2];
+                    switch(messagetype){
+                        case 2: //Welcome:
+                            xxamws.events.welcome(messagedata,messagefrom,ws);
+                            break;
+                        case 33: //Subscribed:
+                            xxamws.events.subscribed(messagedata,messagefrom,ws);
+                            break;
+                        case 83: //Getonline Response:
+                            xxamws.events.getonlineresponse(messagedata,messagefrom,ws);
+                            break;
+                        case 17: //Published
+                            xxamws.events.published(messagedata,messagefrom,ws);
+                            break;
 
-        self.publication = publication;
-        self.publisher = publisher;
-        self.topic = topic;
-    };
-    connection = new autobahn.Connection({
-        url: 'wss://xxam.com/websocket',
-        realm: realm,
-        authmethods: ["chattoken"],
-        onchallenge: function () {
-            return chattoken;
-        }
-    });
-    connection.onopen = function (session) {
-        console.log('onopen');
-        chatsession=session;
-        Ext.Ajax.request({
-            url: setchatidurl,
-            method: 'POST',
-            params: {
-                sessionid: chatsession._id
-            },
+                    }
 
-            success: function() {
-               chatsession.subscribe("com.xxam.imap", function (topic, data) {
-                   console.log('success',topic, data);
-                   /*notify('Chat',data.message);*/
-               },{'disclose_publisher': false,'disclose_me':false}).then(function (subscription) {
-                    //sub1 = subscription;
-               });
-                for(var i=0; i<groups.length; i++){
-                    subscribeChat(groups[i].toLowerCase());
                 }
             }
-    });
-     };
+        }),
+        events:{
+            welcome: function(data,from,ws){
+
+                xxamws.sessionid=data.id;
+                Ext.Ajax.request({
+                    url: setchatidurl,
+                    method: 'POST',
+                    params: {
+                        sessionid: xxamws.sessionid
+                    },
+
+                    success: function() {
+
+                        xxamws.subscribe("com.xxam.imap");
+                        for(var i=0; i<groups.length; i++){
+                            xxamws.subscribe("com.xxam.chat."+groups[i].toLowerCase());
+                        }
+                    }
+                });
+            },
+            subscribed: function(data,from,ws){
+                xxamws.subscriptions.push(data.topic);
+                xxamws.getonline(data.topic);
+                createChatWindows();
+            },
+            getonlineresponse: function(data,from,ws){
+                console.log('getonlineresponse');
+                Ext.Object.each(data.online,function(key,value){
+                    xxamws.online[key]=value;
+                    updateOnlineStatus(key);
+                });
+            },
+            published: function(data,from,ws){
+                console.log('published');
+
+                if (data.topic.substr(0,14)=="com.xxam.chat.") {
+                    var chatroom = data.topic.substr(14);
+                    console.log(chatroom);
+                    var chatroompanel = commpanel.down('#commpanel_chatroom_' + chatroom);
+                    var html = ': <p>' + from+ ': ' + data.message  + '</p>';
+                    chatroompanel.setHtml(chatroompanel.html + html);
+                }
+
+            }
+        },
+        subscribe:function(topic){
+            var message=[32,{topic:topic}]
+            this.websocket.send(Ext.JSON.encode(message));
+
+        },
+        getonline:function(topic){
+            var message=[82,{topic:topic}]
+            this.websocket.send(Ext.JSON.encode(message));
+
+        },
+        publish:function(topic,message,receivers){
+            var message=[16,{topic:topic,message:message,receivers:receivers}]
+            this.websocket.send(Ext.JSON.encode(message));
+
+        },
+        init:function(){
+
+        }
+    }
 
 
-     connection.open(); 
-    
-    
     
 });
 
-function subscribeChat(chatroom){
-    console.log('subscribeChat',chatroom);
-    var chatroomuri="com.xxam.chat."+chatroom.toLowerCase();
-    var subscriptions=chatsession.subscriptions;
-    var found=false;
-    for(var i=0; i<subscriptions.length; i++){
-        if (subscriptions[i].topic==chatroomuri){
-            found=true;
-            break;
-        }
-    }
-    if (!found){
-        chatsession.subscribe(chatroomuri, function (args, kwargs, details) {
-            aargs=args;
-            kkwargs=kwargs;
-            ddetails=details;
-            tttt=this;
-            console.log('success',args, kwargs, details);
-        },{'disclose_publisher': true /*,'disclose_me':true*/}).then(function (subscription) {
-            createChatWindows();
-        });
-    }
-}
+
 function createChatWindows(){
     console.log('createChatWindows');
-    var subscriptions=chatsession.subscriptions;
+    var subscriptions=xxamws.subscriptions;
     console.log(subscriptions);
     var found=false;
     for(var i=0; i<subscriptions.length; i++){
-        if (subscriptions[i][0].topic.substr(0,14)=="com.xxam.chat."){
-            var chatroom=subscriptions[i][0].topic.substr(14);
+        if (subscriptions[i].substr(0,14)=="com.xxam.chat."){
+            var chatroom=subscriptions[i].substr(14);
             var commpanel=Ext.getCmp('commpanel');
+
             if (commpanel.down('#commpanel_chatroom_'+chatroom)==null){
                 //create new chatroom-panel:
                 var chatroompanel=Ext.create('Ext.panel.Panel', {
                     title: Ext.String.capitalize(chatroom),
                     id: 'commpanel_chatroom_'+chatroom,
                     html: '',
-                    chatroom: subscriptions[i][0].topic,
+                    chatroom: subscriptions[i],
                     bbar: [ {
                         xtype: 'textfield',
                         flex: 1,
@@ -436,12 +486,27 @@ function createChatWindows(){
         }
     }
 }
+
+function updateOnlineStatus(topic){
+    var commpanel=Ext.getCmp('commpanel');
+
+    if (topic.substr(0,14)=="com.xxam.chat.") {
+        var chatroom = topic.substr(14);
+        console.log(chatroom);
+        var chatroompanel = commpanel.down('#commpanel_chatroom_' + chatroom);
+        var html = 'Online: <p>' + Ext.Object.getValues(xxamws.online[topic]).join(', ') + '</p>';
+        chatroompanel.setHtml(chatroompanel.html + html);
+    }
+
+}
+
+
 function sendChatMessage(ele,e){
     console.log('sendChatMessage');
     tttt=ele;
     var message=ele.up().down('textfield').getValue();
     var chatroom=ele.up().up().getInitialConfig().chatroom;
-    chatsession.publish(chatroom, [message], {}, {disclose_me: true,disclose_publisher:true} );
+    xxamws.publish(chatroom, message,[]);
     ele.up().down('textfield').setValue('');
 
 
