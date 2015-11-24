@@ -322,8 +322,9 @@ Ext.onReady(function() {
                         title: 'Comm Panel',
                         id: 'commpanel',
                         collapsible: true,
+                        //collapsed: true,
                         split: true,
-                        width: 150,
+                        width: 300,
 
                         items: []
                     }
@@ -372,6 +373,15 @@ Ext.onReady(function() {
                         case 17: //Published
                             xxamws.events.published(messagedata,messagefrom,ws);
                             break;
+                        case 86: //SUBSCRIBEDBROADCAST
+                            xxamws.events.subscribedbroadcast(messagedata,messagefrom,ws);
+                            break;
+                        case 87: //UNSUBSCRIBEDBROADCAST
+                            xxamws.events.unsubscribedbroadcast(messagedata,messagefrom,ws);
+                            break;
+                        case 97: //SIGNALED
+                            xxamws.events.signal(messagedata,messagefrom,ws);
+                            break
 
                     }
 
@@ -405,10 +415,55 @@ Ext.onReady(function() {
             },
             getonlineresponse: function(data,from,ws){
                 console.log('getonlineresponse');
-                Ext.Object.each(data.online,function(key,value){
+                Ext.Object.each(data,function(key,value){
                     xxamws.online[key]=value;
                     updateOnlineStatus(key);
                 });
+            },
+            subscribedbroadcast: function(data,from,ws){
+                Ext.Object.each(data,function(key,value){
+                    var chatroom = key.substr(14);
+
+                    if (key.substr(0,14)=="com.xxam.chat.") {
+                        var html = '';
+                        var commpanel = Ext.getCmp('commpanel');
+                        var chatroompanel = commpanel.down('#commpanel_chatroom_' + chatroom);
+                    }
+                    for (sessid in value) {
+                        xxamws.online[key][sessid]=value[sessid];
+                        if (key.substr(0,14)=="com.xxam.chat.") {
+                            var html = xxamws.chatNoticeRenderer(value[sessid] + ' joined chat.');
+                            chatroompanel.setHtml(chatroompanel.html + html);
+                            Ext.get(chatroompanel.body.el.dom.lastChild.lastChild.lastChild).hide().show(100);
+                            chatroompanel.scrollBy(0, 1000, true);
+                        }
+                    }
+
+
+                });
+
+            },
+            unsubscribedbroadcast: function(data,from,ws){
+                Ext.Object.each(data,function(key,value){
+                    var chatroom = key.substr(14);
+                    if (key.substr(0,14)=="com.xxam.chat.") {
+                        var html = '';
+                        var commpanel = Ext.getCmp('commpanel');
+                        var chatroompanel = commpanel.down('#commpanel_chatroom_' + chatroom);
+                    }
+                    for (sessid in value) {
+                        if (key.substr(0,14)=="com.xxam.chat.") {
+                            var html = xxamws.chatNoticeRenderer(value[sessid] + ' left chat.');
+                            chatroompanel.setHtml(chatroompanel.html + html);
+                            Ext.get(chatroompanel.body.el.dom.lastChild.lastChild.lastChild).hide().show(100);
+                            chatroompanel.scrollBy(0, 1000, true);
+                        }
+                        delete xxamws.online[key][sessid];
+                    }
+
+
+                });
+
             },
             published: function(data,from,ws){
                 console.log('published');
@@ -416,11 +471,29 @@ Ext.onReady(function() {
                 if (data.topic.substr(0,14)=="com.xxam.chat.") {
                     var chatroom = data.topic.substr(14);
                     console.log(chatroom);
+                    var commpanel=Ext.getCmp('commpanel');
                     var chatroompanel = commpanel.down('#commpanel_chatroom_' + chatroom);
-                    var html = ': <p>' + from+ ': ' + data.message  + '</p>';
+                    commpanel.expand();
+                    chatroompanel.expand();
+                    var html= xxamws.chatMessageRenderer(from,data.topic,data.message);
                     chatroompanel.setHtml(chatroompanel.html + html);
+                    Ext.get(chatroompanel.body.el.dom.lastChild.lastChild.lastChild).hide().show(100);
+                    chatroompanel.scrollBy(0,1000,true);
+
                 }
 
+            },
+            signal: function(data,from,ws) {
+                callreceivers=[from];
+                if (!pc) startCall(false);
+
+                var signal = JSON.parse(data.data);
+                if (signal.sdp) {
+                    pc.setRemoteDescription(new RTCSessionDescription(signal.sdp));
+                } else {
+
+                    if(signal.candidate!=null) pc.addIceCandidate(new RTCIceCandidate(signal.candidate));
+                }
             }
         },
         subscribe:function(topic){
@@ -438,6 +511,21 @@ Ext.onReady(function() {
             this.websocket.send(Ext.JSON.encode(message));
 
         },
+        signal:function(data,receivers){
+            var message=[96,{data:data,receivers:receivers}]
+            this.websocket.send(Ext.JSON.encode(message));
+
+        },
+        chatMessageRenderer:function(from,topic,message){
+            var leftright=(from==xxamws.sessionid ? 'right' : 'left');
+            var html = '<div><p style="text-align: '+leftright+'">' + xxamws.online[topic][from]+ '</p><div class="chatbubble'+leftright+'">' + message  + '</div></div>';
+            return html;
+        },
+        chatNoticeRenderer:function(message){
+            var html = '<div class="chatnotice">' + message  + '</div>';
+            return html;
+        },
+
         init:function(){
 
         }
@@ -446,6 +534,7 @@ Ext.onReady(function() {
 
     
 });
+
 
 
 function createChatWindows(){
@@ -463,7 +552,8 @@ function createChatWindows(){
                 var chatroompanel=Ext.create('Ext.panel.Panel', {
                     title: Ext.String.capitalize(chatroom),
                     id: 'commpanel_chatroom_'+chatroom,
-                    html: '',
+                    html: ' ',
+                    autoScroll: true,
                     chatroom: subscriptions[i],
                     bbar: [ {
                         xtype: 'textfield',
@@ -494,23 +584,194 @@ function updateOnlineStatus(topic){
         var chatroom = topic.substr(14);
         console.log(chatroom);
         var chatroompanel = commpanel.down('#commpanel_chatroom_' + chatroom);
-        var html = 'Online: <p>' + Ext.Object.getValues(xxamws.online[topic]).join(', ') + '</p>';
-        chatroompanel.setHtml(chatroompanel.html + html);
+        var html=typeof chatroompanel.html != 'undefined' ? chatroompanel.html : '';
+        html += xxamws.chatNoticeRenderer('Users: ' + Ext.Object.getValues(xxamws.online[topic]).join(', '));
+        chatroompanel.setHtml(html);
     }
 
 }
 
 
 function sendChatMessage(ele,e){
-    console.log('sendChatMessage');
-    tttt=ele;
-    var message=ele.up().down('textfield').getValue();
-    var chatroom=ele.up().up().getInitialConfig().chatroom;
-    xxamws.publish(chatroom, message,[]);
-    ele.up().down('textfield').setValue('');
-
-
+   var message=ele.up().down('textfield').getValue();
+    if (message!=''){
+        var chatroom=ele.up().up().getInitialConfig().chatroom;
+        xxamws.publish(chatroom, message,[]);
+        var commpanel=Ext.getCmp('commpanel');
+        var chatroompanel = commpanel.down('#commpanel_chatroom_' + chatroom.substr(14));
+        commpanel.expand();
+        chatroompanel.expand();
+        var html= xxamws.chatMessageRenderer(xxamws.sessionid,chatroom,message);
+        chatroompanel.setHtml(chatroompanel.html + html);
+        Ext.get(chatroompanel.body.el.dom.lastChild.lastChild.lastChild).hide().show(100);
+        chatroompanel.scrollBy(0,1000,true);
+        ele.up().down('textfield').setValue('');
+    }
 }
+function createVideophonewin(isCaller){
+    if (isCaller){
+        name=callreceivername;
+    }else{
+        name='XXXX';
+    }
+    if (typeof(chatwin)=='undefined') {
+        chatwin = Ext.create('Ext.window.Window', {
+            title: 'Call ' + name + '...',
+            height: 380,
+            width: 400,
+            maximizable: true,
+            layout: 'fit',
+            html: '<video id="remoteVideo" style="width:400px; height:300px;" autoplay></video><div id="localVideoContainer" class="localvideocontainer" style="width:400px; height:300px; right:0; bottom:0"><video id="localVideo" style="width:400px; height:300px" autoplay muted></video></div>',
+            closeAction: 'hide',
+            listeners: {
+                resize: function (win, width, height, oOpts) {
+
+                    console.log(width, height);
+                    if (videochatStartTime){
+                        var remoteVideo = Ext.fly('remoteVideo');
+                        remoteVideo.setWidth(width);
+                        remoteVideo.setHeight(height);
+                    }else{
+                        var localVideo = Ext.fly('localVideo');
+                        localVideo.setWidth(width);
+                        localVideo.setHeight(height);
+                        var localVideoContainer = Ext.fly('localVideoContainer');
+                        localVideoContainer.setWidth(width);
+                        localVideoContainer.setHeight(height);
+                    }
+
+
+                },
+                close: function () {
+                    endCall();
+                }
+
+            },
+            bbar: [
+                {
+                    xtype: 'button',
+                    id: 'hangupbutton',
+                    text: 'Hangup',
+                    scale: 'large',
+                    icon: '/bundles/xxamcore/icons/32x32/call-stop.png',
+                    flex: 1,
+                    disabled: true,
+                    handler: function () {
+                        endCall();
+                    }
+                }
+            ]
+
+
+        });
+
+    }
+    chatwin.show();
+}
+function callUser(sessionid,name){
+
+    callreceivers=[sessionid];
+    callreceivername=name;
+    startCall(true);
+}
+
+
+navigator.mediaDevices = navigator.mediaDevices || ((navigator.mozGetUserMedia || navigator.webkitGetUserMedia) ? {
+        getUserMedia: function(c) {
+            return new Promise(function(y, n) {
+                (navigator.mozGetUserMedia ||
+                navigator.webkitGetUserMedia).call(navigator, c, y, n);
+            });
+        }
+    } : null);
+
+if (!navigator.mediaDevices) {
+    console.log("getUserMedia() not supported.");
+    //return;
+}
+
+var videochatStartTime;
+var pc;
+
+// Helper functions
+function endCall() {
+    var videos = document.getElementsByTagName("video");
+    for (var i = 0; i < videos.length; i++) {
+        videos[i].pause();
+    }
+
+
+    if (pc) {
+        pc.close();
+        pc = null;
+    }
+    chatwin.hide();
+    videochatStartTime = null;
+}
+
+function videochaterror(err){
+    endCall();
+    console.log(err);
+    Xxam.msg('Videochat error',err.name);
+}
+// run start(true) to initiate a call
+function startCall(isCaller) {
+
+    createVideophonewin(isCaller);
+
+    console.log('startCall');
+    Ext.getCmp('hangupbutton').setDisabled(false);
+    var pc_config = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
+    pc = new RTCPeerConnection(pc_config);
+
+
+    // send any ice candidates to the other peer
+    pc.onicecandidate = function (evt) {
+        //signalingChannel.send(JSON.stringify({ "candidate": evt.candidate }));
+        console.log('onicecandidate',evt.candidate);
+        if (evt.candidate!=null) xxamws.signal(JSON.stringify({ "candidate": evt.candidate }),callreceivers);
+    };
+
+    // once remote stream arrives, show it in the remote video element
+    pc.onaddstream = function (evt) {
+        console.log('onaddstream',evt);
+        //remoteVideo.src = URL.createObjectURL(evt.stream);
+        remoteVideo.srcObject = evt.stream;
+        var localVideoContainer = Ext.fly('localVideoContainer');
+        var localVideo = localVideoContainer.down('video');
+        localVideoContainer.animate({duration: 500, to: {width: 100, height: 80}});
+        localVideo.animate({duration: 500, to: {width: 100, height: 80}});
+        videochatStartTime = window.performance.now();
+    };
+    pc.onremotehangup = function(evt){
+        endCall();
+    }
+    pc.onerror = videochaterror;
+
+    // get the local stream, show it in the local video element and send it
+    navigator.mediaDevices.getUserMedia({ "audio": true, "video": {facingMode: "user"} }).then(function (stream) {
+        //localVideo.src = URL.createObjectURL(stream);
+        console.log('iscaller: ',isCaller);
+        localVideo.srcObject = stream;
+        pc.addStream(stream);
+
+        if (isCaller) {
+            pc.createOffer().then(gotDescription).catch(videochaterror);
+        }else {
+
+            pc.createAnswer().then(gotDescription).catch(videochaterror);
+        }
+        function gotDescription(desc) {
+            pc.setLocalDescription(desc);
+            xxamws.signal(JSON.stringify({ "sdp": desc }),callreceivers);
+        }
+    }).catch(function(e) {
+        console.log(e);
+        alert('getUserMedia() error: ' + e.name);
+    });
+}
+
+
 
 function loadtab() {
     var token = window.location.hash.substr(1);

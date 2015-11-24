@@ -76,3 +76,77 @@ html {
     background-position: 0 0 !important;
 
 }
+
+.chatbubbleleft
+{
+    position: relative;
+    background: darkgray;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    padding: 5px;
+    margin: 5px;
+    color: black;
+    box-shadow: 0 1px 2px #000000;
+}
+
+.chatbubbleleft:after
+{
+    content: '';
+    position: absolute;
+    border-style: solid;
+    border-width: 0 6px 5px;
+    border-color: darkgray transparent;
+    display: block;
+    width: 0;
+    z-index: 1;
+    margin-left: -6px;
+    top: -5px;
+    left: 20px;
+}
+
+.chatbubbleright
+{
+    position: relative;
+    background: darkgray;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    padding: 5px;
+    margin: 5px;
+    color: black;
+    box-shadow: 0 1px 2px #000000;
+}
+
+.chatbubbleright:after
+{
+    content: '';
+    position: absolute;
+    border-style: solid;
+    border-width: 0 6px 5px;
+    border-color: darkgray transparent;
+    display: block;
+    width: 0;
+    z-index: 1;
+    margin-left: -6px;
+    top: -5px;
+    right: 20px;
+}
+.bigcallbutton{
+    background-image: url('/bundles/xxamcore/icons/32x32/call-start.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 32px;
+    width: 32px;
+
+}
+.bighangupbutton{
+    background-image: url('/bundles/xxamcore/icons/32x32/call-stop.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 32px;
+    width: 32px;
+}
+.localvideocontainer{
+    position: absolute;
+}

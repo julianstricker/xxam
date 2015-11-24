@@ -41,6 +41,12 @@ class XxamChat implements \Ratchet\MessageComponentInterface  {
     const MSG_GETONLINE = 82;
     const MSG_GETONLINE_RESPONSE = 83;
 
+    const MSG_SUBSCRIBEDBROADCAST = 86;
+    const MSG_UNSUBSCRIBEDBROADCAST = 87;
+
+    const MSG_SIGNAL = 96;
+    const MSG_SIGNALED = 97;
+
     public function __construct() {
         $this->clients = new \SplObjectStorage;
         $this->memcached=new \Memcached();
@@ -79,12 +85,19 @@ class XxamChat implements \Ratchet\MessageComponentInterface  {
                 case XxamChat::MSG_SUBSCRIBE:
                     $this->onXxamSubscribe($conn,$messagedata);
                     break;
+                case XxamChat::MSG_UNSUBSCRIBE:
+                    $this->onXxamUnsubscribe($conn,$messagedata);
+                    break;
                 case XxamChat::MSG_GETONLINE:
                     $this->onXxamGetOnline($conn,$messagedata);
                     break;
                 case XxamChat::MSG_PUBLISH:
                     $this->onXxamPublish($conn,$messagedata);
                     break;
+                case XxamChat::MSG_SIGNAL:
+                    $this->onXxamSignal($conn,$messagedata);
+                    break;
+
             }
             /*foreach ($this->clients as $client) {
                 if ($conn !== $client) {
@@ -102,10 +115,7 @@ class XxamChat implements \Ratchet\MessageComponentInterface  {
         $this->clients->detach($conn);
         if (isset($this->usersubscriptions[$conn->resourceId])){
             foreach ($this->usersubscriptions[$conn->resourceId] as $subscription){
-                $key=array_search($conn->resourceId,$this->subscriptionusers[$subscription]);
-                if (false!==$key){
-                    unset($this->subscriptionusers[$subscription][$key]);
-                }
+                $this->doUnsubscribe( $conn, $subscription);
 
             }
             unset($this->usersubscriptions[$conn->resourceId]);
@@ -134,7 +144,8 @@ class XxamChat implements \Ratchet\MessageComponentInterface  {
         return json_encode([XxamChat::MSG_ERROR,$message,'']);
     }
 
-    private function getUsersForTopic($sessionid,$topic){
+
+    private function getUsersForTopic($sessionid, $topic){
         $user=$this->getUser($sessionid);
         $returnval=[];
         if (isset($this->subscriptionusers[$topic])){
@@ -147,13 +158,38 @@ class XxamChat implements \Ratchet\MessageComponentInterface  {
     }
 
 
-    private function onXxamGetOnline($conn,$messagedata){
-        $topic=$messagedata->topic;
-        $returnval=$this->getUsersForTopic($conn->resourceId,$topic);
-        $conn->send(json_encode([XxamChat::MSG_GETONLINE_RESPONSE,["online"=>[$topic=>$returnval]],'']));
+    /**
+     * Broadcast message to all users of a topic, except $conn
+     *
+     * @param ConnectionInterface $conn
+     * @param string $topic
+     * @param string $messagestring
+     * @return bool
+     */
+    private function broadcastToTopic(ConnectionInterface $conn, $topic, $messagestring){
+        $user=$this->getUser($conn->resourceId);
+        if (!$user) return false;
+
+        foreach ($this->clients as $client) {
+            if ($conn !== $client) {
+                if(in_array($client->resourceId,$this->subscriptionusers[$topic])) {
+                    $userdata = $this->memcached->get('chatsessionid_' . $client->resourceId);
+                    if ($user['tenant_id'] == null || $userdata['tenant_id'] == null || $user['tenant_id'] == $userdata['tenant_id']) {
+                        $client->send($messagestring);
+                    }
+                }
+            }
+        }
     }
 
-    private function onXxamSubscribe($conn,$messagedata){
+
+    private function onXxamGetOnline(ConnectionInterface $conn, \stdClass $messagedata){
+        $topic=$messagedata->topic;
+        $returnval=$this->getUsersForTopic($conn->resourceId,$topic);
+        $conn->send(json_encode([XxamChat::MSG_GETONLINE_RESPONSE,[$topic=>$returnval],'']));
+    }
+
+    private function onXxamSubscribe(ConnectionInterface $conn, \stdClass $messagedata){
         if (!isset($this->usersubscriptions[$conn->resourceId])) $this->usersubscriptions[$conn->resourceId]=[];
         if(!in_array($messagedata->topic,$this->usersubscriptions[$conn->resourceId])) $this->usersubscriptions[$conn->resourceId][]=$messagedata->topic;
         if(!isset($this->subscriptionusers[$messagedata->topic])){
@@ -163,8 +199,34 @@ class XxamChat implements \Ratchet\MessageComponentInterface  {
             $this->subscriptionusers[$messagedata->topic][]=$conn->resourceId;
         }
         $conn->send(json_encode([XxamChat::MSG_SUBSCRIBED,["topic"=>$messagedata->topic],'']));
+        $user = $this->memcached->get('chatsessionid_' . $conn->resourceId);
+        $this->broadcastToTopic($conn, $messagedata->topic, json_encode([XxamChat::MSG_SUBSCRIBEDBROADCAST, [$messagedata->topic=>[$conn->resourceId=>$user['username']]],'']));
+
     }
-    private function onXxamPublish($conn,$messagedata){
+
+    private function onXxamUnsubscribe(ConnectionInterface $conn, \stdClass $messagedata){
+        return $this->doUnsubscribe($conn,$messagedata->topic);
+    }
+
+    private function doUnsubscribe(ConnectionInterface $conn, $topic){
+        if(!in_array($topic,$this->usersubscriptions[$conn->resourceId])) return false;
+        if(!isset($this->subscriptionusers[$topic])) return false;
+
+        $arrpos=array_search($conn->resourceId,$this->subscriptionusers[$topic]);
+        if($arrpos!==false){
+            unset($this->subscriptionusers[$topic][$arrpos]);
+        }
+        $arrpos=array_search($topic,$this->usersubscriptions[$conn->resourceId]);
+        if($arrpos!==false){
+            unset($this->usersubscriptions[$conn->resourceId][$arrpos]);
+        }
+        $conn->send(json_encode([XxamChat::MSG_UNSUBSCRIBED,["topic"=>$topic],'']));
+        $user = $this->memcached->get('chatsessionid_' . $conn->resourceId);
+        $this->broadcastToTopic($conn, $topic, json_encode([XxamChat::MSG_UNSUBSCRIBEDBROADCAST, [$topic=>[$conn->resourceId=>$user['username']]],'']));
+        return true;
+    }
+
+    private function onXxamPublish(ConnectionInterface $conn, \stdClass $messagedata){
         $user=$this->getUser($conn->resourceId);
         $receivers=$messagedata->receivers;
         $message=$messagedata->message;
@@ -179,6 +241,23 @@ class XxamChat implements \Ratchet\MessageComponentInterface  {
                 $userdata=$this->memcached->get('chatsessionid_'.$client->resourceId);
                 if($user['tenant_id']==null || $userdata['tenant_id']==null || $user['tenant_id']==$userdata['tenant_id'])
                     $client->send(json_encode([XxamChat::MSG_PUBLISHED,["topic"=>$topic,"message"=>$message],$conn->resourceId]));
+            }
+        }
+
+    }
+    private function onXxamSignal(ConnectionInterface $conn, \stdClass $messagedata){
+        $user=$this->getUser($conn->resourceId);
+        $receivers=$messagedata->receivers;
+        $data=$messagedata->data;
+
+        dump($data);
+
+        foreach ($this->clients as $client) {
+            if ($conn !== $client &&  (count($receivers>0) && in_array($client->resourceId,$receivers))) {
+                // The sender is not the receiver, send to each client connected
+                $userdata=$this->memcached->get('chatsessionid_'.$client->resourceId);
+                if($user['tenant_id']==null || $userdata['tenant_id']==null || $user['tenant_id']==$userdata['tenant_id'])
+                    $client->send(json_encode([XxamChat::MSG_SIGNALED,["data"=>$data],$conn->resourceId]));
             }
         }
 

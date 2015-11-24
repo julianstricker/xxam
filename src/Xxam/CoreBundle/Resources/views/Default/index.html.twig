@@ -29,6 +29,7 @@
            var realm='realm{{tenant_id}}';
            var groups=[{% for group in app.user.groups %}{% if not loop.first %},{% endif %}'{{ group.name }}'{% endfor %}];
         </script>
+        <script type="text/javascript" src="/bundles/xxamcore/js/adapter.js"></script>
         <script type="text/javascript" src="/bundles/xxamcore/js/layout.js"></script>
 
 
