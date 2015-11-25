@@ -432,8 +432,8 @@ Ext.onReady(function() {
                     for (sessid in value) {
                         xxamws.online[key][sessid]=value[sessid];
                         if (key.substr(0,14)=="com.xxam.chat.") {
-                            var html = xxamws.chatNoticeRenderer(value[sessid] + ' joined chat.');
-                            chatroompanel.setHtml(chatroompanel.html + html);
+                            var html = xxamws.chatNoticeRenderer(xxamws.chatUserRenderer(sessid,key) + ' joined chat.');
+                            chatroompanel.setHtml(chatroompanel.body.el.dom.lastChild.lastChild.innerHTML + html);
                             Ext.get(chatroompanel.body.el.dom.lastChild.lastChild.lastChild).hide().show(100);
                             chatroompanel.scrollBy(0, 1000, true);
                         }
@@ -454,9 +454,14 @@ Ext.onReady(function() {
                     for (sessid in value) {
                         if (key.substr(0,14)=="com.xxam.chat.") {
                             var html = xxamws.chatNoticeRenderer(value[sessid] + ' left chat.');
-                            chatroompanel.setHtml(chatroompanel.html + html);
+
+                            chatroompanel.setHtml(chatroompanel.body.el.dom.lastChild.lastChild.innerHTML + html);
                             Ext.get(chatroompanel.body.el.dom.lastChild.lastChild.lastChild).hide().show(100);
                             chatroompanel.scrollBy(0, 1000, true);
+                            var userhtmls=Ext.query('.user_'+sessid);
+                            Ext.Array.each(userhtmls,function(userhtml){
+                                Ext.get(userhtml).removeCls('isonline');
+                            });
                         }
                         delete xxamws.online[key][sessid];
                     }
@@ -476,7 +481,7 @@ Ext.onReady(function() {
                     commpanel.expand();
                     chatroompanel.expand();
                     var html= xxamws.chatMessageRenderer(from,data.topic,data.message);
-                    chatroompanel.setHtml(chatroompanel.html + html);
+                    chatroompanel.setHtml(chatroompanel.body.el.dom.lastChild.lastChild.innerHTML + html);
                     Ext.get(chatroompanel.body.el.dom.lastChild.lastChild.lastChild).hide().show(100);
                     chatroompanel.scrollBy(0,1000,true);
 
@@ -518,14 +523,39 @@ Ext.onReady(function() {
         },
         chatMessageRenderer:function(from,topic,message){
             var leftright=(from==xxamws.sessionid ? 'right' : 'left');
-            var html = '<div><p style="text-align: '+leftright+'">' + xxamws.online[topic][from]+ '</p><div class="chatbubble'+leftright+'">' + message  + '</div></div>';
+            var html = '<div><p style="text-align: '+leftright+'">' + xxamws.chatUserRenderer(from,topic) + '</p><div class="chatbubble'+leftright+'">' + message  + '</div></div>';
             return html;
         },
         chatNoticeRenderer:function(message){
             var html = '<div class="chatnotice">' + message  + '</div>';
             return html;
         },
-
+        chatUserRenderer:function(userid,topic){
+            var status='isonline';
+            if (userid==xxamws.sessionid) status='me';
+            var html = '<div class="chatuser user_'+userid+' '+status+'">' + xxamws.online[topic][userid]  + '</div>';
+            return html;
+        },
+        isUserOnline: function(userid){
+            for(var topic in xxamws.online){
+                if (xxamws.online.hasOwnProperty(topic)) {
+                    if (typeof(xxamws.online[topic][userid])!='undefined'){
+                        return true;
+                    }
+                }
+            }
+            return false;
+        },
+        getUsernameForId:function(userid){
+            for(var topic in xxamws.online){
+                if (xxamws.online.hasOwnProperty(topic)) {
+                    if (typeof(xxamws.online[topic][userid])!='undefined'){
+                        return xxamws.online[topic][userid];
+                    }
+                }
+            }
+            return false;
+        },
         init:function(){
 
         }
@@ -584,8 +614,12 @@ function updateOnlineStatus(topic){
         var chatroom = topic.substr(14);
         console.log(chatroom);
         var chatroompanel = commpanel.down('#commpanel_chatroom_' + chatroom);
-        var html=typeof chatroompanel.html != 'undefined' ? chatroompanel.html : '';
-        html += xxamws.chatNoticeRenderer('Users: ' + Ext.Object.getValues(xxamws.online[topic]).join(', '));
+        var html=typeof chatroompanel.body.el.dom.lastChild.lastChild.innerHTML != 'undefined' ? chatroompanel.body.el.dom.lastChild.lastChild.innerHTML : '';
+        var usershtml=[];
+        Ext.Object.each(xxamws.online[topic],function(key,value){
+            usershtml.push(xxamws.chatUserRenderer(key,topic));
+        });
+        html += xxamws.chatNoticeRenderer('Users: ' + usershtml.join(', '));
         chatroompanel.setHtml(html);
     }
 
@@ -602,7 +636,7 @@ function sendChatMessage(ele,e){
         commpanel.expand();
         chatroompanel.expand();
         var html= xxamws.chatMessageRenderer(xxamws.sessionid,chatroom,message);
-        chatroompanel.setHtml(chatroompanel.html + html);
+        chatroompanel.setHtml(chatroompanel.body.el.dom.lastChild.lastChild.innerHTML + html);
         Ext.get(chatroompanel.body.el.dom.lastChild.lastChild.lastChild).hide().show(100);
         chatroompanel.scrollBy(0,1000,true);
         ele.up().down('textfield').setValue('');
@@ -610,13 +644,16 @@ function sendChatMessage(ele,e){
 }
 function createVideophonewin(isCaller){
     if (isCaller){
-        name=callreceivername;
+        var name=callreceivername;
+        var wintitle= 'Calling ' + name + '...';
     }else{
-        name='XXXX';
+        var name=xxamws.getUsernameForId(callreceivers[0]) | '?';
+        var wintitle= 'Incoming call from ' + name + '...';
+
     }
     if (typeof(chatwin)=='undefined') {
         chatwin = Ext.create('Ext.window.Window', {
-            title: 'Call ' + name + '...',
+            title: wintitle,
             height: 380,
             width: 400,
             maximizable: true,
@@ -666,7 +703,9 @@ function createVideophonewin(isCaller){
         });
 
     }
+    chatwin.setTitle(wintitle);
     chatwin.show();
+
 }
 function callUser(sessionid,name){
 

@@ -150,3 +150,18 @@ html {
 .localvideocontainer{
     position: absolute;
 }
+
+.chatuser {
+    color: darkgray;
+    display: inline;
+}
+.chatuser.me {
+    color: darkblue;
+}
+.chatuser.isonline {
+    color: darkgreen;
+}
+.chatuser.isonline:hover {
+    color: green;
+    cursor: pointer;
+}
