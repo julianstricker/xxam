@@ -340,6 +340,7 @@ Ext.onReady(function() {
     xxamws={
         subscriptions:[],
         online:{},
+        incomingvideophonecallwins:{},
         websocket: Ext.create ('Ext.ux.WebSocket', {
             url: 'wss://xxam.com/websocket' ,
             listeners: {
@@ -370,8 +371,8 @@ Ext.onReady(function() {
                         case 83: //Getonline Response:
                             xxamws.events.getonlineresponse(messagedata,messagefrom,ws);
                             break;
-                        case 17: //Published
-                            xxamws.events.published(messagedata,messagefrom,ws);
+                        case 16: //Publish
+                            xxamws.events.publish(messagedata,messagefrom,ws);
                             break;
                         case 86: //SUBSCRIBEDBROADCAST
                             xxamws.events.subscribedbroadcast(messagedata,messagefrom,ws);
@@ -379,8 +380,17 @@ Ext.onReady(function() {
                         case 87: //UNSUBSCRIBEDBROADCAST
                             xxamws.events.unsubscribedbroadcast(messagedata,messagefrom,ws);
                             break;
-                        case 97: //SIGNALED
+                        case 96: //SIGNAL
                             xxamws.events.signal(messagedata,messagefrom,ws);
+                            break
+                        case 101: //VIDEOPHONECALL
+                            xxamws.events.videophonecall(messagedata,messagefrom,ws);
+                            break
+                        case 102: //VIDEOPHONECALLACCEPT
+                            xxamws.events.videophonecallaccept(messagedata,messagefrom,ws);
+                            break
+                        case 103: //VIDEOPHONECALLCANCEL
+                            xxamws.events.videophonecallcancel(messagedata,messagefrom,ws);
                             break
 
                     }
@@ -436,6 +446,13 @@ Ext.onReady(function() {
                             chatroompanel.setHtml(chatroompanel.body.el.dom.lastChild.lastChild.innerHTML + html);
                             Ext.get(chatroompanel.body.el.dom.lastChild.lastChild.lastChild).hide().show(100);
                             chatroompanel.scrollBy(0, 1000, true);
+
+                            Ext.Array.each(Ext.query('.chatuser'),function(userhtml){
+                                Ext.get(userhtml).clearListeners();
+                            });
+                            Ext.Array.each(Ext.query('.isonline'),function(userhtml){
+                                Ext.get(userhtml).addListener('click',onChatuserbuttonclicked);
+                            });
                         }
                     }
 
@@ -460,8 +477,10 @@ Ext.onReady(function() {
                             chatroompanel.scrollBy(0, 1000, true);
                             var userhtmls=Ext.query('.user_'+sessid);
                             Ext.Array.each(userhtmls,function(userhtml){
+                                Ext.get(userhtml).clearListeners();
                                 Ext.get(userhtml).removeCls('isonline');
                             });
+
                         }
                         delete xxamws.online[key][sessid];
                     }
@@ -470,7 +489,7 @@ Ext.onReady(function() {
                 });
 
             },
-            published: function(data,from,ws){
+            publish: function(data,from,ws){
                 console.log('published');
 
                 if (data.topic.substr(0,14)=="com.xxam.chat.") {
@@ -484,6 +503,13 @@ Ext.onReady(function() {
                     chatroompanel.setHtml(chatroompanel.body.el.dom.lastChild.lastChild.innerHTML + html);
                     Ext.get(chatroompanel.body.el.dom.lastChild.lastChild.lastChild).hide().show(100);
                     chatroompanel.scrollBy(0,1000,true);
+
+                    Ext.Array.each(Ext.query('.chatuser'),function(userhtml){
+                        Ext.get(userhtml).clearListeners();
+                    });
+                    Ext.Array.each(Ext.query('.isonline'),function(userhtml){
+                        Ext.get(userhtml).addListener('click',onChatuserbuttonclicked);
+                    });
 
                 }
 
@@ -499,7 +525,86 @@ Ext.onReady(function() {
 
                     if(signal.candidate!=null) pc.addIceCandidate(new RTCIceCandidate(signal.candidate));
                 }
+            },
+            videophonecall: function(data,from,ws) { //received a videophonecall:
+                console.log(from,data);
+                var name=xxamws.getUsernameForId(from) || 'Unknown User'
+                if (!name) name= 'Unknown User';
+                var wintitle= 'Incoming call from ' + name + '...';
+                //if (typeof(xxamws.incomingvideophonecallwins[from])=='undefined') {
+
+                    xxamws.incomingvideophonecallwins[from] = Ext.create('Ext.window.Window', {
+                        title: wintitle,
+                        width: 320,
+                        height: 120,
+                        maximizable: true,
+                        layout: 'fit',
+                        closable: false,
+                        closeAction: 'destroy',
+                        videophonecallfrom: from,
+                        listeners: {
+                            close: function () {
+
+                            }
+                        },
+                        bbar: [
+                            {
+                                xtype: 'button',
+                                text: 'Accept',
+                                scale: 'large',
+                                icon: '/bundles/xxamcore/icons/32x32/call-start.png',
+                                flex: 1,
+                                disabled: false,
+                                handler: function () {
+                                    var win=this.up('window');
+                                    xxamws.videophonecallaccept([win.videophonecallfrom]);
+                                    win.close();
+                                }
+                            },
+                            {
+                                xtype: 'button',
+                                text: 'Decline',
+                                scale: 'large',
+                                icon: '/bundles/xxamcore/icons/32x32/call-stop.png',
+                                flex: 1,
+                                disabled: false,
+                                handler: function () {
+                                    var win=this.up('window');
+                                    console.log('close',win.videophonecallfrom);
+                                    xxamws.videophonecallcancel([win.videophonecallfrom]);
+                                    delete xxamws.incomingvideophonecallwins[win.videophonecallfrom];
+                                    win.close();
+                                }
+                            }
+                        ]
+
+
+                    });
+
+
+
+                xxamws.incomingvideophonecallwins[from].show();
+            },
+            videophonecallaccept: function(data,from,ws) {
+                if (typeof videophonecallingwin != 'undefined' && videophonecallingwin.videophonecallreceivers.indexOf(from)>-1){
+                    videophonecallingwin.close();
+                    delete videophonecallingwin;
+                    var name=xxamws.getUsernameForId(from) || 'Unknown User'
+                    callUser(from,name);
+                }
+
+            },
+            videophonecallcancel: function(data,from,ws) {
+                if (typeof videophonecallingwin != 'undefined'){
+                    videophonecallingwin.close();
+                    delete videophonecallingwin;
+                }
+                if (typeof(xxamws.incomingvideophonecallwins[from])!='undefined') {
+                    xxamws.incomingvideophonecallwins[from].close();
+                    delete xxamws.incomingvideophonecallwins[from];
+                }
             }
+
         },
         subscribe:function(topic){
             var message=[32,{topic:topic}]
@@ -521,9 +626,60 @@ Ext.onReady(function() {
             this.websocket.send(Ext.JSON.encode(message));
 
         },
+        videophonecall:function(receivers){ //init a videophonecall:
+            var message=[101,{receivers:receivers}]
+            this.websocket.send(Ext.JSON.encode(message));
+            var name=xxamws.getUsernameForId(receivers[0]) || 'Unknown User'
+
+            var wintitle= 'Calling ' + name + '...';
+            videophonecallingwin = Ext.create('Ext.window.Window', {
+                title: wintitle,
+                width: 200,
+                height: 120,
+                maximizable: true,
+                layout: 'fit',
+                closable: false,
+                closeAction: 'destroy',
+                videophonecallreceivers: receivers,
+                modal: true,
+                listeners: {
+                    close: function () {
+                        delete videophonecallingwin;
+                    }
+                },
+                bbar: [
+                    {
+                        xtype: 'button',
+                        text: 'Hangup',
+                        scale: 'large',
+                        icon: '/bundles/xxamcore/icons/32x32/call-stop.png',
+                        flex: 1,
+                        disabled: false,
+                        handler: function () {
+
+                            var win=this.up('window');
+                            xxamws.videophonecallcancel(win.videophonecallreceivers);
+                            videophonecallingwin.close();
+                            //delete videophonecallingwin;
+                        }
+                    }
+                ]
+
+
+            }).show();
+
+        },
+        videophonecallaccept:function(receivers){ //accept a videophonecall:
+            var message=[102,{receivers:receivers}]
+            this.websocket.send(Ext.JSON.encode(message));
+        },
+        videophonecallcancel:function(receivers){ //cancel a videophonecall:
+            var message=[103,{receivers:receivers}]
+            this.websocket.send(Ext.JSON.encode(message));
+        },
         chatMessageRenderer:function(from,topic,message){
             var leftright=(from==xxamws.sessionid ? 'right' : 'left');
-            var html = '<div><p style="text-align: '+leftright+'">' + xxamws.chatUserRenderer(from,topic) + '</p><div class="chatbubble'+leftright+'">' + message  + '</div></div>';
+            var html = '<div><div style="text-align: '+leftright+'">' + xxamws.chatUserRenderer(from,topic) + '</div><div class="chatbubble'+leftright+'">' + message  + '</div></div>';
             return html;
         },
         chatNoticeRenderer:function(message){
@@ -621,10 +777,28 @@ function updateOnlineStatus(topic){
         });
         html += xxamws.chatNoticeRenderer('Users: ' + usershtml.join(', '));
         chatroompanel.setHtml(html);
+
+        Ext.Array.each(Ext.query('.chatuser'),function(userhtml){
+            Ext.get(userhtml).clearListeners();
+        });
+        Ext.Array.each(Ext.query('.isonline'),function(userhtml){
+            Ext.get(userhtml).addListener('click',onChatuserbuttonclicked);
+        });
+
     }
 
 }
 
+function onChatuserbuttonclicked(){
+    var userid=null;
+    Ext.Array.each(this.dom.classList,function(classname){
+        if (classname.substr(0,5)=='user_'){
+            userid=parseInt(classname.substr(5));
+        }
+    });
+    xxamws.videophonecall([userid]);
+    console.log(userid);
+}
 
 function sendChatMessage(ele,e){
    var message=ele.up().down('textfield').getValue();
@@ -638,8 +812,16 @@ function sendChatMessage(ele,e){
         var html= xxamws.chatMessageRenderer(xxamws.sessionid,chatroom,message);
         chatroompanel.setHtml(chatroompanel.body.el.dom.lastChild.lastChild.innerHTML + html);
         Ext.get(chatroompanel.body.el.dom.lastChild.lastChild.lastChild).hide().show(100);
+
         chatroompanel.scrollBy(0,1000,true);
         ele.up().down('textfield').setValue('');
+
+        Ext.Array.each(Ext.query('.chatuser'),function(userhtml){
+            Ext.get(userhtml).clearListeners();
+        });
+        Ext.Array.each(Ext.query('.isonline'),function(userhtml){
+            Ext.get(userhtml).addListener('click',onChatuserbuttonclicked);
+        });
     }
 }
 function createVideophonewin(isCaller){
@@ -737,6 +919,7 @@ function endCall() {
     var videos = document.getElementsByTagName("video");
     for (var i = 0; i < videos.length; i++) {
         videos[i].pause();
+        if (typeof(videos[i].srcObject) != 'undefined' && typeof(videos[i].srcObject.stop) == 'function') videos[i].srcObject.stop();
     }
 
 
