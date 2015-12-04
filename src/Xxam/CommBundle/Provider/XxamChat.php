@@ -200,6 +200,7 @@ class XxamChat implements \Ratchet\MessageComponentInterface  {
     private function onXxamGetOnline(ConnectionInterface $conn, \stdClass $messagedata){
         $topic=$messagedata->topic;
         $returnval=$this->getUsersForTopic($conn->resourceId,$topic);
+        echo 'onXxamGetOnline';
         $conn->send(json_encode([XxamChat::MSG_GETONLINE_RESPONSE,[$topic=>$returnval],'']));
     }
 

@@ -1,0 +1,72 @@
+mailclient:
+    path: /mailclient
+    defaults: { _controller: XxamMailclientBundle:Mailclient:index }
+    
+mailclient_listfolders:
+    path: /mailclient/listfolders
+    defaults: { _controller: XxamMailclientBundle:Mailclient:listfolders }
+
+mailclient_listmails:
+    path: /mailclient/listmails
+    defaults: { _controller: XxamMailclientBundle:Mailclient:listmails }
+    
+mailclient_getmail:
+    path: /mailclient/getmail
+    defaults: { _controller: XxamMailclientBundle:Mailclient:getmail }
+
+mailclient_getmailcontent:
+    path: /mailclient/getmailcontent
+    defaults: { _controller: XxamMailclientBundle:Mailclient:getmailcontent }
+    
+mailclient_movemails:
+    path: /mailclient/movemails
+    defaults: { _controller: XxamMailclientBundle:MailclientExtra:movemails }
+    
+mailclient_show:
+    path: /mailclient/show/{path}/{id}
+    defaults: { _controller: XxamMailclientBundle:Mailclient:show }
+    
+mailclient_trashmails:
+    path: /mailclient/trashmails
+    defaults: { _controller: XxamMailclientBundle:MailclientExtra:trashmails }
+ 
+mailclient_junkmails:
+    path: /mailclient/junkmails
+    defaults: { _controller: XxamMailclientBundle:MailclientExtra:junkmails }
+
+mailclient_markmailsasread:
+    path: /mailclient/markmailsasread
+    defaults: { _controller: XxamMailclientBundle:MailclientExtra:markmailsasread }
+
+mailclient_markmailsasunread:
+    path: /mailclient/markmailsasunread
+    defaults: { _controller: XxamMailclientBundle:MailclientExtra:markmailsasunread }
+
+mailclient_markmailsasflagged:
+    path: /mailclient/markmailsasflagged
+    defaults: { _controller: XxamMailclientBundle:MailclientExtra:markmailsasflagged }
+    
+mailclient_markmailsasunflagged:
+    path: /mailclient/markmailsasunflagged
+    defaults: { _controller: XxamMailclientBundle:MailclientExtra:markmailsasunflagged }
+    
+mailclient_getmailboxinfo:
+    path: /mailclient/getmailboxinfo
+    defaults: { _controller: XxamMailclientBundle:MailclientExtra:getmailboxinfo }
+    
+mailclient_write:
+    path: /mailclient/write
+    defaults: { _controller: XxamMailclientBundle:Mailclient:write }
+    
+mailclient_uploadfile:
+    path: /mailclient/uploadfile
+    defaults: { _controller: XxamMailclientBundle:MailclientExtra:uploadfile }
+    
+mailclient_sendmail:
+    path: /mailclient/sendmail
+    defaults: { _controller: XxamMailclientBundle:MailclientExtra:sendmail }
+    
+mailclient_settings:
+    path: /mailclient/settings
+    defaults: { _controller: XxamMailclientBundle:Mailclient:settings }
+    
