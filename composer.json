@@ -12,7 +12,7 @@
     "keywords" : ["xxam", "symfony2", "framework"],
     "autoload": {
         "psr-0": {
-            "": "src/",
+            "Xxam\\": "src/",
             "SymfonyStandard": "app/"
         }
     },
@@ -55,8 +55,8 @@
         "phpunit/phpunit": "^4.8",
         "fxp/composer-asset-plugin": "~1.0",
         "npm-asset/extjs": "5.1.1",
-        "php-imap/php-imap": "~2.0",
-        "cboden/ratchet": "^0.3.3"
+        "cboden/ratchet": "^0.3.3",
+        "php-imap/php-imap": "^2.0"
 
     },
     "require-dev": {

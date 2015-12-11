@@ -1,0 +1,137 @@
+{% set iconsize = '16x16' %}
+{% set buttonsize = 'medium' %}
+{% if buttonsize == 'large' %}
+    {% set iconsize = '32x32' %}
+{% endif %}
+{
+    tabtitle: 'Mail',
+    tabicon: '/bundles/xxammailclient/icons/16x16/email.png',
+    getitems: function (){
+    
+        getthumbnailurlOLD=function(filename,filepath){
+            var fileextensionsicons=['bup','dvf','indd','mid','ps','ses','vob','3gp','cab','dwg','iso','mov','pst','sit','wav','7z','cbr','eml','jar','mp2','ptb','sitx','wma','ace','cda','eps','jpeg','mp4','pub','ss','wmv','aiff','cdl','exe','jpg','mpeg','qbb','swf','wps','aif','cdr','fla','lnk','mpg','qbw','tgz','xls','ai','chm','flv','log','msi','qxd','thm','xpi','amr','dat','gif','m4a','mswmmram','tif','zip','asf','divxgz','m4b','ogg','rar','tmp','rss','asx','dll','hqx','m4p','pdf','rm','torrent','bat','dmg','htmlm4v','png','rmvbttf','bin','doc','htm','mcd','pps','rtf','txt','bmp','dss','ifo','mdb','psd','sea','vcd'];
+            var thumbnailextensions=['jpg','jpeg','png','gif','bmp'];
+            var storedata=[];
+            var filenamesplit=filename.split('.');
+            
+            var filetype=filenamesplit[filenamesplit.length-1].toLowerCase();
+            if (Ext.Array.indexOf(thumbnailextensions,filetype)>-1){
+                return "{{path('xxam_core_homepage')}}thumbnails/crop/32x32"+filepath;
+            }
+            if (Ext.Array.indexOf(fileextensionsicons,filetype)>-1){
+                return "/bundles/xxamcore/icons/32x32/file_extension_"+filetype+".png";
+            }
+            return "/bundles/xxamcore/icons/32x32/file_extension_"+filetype+".pngxx";
+
+        }
+        
+        getthumbnailurl=function(filename,filepath){
+            var fileextensiontomimetype={{fileextensiontomimetype|json_encode|raw}};
+            var fileextensionswiththumbnails={{fileextensionswiththumbnails|json_encode|raw}}
+            var filenamesplit=filename.split('.');
+            
+            var filetype=filenamesplit[filenamesplit.length-1].toLowerCase();
+            if (Ext.Array.indexOf(fileextensionswiththumbnails,filetype)>-1){
+                return "{{path('xxam_core_homepage')}}thumbnails/crop/64x64"+filepath;
+            }
+            if (typeof fileextensiontomimetype[filetype] != 'undefined'){
+                return "/bundles/xxamcore/icons/64x64/mimetypes/"+fileextensiontomimetype[filetype];
+            }
+            return "/bundles/xxamcore/icons/64x64/mimetypes/unknown.png";
+
+        };
+    
+        return {
+            layout: 'border',
+            id: 'mailclient_mailpanel{{id}}',
+            items: [
+                {{ include('Xxam\MailclientBundle:Mailclient:mailpanelitems.js.twig', { 'id': id }) }}
+            ],
+            listeners:{
+                afterrender: function(tab){
+                    var path='{{path}}';
+                    var mailaccountid=path.split('.')[0];
+                    console.log(mailaccountid);
+                    var mailid={{id}};
+                    Ext.Ajax.request({
+                        url: 'mailclient/getmail?path='+path+'&mailid='+mailid,
+                        success: function(response){
+                            var responsejson=Ext.JSON.decode(response.responseText);
+                            var headerhtml=[];
+                            var mailtitle='';
+                            //subject
+                            if(typeof responsejson.subject != 'undefined'){
+                                mailtitle=Ext.String.htmlEncode(responsejson.subject)+' - ';
+                                Ext.getCmp('contenttabpanel').getActiveTab().setTitle(Ext.util.Format.ellipsis(Ext.String.htmlEncode(responsejson.subject),20));
+                            }
+                            //from
+                            var fromtext='';
+                            if(typeof responsejson.fromName != 'undefined'){
+                                fromtext=responsejson.fromName;
+                                mailtitle+='<span class="mailtitlefrom">('+Ext.String.htmlEncode(responsejson.fromName);
+                            }else{
+                                mailtitle+='<span class="mailtitlefrom">('+Ext.String.htmlEncode(responsejson.fromAddress);
+                            }
+                            if(typeof responsejson.fromAddress != 'undefined') fromtext+='<'+responsejson.fromAddress+'>';
+                            if(fromtext != '') {
+                                headerhtml.push('<tr><th>{% trans %}From{% endtrans %}</th><td>'+Ext.String.htmlEncode(fromtext)+'</td></tr>');
+                            }
+                            //to
+                            if(typeof responsejson.toString != 'undefined'){
+                                headerhtml.push('<tr><th>{% trans %}To{% endtrans %}</th><td>'+Ext.String.htmlEncode(responsejson.toString)+'</td></tr>');
+                            }
+                            //replyto
+                            var replytotext='';
+                            if(typeof responsejson.replyTo != 'undefined'){
+                                Ext.Object.each(responsejson.replyTo, function(key,value){
+                                    if (value!=null) replytotext+=value+ ' ';
+                                    replytotext+='<'+key+'>';
+                                });
+                            }
+                            if (replytotext!='')headerhtml.push('<tr><th>{% trans %}Reply to{% endtrans %}</th><td>'+Ext.String.htmlEncode(replytotext)+'</td></tr>');
+                            //date
+                            if(typeof responsejson.date != 'date'){
+                                headerhtml.push('<tr><th>{% trans %}Date{% endtrans %}</th><td>'+Ext.String.htmlEncode(responsejson.date)+'</td></tr>');
+                                mailtitle+=' '+Ext.String.htmlEncode(responsejson.date)+')</span>';
+                            }
+                            //prio
+                            //if(typeof responsejson.subject != 'undefined') headerhtml.push('<tr><th>{% trans %}Priority{% endtrans %}</th><td>'+Ext.String.htmlEncode(responsejson.subject)+'</td></tr>');
+                            Ext.getCmp('mailclient_mailpanel{{id}}').setTitle(mailtitle);
+                            Ext.getCmp('mailclient_mailpanel{{id}}').getComponent('mailpanelheader').setHtml('<table class="mailpanelheader">'+headerhtml.join('')+'</table>'); 
+                            if(responsejson.hasexternallinks) Ext.getCmp('mailclient_mailpanel{{id}}').getComponent('mailpanelheader').setHtml(Ext.getCmp('mailclient_mailpanel{{id}}').getComponent('mailpanelheader').html+'<div class="mailpanelheadernotice"><div>{% trans %}To protect your privacy, remote images are blocked in this message.{% endtrans %} <a href="#" onclick="return displayimages('+mailid+',this);">{% trans %}Display images{% endtrans %}</a></div></div>');
+                            displayimages=function(mailid,ele){
+                                Ext.get(Ext.dom.Query.select('.mailpanelheadernotice')[0]).destroy();
+                                Ext.getCmp('mailclient_mailpanelbody{{id}}').load('mailclient/getmailcontent?path='+path+'&externalsources=1&mailid='+mailid);
+                                Ext.getCmp('mailclient_mailpanel{{id}}').doLayout();
+                                return false;
+                            }
+                            if(Ext.getCmp('mailclient_minimizeheaderbutton{{id}}').pressed){
+                                Ext.get(Ext.getCmp('mailclient_mailpanel{{id}}').body.dom.querySelector('.mailpanelheader')).setVisibilityMode(Ext.Element.DISPLAY).hide();
+                            }else{
+                                Ext.get(Ext.getCmp('mailclient_mailpanel{{id}}').body.dom.querySelector('.mailpanelheader')).show();
+                            }
+                            
+                            //attachments:
+                            if(typeof responsejson.files != 'undefined'){
+                                var storedata=[];
+                                Ext.Array.each(responsejson.files, function(file){
+                                    file.thumbnail=getthumbnailurl(file.name,file.filepath);
+                                    storedata.push(file);
+
+
+                                });
+                                Ext.getCmp('mailclient_mailpanelattachments{{id}}').store.setData(storedata);
+                                Ext.getCmp('mailclient_mailpanelattachments{{id}}').up('panel').expand();
+                            }
+                            
+                            Ext.getCmp('mailclient_mailpanel{{id}}').setCollapsed(false);
+                            //if(responsejson.textHtml==null){
+                            Ext.getCmp('mailclient_mailpanelbody{{id}}').load('mailclient/getmailcontent?path='+path+'&mailid='+mailid);
+                            Ext.getCmp('mailclient_mailpanel{{id}}').doLayout(); 
+                        }
+                    });
+                }
+            }
+        }
+    }
+}
