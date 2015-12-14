@@ -2,7 +2,11 @@
 
 namespace Xxam\MailclientBundle\Controller;
 
+use PhpImap\IncomingMail;
+use Swift_Mailer;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Xxam\MailclientBundle\Entity\Mailaccountuser;
+use Xxam\MailclientBundle\Entity\MailaccountuserRepository;
 use Xxam\MailclientBundle\Helper\Imap\ImapMailbox;
 use Xxam\MailclientBundle\Entity\Mailaccount;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,9 +22,12 @@ class MailclientBaseController extends Controller {
     
     protected function getUserMailaccountForId($mailaccountid){
         $user = $this->get('security.token_storage')->getToken()->getUser();
-        $mailaccountusers=$this->getDoctrine()->getManager()->getRepository('XxamMailclientBundle:Mailaccountuser')->findByUserId($user->getId());
-        $mailaccount=false;
+        /* @var MailaccountuserRepository $repository */
+        $repository=$this->getDoctrine()->getManager()->getRepository('XxamMailclientBundle:Mailaccountuser');
+        $mailaccountusers=$repository->findByUserId($user->getId());
+        $mailaccount=null;
         foreach ($mailaccountusers as $mau){
+            /* @var Mailaccountuser $mau */
             $ma=$mau->getMailaccount();
             if($ma->getId()==$mailaccountid){
                 $mailaccount=$ma;
@@ -40,7 +47,6 @@ class MailclientBaseController extends Controller {
 
     protected function removeMailaccountidFromPath( $path){
         $pathexpl=explode('.',$path);
-        $mailaccountid=$pathexpl[0];
         unset($pathexpl[0]);
         $path=count($pathexpl)>0 ? '.'.implode('.',$pathexpl) : '';
         return $path;
@@ -95,6 +101,11 @@ class MailclientBaseController extends Controller {
      *
      * @Security("has_role('ROLE_MAILCLIENT_LIST')")
      *
+     * @param Mailaccount $mailaccount
+     * @param string $path
+     *
+     * @return ImapMailbox
+     *
      */
     protected function getImapMailbox(Mailaccount $mailaccount, $path='')
     {
@@ -118,7 +129,7 @@ class MailclientBaseController extends Controller {
         return new ImapMailbox($connectionstring, $mailaccount->getImapusername(), $mailaccount->getImappassword(), $this->attachments_dir, 'UTF-8');
     }
     
-    protected function removeHtmltag(&$doc, $tagname){
+    protected function removeHtmltag( \DOMDocument &$doc, $tagname){
         $tags=$doc->getElementsByTagName($tagname);
         $length = $tags->length;
         // for each tag, remove it from the DOM
@@ -132,7 +143,7 @@ class MailclientBaseController extends Controller {
         //return $doc;
     }
     
-    protected function cleanHtml($mail,$externalsources,$quotetext=''){
+    protected function cleanHtml(IncomingMail $mail,$externalsources,$quotetext=''){
         
         $fetchedHtml=$mail->replaceInternalLinks($this->attachmentsbase_dir);
         
@@ -164,7 +175,7 @@ class MailclientBaseController extends Controller {
         libxml_use_internal_errors(true);
         $doc->loadHTML($newhtml);
         libxml_clear_errors();
-        $encoding=$doc->actualEncoding;
+        $encoding=$doc->encoding;
         if ($encoding==NULL) {
             $encoding='UTF-8';
             $convhtml=iconv('UTF-8',$encoding,$newhtml);
@@ -327,7 +338,7 @@ class MailclientBaseController extends Controller {
             return $this->throwJsonError('Mailaccount not found');
         }
 
-
+        /* @var \Swift_Message $message */
         $message = \Swift_Message::newInstance()
             ->setSubject($request->get('fieldsubject',''))
             ->setFrom(array($mailaccount->getAccountemail()=>$mailaccount->getName()));
@@ -358,7 +369,7 @@ class MailclientBaseController extends Controller {
 
     }
 
-    protected function sendmail($mailer,$message){
+    protected function sendmail(Swift_Mailer $mailer, \Swift_Message $message){
         try {
             $response = $mailer->send($message);
         } catch (\Swift_TransportException $e) {
@@ -370,5 +381,6 @@ class MailclientBaseController extends Controller {
         if (!$response){
             return $this->throwJsonError('Error sending mail');
         }
+        return true;
     }
 }

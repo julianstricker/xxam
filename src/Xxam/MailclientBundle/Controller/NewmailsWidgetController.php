@@ -4,6 +4,8 @@ namespace Xxam\MailclientBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Xxam\MailclientBundle\Entity\Mailaccountuser;
+use Xxam\MailclientBundle\Entity\MailaccountuserRepository;
 
 
 class NewmailsWidgetController extends Controller
@@ -25,11 +27,14 @@ class NewmailsWidgetController extends Controller
     //this function is required for every portalwidget:
     public function getDefinitionAction()
     {
-        
-        $user = $this->securityTokenStorage->getToken()->getUser();
-        $mailaccountusers=$this->getDoctrine()->getManager()->getRepository('XxamMailclientBundle:Mailaccountuser')->findByUserId($user->getId());
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+        //$user = $this->securityTokenStorage->getToken()->getUser();
+        $repository = $this->getDoctrine()->getManager()->getRepository('XxamMailclientBundle:Mailaccountuser');
+        /* @var MailaccountuserRepository $repository */
+        $mailaccountusers=$repository->findByUserId($user->getId());
         $mailaccounts=Array();
         foreach($mailaccountusers as $mau){
+            /* @var Mailaccountuser $mau */
             $ma=$mau->getMailaccount();
             $mailaccounts[]=Array($ma->getId(),$ma->getAccountname());
         }

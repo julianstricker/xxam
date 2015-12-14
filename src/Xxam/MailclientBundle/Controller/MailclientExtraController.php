@@ -5,14 +5,17 @@ namespace Xxam\MailclientBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Component\HttpFoundation\Response;
 
 class MailclientExtraController extends MailclientBaseController {
     
     /**
-     * Mailclient
+     * Mailclient getmailboxinfoAction
      *
      * @Security("has_role('ROLE_MAILCLIENT_LIST')")
      *
+     * @param Request $request
+     * @return Response
      */
     public function getmailboxinfoAction(Request $request){
         $mailaccountid=$this->getMailaccountidFromPath($request->get('path',''));
@@ -27,7 +30,15 @@ class MailclientExtraController extends MailclientBaseController {
 
         return $this->getJsonResponse(Array('mailboxinfo'=>$mailboxinfo));
     }
-    
+
+    /**
+     * Mailclient movemailsAction
+     *
+     * @Security("has_role('ROLE_MAILCLIENT_DELETE')")
+     *
+     * @param Request $request
+     * @return Response
+     */
     public function movemailsAction(Request $request){
         $ids=$request->get('ids','');
 
@@ -58,6 +69,8 @@ class MailclientExtraController extends MailclientBaseController {
      *
      * @Security("has_role('ROLE_MAILCLIENT_DELETE')")
      *
+     * @param Request $request
+     * @return Response
      */
     public function trashmailsAction(Request $request){
         $mailaccountid=$this->getMailaccountidFromPath($request->get('from',''));
@@ -69,7 +82,6 @@ class MailclientExtraController extends MailclientBaseController {
             return $this->throwJsonError('Mailaccount not found');
         }
         $to=$mailaccount->getTrashfolder();
-        $folders=$frommailbox->getListingFolders();
         $movedids=Array();
         foreach($idsarr as $id){
             if ($frommailbox->moveMail($id, $mailaccount->getImappathprefix().$to)){
@@ -84,6 +96,8 @@ class MailclientExtraController extends MailclientBaseController {
      *
      * @Security("has_role('ROLE_MAILCLIENT_DELETE')")
      *
+     * @param Request $request
+     * @return Response
      */
     public function junkmailsAction(Request $request){
         $idsarr=explode(',',$request->get('ids',''));
@@ -95,7 +109,6 @@ class MailclientExtraController extends MailclientBaseController {
            return $this->throwJsonError('Mailaccount not found');
         }
         $to=$mailaccount->getJunkfolder();
-        $folders=$frommailbox->getListingFolders();
         $movedids=Array();
         foreach($idsarr as $id){
             if ($frommailbox->moveMail($id, $mailaccount->getImappathprefix().$to)){
@@ -112,6 +125,8 @@ class MailclientExtraController extends MailclientBaseController {
      *
      * @Security("has_role('ROLE_MAILCLIENT_EDIT')")
      *
+     * @param Request $request
+     * @return Response
      */
     public function markmailsasreadAction(Request $request){
         $from=$request->get('from','');
@@ -132,6 +147,8 @@ class MailclientExtraController extends MailclientBaseController {
      *
      * @Security("has_role('ROLE_MAILCLIENT_EDIT')")
      *
+     * @param Request $request
+     * @return Response
      */
     public function markmailsasunreadAction(Request $request){
         $from=$request->get('from','');
@@ -155,13 +172,14 @@ class MailclientExtraController extends MailclientBaseController {
      *
      * @Security("has_role('ROLE_MAILCLIENT_EDIT')")
      *
+     * @param Request $request
+     * @return Response
      */
     public function markmailsasflaggedAction(Request $request){
         $from=$request->get('from','');
         $idsarr=explode(',',$request->get('ids',''));
         $frommailbox=$this->getImapMailboxForPath($from);
         if(!$frommailbox) $this->throwJsonError('Mailaccount not found');
-        $mailsbyid=Array();
         $movedids=Array();
         if ($frommailbox->setFlag($idsarr, '\\Flagged')){
             $movedids=$idsarr;
@@ -174,6 +192,8 @@ class MailclientExtraController extends MailclientBaseController {
      *
      * @Security("has_role('ROLE_MAILCLIENT_EDIT')")
      *
+     * @param Request $request
+     * @return Response
      */
     public function markmailsasunflaggedAction(Request $request){
         $from=$request->get('from','');
@@ -192,6 +212,8 @@ class MailclientExtraController extends MailclientBaseController {
      *
      * @Security("has_role('ROLE_MAILCLIENT_CREATE')")
      *
+     * @param Request $request
+     * @return Response
      */
     public function sendmailAction(Request $request) {
         $fieldfrom=$request->get('fieldfrom',0);
@@ -224,6 +246,8 @@ class MailclientExtraController extends MailclientBaseController {
      *
      * @Security("has_role('ROLE_MAILCLIENT_CREATE')")
      *
+     * @param Request $request
+     * @return Response
      */
     public function uploadfileAction(Request $request) {
         $filename=preg_replace("([^\w\s\d\-_~,;:\[\]\(\).])", '', $request->headers->get('X_FILENAME'));

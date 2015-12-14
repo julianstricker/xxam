@@ -2,13 +2,12 @@
 
 namespace Xxam\MailclientBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Xxam\MailclientBundle\Helper\Imap\ImapMailbox;
-use Xxam\MailclientBundle\Entity\Mailaccount;
+
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-//use Symfony\Component\HttpFoundation\Session;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Xxam\MailclientBundle\Entity\Mailaccountuser;
+use Xxam\MailclientBundle\Entity\MailaccountuserRepository;
 
 class MailclientController extends MailclientBaseController {
     
@@ -22,7 +21,7 @@ class MailclientController extends MailclientBaseController {
     public function indexAction() {
         $fileextensionswiththumbnails=$this->container->getParameter('fileextensionswiththumbnails');
         $fileextensiontomimetype=$this->container->getParameter('fileextensiontomimetype');
-        return $this->render('Xxam\MailclientBundle:Mailclient:index.js.twig', array(
+        return $this->render('XxamMailclientBundle:Mailclient:index.js.twig', array(
             'fileextensionswiththumbnails'=>$fileextensionswiththumbnails,
             'fileextensiontomimetype'=>$fileextensiontomimetype
         ));
@@ -32,6 +31,9 @@ class MailclientController extends MailclientBaseController {
      *
      * @Security("has_role('ROLE_MAILCLIENT_LIST')")
      *
+     * @param Request $request
+     * @return Response A Response instance
+     *
      */
     public function showAction(Request $request) {
         $path=$request->get('path','');
@@ -39,7 +41,7 @@ class MailclientController extends MailclientBaseController {
         $fileextensionswiththumbnails=$this->container->getParameter('fileextensionswiththumbnails');
         $fileextensiontomimetype=$this->container->getParameter('fileextensiontomimetype');
         
-        return $this->render('Xxam\MailclientBundle:Mailclient:show.js.twig', array(
+        return $this->render('XxamMailclientBundle:Mailclient:show.js.twig', array(
             'id'=>$id,
             'path'=>$path,
             'fileextensionswiththumbnails'=>$fileextensionswiththumbnails,
@@ -54,12 +56,13 @@ class MailclientController extends MailclientBaseController {
      *
      */
     public function listfoldersAction() {
-        dump(get_declared_classes());
-        die();
         $user = $this->get('security.token_storage')->getToken()->getUser();
-        $mailaccountusers=$this->getDoctrine()->getManager()->getRepository('XxamMailclientBundle:Mailaccountuser')->findByUserId($user->getId());
+        $repository=$this->getDoctrine()->getManager()->getRepository('XxamMailclientBundle:Mailaccountuser');
+        /* @var MailaccountuserRepository $repository */
+        $mailaccountusers=$repository->findByUserId($user->getId());
         $returndata=Array();
         foreach($mailaccountusers as $mailaccountuser){
+            /* @var Mailaccountuser $mailaccountuser */
             $mailaccount=$mailaccountuser->getMailaccount();
             $mailbox = $this->getImapMailbox($mailaccount,'');
             $folders = $mailbox->getListingFolders();
@@ -111,6 +114,9 @@ class MailclientController extends MailclientBaseController {
      *
      * @Security("has_role('ROLE_MAILCLIENT_LIST')")
      *
+     * @param Request $request
+     * @return Response
+     *
      */
     public function listmailsAction(Request $request){
         //$page=$request->get('page',1);
@@ -119,7 +125,7 @@ class MailclientController extends MailclientBaseController {
         $sort=$request->get('sort','arrival');
         $dir=$request->get('dir','DESC');
         $path=$request->get('path','');
-        
+        $mailaccountid=0;
         if ($path){
             $pathexpl=explode('.',$path);
             $mailaccountid=$pathexpl[0];
@@ -167,10 +173,13 @@ class MailclientController extends MailclientBaseController {
      *
      * @Security("has_role('ROLE_MAILCLIENT_LIST')")
      *
+     * @param Request $request
+     * @return Response
      */
     public function getmailAction(Request $request){
         $mailid=$request->get('mailid',false);
         $path=$request->get('path','');
+        $mailaccountid=false;
         if ($path){
             $pathexpl=explode('.',$path);
             $mailaccountid=$pathexpl[0];
@@ -206,7 +215,7 @@ class MailclientController extends MailclientBaseController {
             $attachments[]=Array(
                 'id'=>$attachment->id,
                 'name'=>$attachment->name,
-                'filesize'=>$attachment->fileSize,
+                'filesize'=>0, //$attachment->fileSize,
                 'filepath'=>str_replace($this->attachments_dir,$this->attachmentsbase_dir,$attachment->filePath)
                 
             );
@@ -238,6 +247,7 @@ class MailclientController extends MailclientBaseController {
     public function getmailcontentAction(Request $request){
         $path=$request->get('path','');
         $externalsources=$request->get('externalsources',false);
+        $mailaccountid=false;
         if ($path){
             $pathexpl=explode('.',$path);
             $mailaccountid=$pathexpl[0];
@@ -286,6 +296,7 @@ class MailclientController extends MailclientBaseController {
             'path'=>$path,
             
         );
+        $mailaccountid=false;
         if (in_array($type,array('reply','replyall','forward'))){
            if ($path){
                 $pathexpl=explode('.',$path);
@@ -308,6 +319,7 @@ class MailclientController extends MailclientBaseController {
             $mail = $mailbox->getMail($mailid);  
             
             $mail->hasexternallinks=false;
+            $fetchedHtml='';
             if ($mail->textHtml){
                 //clean html:
                 $fetchedHtml=$this->cleanHtml($mail,false,'On.......wrote:');
@@ -323,7 +335,7 @@ class MailclientController extends MailclientBaseController {
                 $attachments[]=Array(
                     'id'=>$attachment->id,
                     'name'=>$attachment->name,
-                    'filesize'=>$attachment->fileSize,
+                    'filesize'=> 0, //$attachment->fileSize,
                     'filepath'=>str_replace($this->attachments_dir,$this->attachmentsbase_dir,$attachment->filePath)
 
                 );
@@ -350,8 +362,11 @@ class MailclientController extends MailclientBaseController {
         }
         
         //dump($params);
-        $mailaccountusers=$this->getDoctrine()->getManager()->getRepository('XxamMailclientBundle:Mailaccountuser')->findByUserId($user->getId());
+        /* @var MailaccountuserRepository $repository */
+        $repository=$this->getDoctrine()->getManager()->getRepository('XxamMailclientBundle:Mailaccountuser');
+        $mailaccountusers=$repository->findByUserId($user->getId());
         foreach($mailaccountusers as $mailaccountuser){
+            /* @var Mailaccountuser $mailaccountuser */
             $params['mailaccounts'][]=$mailaccountuser->getMailaccount();
         }
         return $this->render('XxamMailclientBundle:Mailclient:write.js.twig', $params);
@@ -362,12 +377,16 @@ class MailclientController extends MailclientBaseController {
      *
      * @Security("has_role('ROLE_MAILCLIENT_SETTINGS')")
      *
+     * @return Response
      */
-    public function settingsAction(Request $request) {
+    public function settingsAction() {
         $user = $this->get('security.token_storage')->getToken()->getUser();
-        $mailaccountusers=$this->getDoctrine()->getManager()->getRepository('XxamMailclientBundle:Mailaccountuser')->findByUserId($user->getId());
+        /* @var MailaccountuserRepository $repository */
+        $repository=$this->getDoctrine()->getManager()->getRepository('XxamMailclientBundle:Mailaccountuser');
+        $mailaccountusers=$repository->findByUserId($user->getId());
         $mas=Array();
         foreach($mailaccountusers as $mailaccountuser){
+            /* @var Mailaccountuser $mailaccountuser */
             $mas[]=$mailaccountuser->getMailaccount();
         }
         return $this->render('XxamMailclientBundle:Mailclient:settings.js.twig', array('mailaccounts'=>$mas));
