@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Xxam package.
+ *
+ * (c) Julian Stricker <julian@julianstricker.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Xxam\CoreBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -18,7 +27,6 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('xxam_core');
 
         // Here you should define the parameters that are allowed to
         // configure your bundle. See the documentation linked above for

@@ -8,6 +8,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ORM\Mapping as ORM;
 use Xxam\CoreBundle\Entity\Base as Base;
+use Xxam\CoreBundle\Entity\Widget;
 
 /**
  * @ORM\Entity
@@ -55,6 +56,7 @@ class User extends BaseUser implements Base\TenantInterface
 
 
     /**
+     * @var Widget[] $widgets
      * @ORM\OneToMany(targetEntity="Xxam\CoreBundle\Entity\Widget", mappedBy="user", cascade={"persist", "remove"})
      * @ORM\OrderBy({"sortfield" = "ASC"})
      */
@@ -131,7 +133,7 @@ class User extends BaseUser implements Base\TenantInterface
     /**
      * Add widgets
      *
-     * @param Xxam\CoreBundle\Entity\Widget $widgets
+     * @param \Xxam\CoreBundle\Entity\Widget $widgets
      */
     public function addWidget(\Xxam\CoreBundle\Entity\Widget $widgets) {
         $this->widgets[] = $widgets;
@@ -140,7 +142,7 @@ class User extends BaseUser implements Base\TenantInterface
     /**
      * Get widgets
      *
-     * @return Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getWidgets() {
         return $this->widgets;
@@ -149,7 +151,7 @@ class User extends BaseUser implements Base\TenantInterface
     /**
      * Add extjsstates
      *
-     * @param Xxam\CoreBundle\Entity\Extjsstate $extjsstates
+     * @param \Xxam\CoreBundle\Entity\Extjsstate $extjsstates
      */
     public function addExtjsstate(\Xxam\CoreBundle\Entity\Extjsstate $extjsstates) {
         $this->extjsstates[] = $extjsstates;
@@ -158,7 +160,7 @@ class User extends BaseUser implements Base\TenantInterface
     /**
      * Get extjsstates
      *
-     * @return Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getExtjsstates() {
         return $this->extjsstates;

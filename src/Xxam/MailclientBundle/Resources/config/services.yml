@@ -12,6 +12,6 @@ services:
     #every portal-widget must start with "xxamportalwidget...."
     xxamportalwidget.mailclient.newmails:
         class: Xxam\MailclientBundle\Controller\NewmailsWidgetController
-        arguments: ["@templating", "@security.token_storage"]
+        arguments: ["@security.token_storage"]
         tags:
             -  { name: xxamportalwidget }

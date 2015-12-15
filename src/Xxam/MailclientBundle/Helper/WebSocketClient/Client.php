@@ -2,6 +2,7 @@
 namespace Xxam\MailclientBundle\Helper\WebSocketClient;
 
 
+
 use Xxam\MailclientBundle\Helper\WebSocketClient\WebSocketClientInterface;
 
 class Client implements WebSocketClientInterface
@@ -153,7 +154,7 @@ class Client implements WebSocketClientInterface
         $this->client->unsubscribe($topic);
     }
 
-    public function call($proc, $args, Closure $callback = null)
+    public function call($proc, $args, \Closure $callback = null)
     {
         $this->client->call($proc, $args, $callback);
     }

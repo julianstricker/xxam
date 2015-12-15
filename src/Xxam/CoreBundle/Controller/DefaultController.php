@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Xxam package.
+ *
+ * (c) Julian Stricker <julian@julianstricker.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Xxam\CoreBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -7,6 +16,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Xxam\CoreBundle\Entity\Extjsstate;
 use Xxam\CoreBundle\Entity\Widget;
+
+/*
+ * Class DefaultController
+ * This is the Default Controller for Xxam
+ *
+ * @package Xxam\CoreBundle\Controller
+ * @author Julian Stricker <julian@julianstricker.com>
+ */
 
 class DefaultController extends DefaultBaseController
 {
@@ -140,11 +157,15 @@ class DefaultController extends DefaultBaseController
 
 
 
-    /*
-     * save/load/delete Ext-Js Stateful-Settings 
+    /**
+     * save/load/delete Ext-Js Stateful-Settings
+     *
+     * @param Request $request
+     * @return Response
      */
     public function statefulserviceAction(Request $request){
 
+        /** @var User $user */
         $user = $this->get('security.token_storage')->getToken()->getUser();
         if($request->getMethod()=='GET'){
             return $this->statefulGetResponse($user);

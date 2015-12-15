@@ -1,37 +1,44 @@
 <?php
 
+/*
+ * This file is part of the Xxam package.
+ *
+ * (c) Julian Stricker <julian@julianstricker.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Xxam\CoreBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
 
+
+/**
+ * Class FeedWidgetController
+ * @package Xxam\CoreBundle\Controller
+ */
 class FeedWidgetController extends Controller
 {
-    /*private $templating;
-
-    public function __construct($templating)
-    {
-        $this->templating = $templating;
-    }*/
 
 
-    /*public function indexAction($params)
-    {
-        return $this->templating->renderResponse(
-                'XxamCoreBundle:FeedWidget:index.js.twig',
-                array('params' => $params)
-        );
-
-    }*/
-
-    //this function is required for every portalwidget:
+    /**
+     * Returns the Portal Widget Template name
+     * this function is required for every portalwidget
+     *
+     * @return string
+     */
     public function getWidgetTemplateAction(){
         return 'XxamCoreBundle:FeedWidget:index.js.twig';
     }
 
-
-    //this function is required for every portalwidget:
+    /**
+     * Returns the Portal Widget Definitions
+     * this function is required for every portalwidget
+     *
+     * @return array
+     */
     public function getDefinitionAction()
     {
         return Array(
@@ -52,6 +59,12 @@ class FeedWidgetController extends Controller
         );
     }
 
+    /**
+     * Returns the data of a RSS-Feed
+     *
+     * @param string $url
+     * @return Response
+     */
     public function loadfeedAction($url){
         $response = new Response(str_replace(array("dc:creator","content:encoded"), array('author','content'), file_get_contents(urldecode($url))));
         $response->headers->set('Content-Type', 'text/xml; charset=UTF-8');

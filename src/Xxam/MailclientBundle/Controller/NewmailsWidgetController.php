@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Xxam package.
+ *
+ * (c) Julian Stricker <julian@julianstricker.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Xxam\MailclientBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -10,15 +19,23 @@ use Xxam\MailclientBundle\Entity\MailaccountuserRepository;
 
 class NewmailsWidgetController extends Controller
 {
-    private $templating;
     private $securityTokenStorage;
-    public function __construct($templating,$securityTokenStorage)
+
+    /**
+     * NewmailsWidgetController constructor.
+     * @param $securityTokenStorage
+     */
+    public function __construct($securityTokenStorage)
     {
-        $this->templating = $templating;
         $this->securityTokenStorage = $securityTokenStorage;
     }
 
-    //this function is required for every portalwidget:
+
+    /**
+     * this function is required for every portalwidget:
+     *
+     * @return string
+     */
     public function getWidgetTemplateAction(){
         return 'XxamMailclientBundle:NewmailsWidget:index.js.twig';
     }

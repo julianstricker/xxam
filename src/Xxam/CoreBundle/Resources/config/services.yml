@@ -7,7 +7,7 @@ services:
 #every portal-widget must start with "xxamportalwidget...."
     xxamportalwidget.core.feed:
         class: Xxam\CoreBundle\Controller\FeedWidgetController
-        arguments: ["@templating"]
+       # arguments: ["@templating"]
         tags:
             -  { name: xxamportalwidget }
             

@@ -1,9 +1,19 @@
 <?php
 
+/*
+ * This file is part of the Xxam package.
+ *
+ * (c) Julian Stricker <julian@julianstricker.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Xxam\CoreBundle\Entity;
 
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping as ORM;
+use Xxam\UserBundle\Entity\User;
 
 /**
  * Contact
@@ -220,10 +230,10 @@ class Widget implements Base\TenantInterface
     /**
      * Set user
      *
-     * @param \Xxam\UserBundle\Entity\User $user
+     * @param User $user
      * @return Widget
      */
-    public function setUser(\Xxam\UserBundle\Entity\User $user = null)
+    public function setUser(User $user = null)
     {
         $this->user = $user;
 
@@ -233,7 +243,7 @@ class Widget implements Base\TenantInterface
     /**
      * Get user
      *
-     * @return \Xxam\UserBundle\Entity\User
+     * @return User
      */
     public function getUser()
     {
