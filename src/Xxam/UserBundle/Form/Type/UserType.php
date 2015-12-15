@@ -1,14 +1,11 @@
 <?php
 
 namespace Xxam\UserBundle\Form\Type;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Xxam\UserBundle\Entity\User;
-use Xxam\UserBundle\Transformer\RolesTransformer;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class UserType extends AbstractType
 {
@@ -48,9 +45,9 @@ class UserType extends AbstractType
     {
         $this->roledefinitions = $roledefinitions;        
     }
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setOptional(array('lang')); 
+        $resolver->setDefined(array('lang'));
         $resolver->setDefaults(array(
             'data_class' => 'Xxam\UserBundle\Entity\User',
             //'validation_groups' => array('Brandnamic\CoreBundle\Entity\User'),

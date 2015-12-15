@@ -3,7 +3,7 @@
 namespace Xxam\FilemanagerBundle\Controller;
 
 use Xxam\FilemanagerBundle\Entity\Filesystem;
-use Xxam\FilemanagerBundle\Form\FilesystemType;
+
 
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
@@ -11,14 +11,14 @@ use FOS\RestBundle\Controller\Annotations\View;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\View\View as FOSView;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use Voryx\RESTGeneratorBundle\Controller\VoryxController;
+use Xxam\FilemanagerBundle\Entity\FilesystemRepository;
+use Xxam\FilemanagerBundle\Form\Type\FilesystemType;
 
 /**
  * Filemanager controller.
@@ -64,11 +64,14 @@ class FilemanagerRESTController extends VoryxController
             $filters = !is_null($paramFetcher->get('filters')) ? $paramFetcher->get('filters') : array();
 
             $em = $this->getDoctrine()->getManager();
-            $entities = $em->getRepository('XxamFilemanagerBundle:Filesystem')->findBy($filters, $order_by, $limit, $offset);
+            /** @var FilesystemRepository $repository */
+            $repository=$em->getRepository('XxamFilemanagerBundle:Filesystem');
+            $entities = $repository->findBy($filters, $order_by, $limit, $offset);
             if ($entities) {
                 //total:
-                $total = $em->getRepository('XxamFilemanagerBundle:Filesystem')->getTotalcount($filters);
+                $total = $repository->getTotalcount($filters);
                 $results=Array();
+                /** @var Filesystem $entity */
                 foreach($entities as $entity){
                     $results[]=$entity->toGridObject();
                 }

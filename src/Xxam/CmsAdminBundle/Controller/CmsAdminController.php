@@ -124,9 +124,9 @@ class CmsAdminController extends Controller
      * @Security("has_role('ROLE_CMSADMIN_CREATE')")
      */
     public function newAction() {
-        $repository=$this->getDoctrine()->getManager()->getRepository('XxamCmsAdminBundle:CmsAdmin');
-        $entity=new CmsAdmin();
-        return $this->render('XxamCmsAdminBundle:CmsAdmin:edit.js.twig', array('entity'=>$entity,'cmsadmintypes'=>$this->cmsadmintypesAsKeyValue(),'modelfields'=>$repository->getModelFields()));
+        //$repository=$this->getDoctrine()->getManager()->getRepository('XxamCmsAdminBundle:CmsAdmin');
+        //$entity=new CmsAdmin();
+        return $this->render('XxamCmsAdminBundle:CmsAdmin:edit.js.twig', array('entity'=>null,'cmsadmintypes'=>$this->cmsadmintypesAsKeyValue(),'modelfields'=>$repository->getModelFields()));
     }
     
     /**

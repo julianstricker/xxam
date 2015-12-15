@@ -2,15 +2,9 @@
 
 namespace Xxam\UserBundle\Handler;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Routing\Router;
-use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler;
-use Symfony\Component\Security\Http\HttpUtils;
-
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class AuthenticationSuccessHandler extends DefaultAuthenticationSuccessHandler {
 

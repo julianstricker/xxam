@@ -2,13 +2,9 @@
 
 namespace Xxam\CommBundle\Command;
 
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Doctrine\ORM\Query\ResultSetMapping;
 use Xxam\CommBundle\Provider\XxamChat;
 use Ratchet\WebSocket\WsServer;
 use Ratchet\Http\HttpServer;

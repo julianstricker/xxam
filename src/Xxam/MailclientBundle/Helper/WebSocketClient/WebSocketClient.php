@@ -678,7 +678,8 @@ class WebSocketClient
                 $mask = substr($bytes, 2, 4);
                 $coded_data = substr($bytes, 6);
             }
-            for ($i = 0; $i < strlen($coded_data); $i++) {
+            $coded_data_length=strlen($coded_data);
+            for ($i = 0; $i < $coded_data_length; $i++) {
                 $decodedData .= $coded_data[$i] ^ $mask[$i % 4];
             }
         } else {

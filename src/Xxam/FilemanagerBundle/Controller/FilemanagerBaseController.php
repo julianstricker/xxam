@@ -3,7 +3,6 @@
 namespace Xxam\FilemanagerBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Xxam\FilemanagerBundle\Entity\Filesystem as FilesystemEntity;
 use Symfony\Component\HttpFoundation\Response;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
@@ -16,6 +15,8 @@ use League\Flysystem\Cached\Storage\Memcached as Cache;
 
 
 use Xxam\FilemanagerBundle\Helper\FlysystemPlugins\ThumbnailDropbox;
+use Xxam\UserBundle\Entity\Group;
+use Xxam\FilemanagerBundle\Entity\Filesystem as XxamFilesystem;
 
 class FilemanagerBaseController extends Controller {
 
@@ -26,7 +27,8 @@ class FilemanagerBaseController extends Controller {
         "m"=>"128x128",
     );
 
-    protected $memcached;
+    /* @var \Memcached $memcached */
+    protected  $memcached;
     
     protected function removeChildrenkeys($children){
         if (isset($children['children'])){
@@ -37,18 +39,24 @@ class FilemanagerBaseController extends Controller {
         }
         return $children;
     }
-    
+
+    /**
+     * @return array
+     */
     protected function getFilesystems(){
         $user = $this->get('security.token_storage')->getToken()->getUser();
         $filesystems=Array();
         $fss=$user->getFilesystems();
         if (count($fss)>0){
+
             foreach($fss as $filesystem){
+                /** @var XxamFilesystem $filesystem */
                 $filesystems[$filesystem->getId()]=$filesystem;
             }
         }
         if (count($user->getGroups())>0){
             foreach($user->getGroups() as $group){
+                /** @var Group $group */
                 $fss=$group->getFilesystems();
                 if (count($fss)>0){
                     foreach($fss as $filesystem){
@@ -123,7 +131,7 @@ class FilemanagerBaseController extends Controller {
         return $adapter;
     }
     
-    protected function getFs( $filesystem){
+    protected function getFs( XxamFilesystem $filesystem){
         $settings=json_decode($filesystem->getSettings(),true);
         $adapter=false;
         switch ($filesystem->getAdapter()) {
@@ -195,10 +203,14 @@ class FilemanagerBaseController extends Controller {
         return false;
     }
 
-    /*
+
+    /**
      * Get List of Filesystem for root directory listing
+     *
+     * @param XxamFilesystem[] $filesystems
+     * @return array
      */
-    protected function getFilesystemsFolders($filesystems){
+    protected function getFilesystemsFolders(Array $filesystems){
         $children = Array();
         foreach ($filesystems as $filesystem) {
             $children[] = Array(
@@ -215,10 +227,14 @@ class FilemanagerBaseController extends Controller {
         return $children;
     }
 
-    /*
+    /**
      * Get List of Folders for path
+     *
+     * @param XxamFilesystem $filesystem
+     * @param $path
+     * @return array
      */
-    protected function getFoldersForPath($filesystem,$path){
+    protected function getFoldersForPath(XxamFilesystem $filesystem, $path){
         $children = Array();
         $fs = $this->getFs($filesystem);
         $contents = $fs->listContents($path);
@@ -240,7 +256,7 @@ class FilemanagerBaseController extends Controller {
     /*
      * Get List of Files/Folders for path
      */
-    protected function getFilesForPath($filesystem,$path){
+    protected function getFilesForPath(XxamFilesystem $filesystem,$path){
         $children = Array();
         $fs = $this->getFs($filesystem);
         $contents = $fs->listContents($path);
@@ -258,7 +274,7 @@ class FilemanagerBaseController extends Controller {
         return $children;
     }
 
-    protected function getThumbnailResponse($path,$fs,$size,$cachename){
+    protected function getThumbnailResponse($path,Filesystem $fs,$size,$cachename){
         $fileextensionswiththumbnails = $this->container->getParameter('fileextensionswiththumbnails');
         $pathexpl = explode('.', $path);
         $fileextension = strtolower($pathexpl[count($pathexpl) - 1]);

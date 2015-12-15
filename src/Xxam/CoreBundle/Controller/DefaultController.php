@@ -11,11 +11,10 @@
 
 namespace Xxam\CoreBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Xxam\CoreBundle\Entity\Extjsstate;
 use Xxam\CoreBundle\Entity\Widget;
+use Xxam\UserBundle\Entity\User;
 
 /*
  * Class DefaultController
@@ -86,7 +85,6 @@ class DefaultController extends DefaultBaseController
 
     public function addwidgetAction() {
 
-        $user = $this->get('security.token_storage')->getToken()->getUser();
         return $this->render('XxamCoreBundle:Default:addwidget.js.twig', array());
     }
 
@@ -114,8 +112,12 @@ class DefaultController extends DefaultBaseController
         return $response;
     }
 
+
     /**
-     * Loads the Widget Component.
+     * Removes a Widget Component.
+     *
+     * @param int $id
+     * @return Response
      */
     public function removewidgetAction($id) {
 
@@ -128,8 +130,12 @@ class DefaultController extends DefaultBaseController
         return $response;
     }
 
+
     /**
-     * Loads the Widget Component.
+     * gets the Widget Component.
+     *
+     * @param int $id
+     * @return Response
      */
     public function getwidgetAction($id) {
         $widget=$this->getDoctrine()->getManager()->getRepository('XxamCoreBundle:Widget')->find($id);
@@ -138,8 +144,10 @@ class DefaultController extends DefaultBaseController
         return $this->render($template, array('params' => json_decode($widget->getParams()),'id'=>$widget->getId()));
     }
 
-    /*
+    /**
      * Get list of all available Widgets:
+     *
+     * @return Response
      */
     public function getwidgetsAction(){
         $returnvalue=Array();
@@ -174,6 +182,6 @@ class DefaultController extends DefaultBaseController
         }else if($request->getMethod()=='DELETE'){
             return $this->statefulDeleteResponse($user,$request->get('key',false));
         }
-
+        return true;
     }
 }

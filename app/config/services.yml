@@ -23,7 +23,7 @@ services:
 #            - { name: thruway.internal_client }
 
     xxam.twig_extension:
-            class: XxamCoreBundle\Twig\XxamExtension
+            class: Xxam\CoreBundle\Twig\XxamExtension
             public: false
             tags:
                 - { name: twig.extension }

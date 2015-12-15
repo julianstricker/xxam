@@ -2,20 +2,18 @@
 
 namespace Xxam\MailclientBundle\Command;
 
-use Symfony\Component\Console\Command\Command;
+
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
+
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Doctrine\ORM\Query\ResultSetMapping;
+
 
 use Thruway\ClientSession;
 use Thruway\Peer\Client;
-use Thruway\Transport\PawlTransportProvider;
-use Xxam\CommBundle\Provider\ChattokenClientAuth;
-use Xxam\UserBundle\Entity\User;
-//use React\SocketClient;
+
+
 
 class ImapidleCommand extends ContainerAwareCommand {
 

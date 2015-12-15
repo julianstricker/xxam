@@ -2,13 +2,10 @@
 
 namespace Xxam\UserBundle\Form\Type;
 use Xxam\UserBundle\Entity\Group;
-use Xxam\UserBundle\Transformer\RolesTransformer;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class GroupType extends AbstractType
 {
@@ -44,9 +41,9 @@ class GroupType extends AbstractType
     {
         $this->roledefinitions = $roledefinitions;        
     }
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setOptional(array('lang')); 
+        $resolver->setDefined(array('lang'));
         $resolver->setDefaults(array(
             'data_class' => 'Xxam\UserBundle\Entity\Group',
             //'validation_groups' => array('Brandnamic\CoreBundle\Entity\Group'),

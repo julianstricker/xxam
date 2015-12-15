@@ -3,8 +3,6 @@
 namespace Xxam\CodingBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Xxam\CodingBundle\Helper\Imap\ImapMailbox;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 

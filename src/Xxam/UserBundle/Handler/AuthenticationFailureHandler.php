@@ -3,9 +3,6 @@ namespace Xxam\UserBundle\Handler;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Translator;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
