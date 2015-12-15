@@ -5,11 +5,11 @@
 {% endif %}
 {
     tabtitle: '{% if entity.id %}{% trans with {'%firstname%': entity.firstname, '%lastname%': entity.lastname} %}Edit %firstname% %lastname%{% endtrans %}{% else %}{% trans %}Create new contact{% endtrans %}{% endif %}',
-    getitems: function (){
+    getitems: function(){
         if (typeof(ContactModel)=='undefined'){
           Ext.define('ContactModel',{
              extend: 'Ext.data.Model',
-             fields: {{modelfields|json_encode(false)|raw}},
+             fields: {{modelfields|jscode(false)}},
              idProperty: 'id',
              proxy: {
                 type: 'rest',
@@ -23,7 +23,7 @@
         }
         var contacttypesStore = Ext.create('Ext.data.Store', {
             fields: ['id', 'value'],
-            data : {{contacttypes|json_encode()|raw}}
+            data : {{contacttypes|jscode()}}
         });
         
         return {

@@ -23,7 +23,7 @@
         }
         var grouproles=[];
         {% for group in groups %}
-        grouproles[{{group.id}}]={{group.roles|json_encode|raw}};
+        grouproles[{{group.id}}]={{group.roles|jscode}};
         {% endfor %}
         
         return {

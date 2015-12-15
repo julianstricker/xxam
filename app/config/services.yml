@@ -21,3 +21,9 @@ services:
 #        parent: voryx.thruway.wamp.cra.auth.client
 #        tags:
 #            - { name: thruway.internal_client }
+
+    xxam.twig_extension:
+            class: XxamCoreBundle\Twig\XxamExtension
+            public: false
+            tags:
+                - { name: twig.extension }

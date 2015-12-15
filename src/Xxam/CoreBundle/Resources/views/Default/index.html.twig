@@ -21,7 +21,7 @@
         {% endif %}
         <script type="text/javascript" src="/assets/vendor/extjs/build/packages/sencha-charts/build/sencha-charts{%if app.environment == 'dev' %}-debug{%endif%}.js"></script>
         <script type="text/javascript">
-           var menu={{ menu|json_encode|raw }}
+           var menu={{ menu|jscode }}
            var xxam_core_homepage='{{path('xxam_core_homepage')}}';
            var statefulservicepath= '{{path('xxam_core_statefulservice')}}';
            var setchatidurl= '{{path('xxam_comm_setchatid')}}';

@@ -8,10 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Xxam\CmsAdminBundle\Entity\CmsAdmin;
-use Xxam\CmsAdminBundle\Form\Type\CmsAdminType;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * CmsAdmin controller.
@@ -68,7 +65,8 @@ class CmsAdminController extends Controller
         $pages=$qb->getQuery()->execute();
         dump($pages);
         dump($pages['/cms/pages/Home']->getChildren());
-
+        $returndata=[];
+/*
         foreach($mailaccountusers as $mailaccountuser){
             $mailaccount=$mailaccountuser->getMailaccount();
             $mailbox = $this->getImapMailbox($mailaccount,'');
@@ -109,6 +107,7 @@ class CmsAdminController extends Controller
 
             $returndata[] =  $this->removeChildrenkeys($children);
         }
+*/
         //dump($returndata);
         //setLocale(LC_ALL,'de_DE.UTF8');
         $response = new Response(json_encode($returndata));

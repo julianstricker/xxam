@@ -17,7 +17,7 @@
                  }
              });
         }
-        var gridcolumns= {{gridcolumns|json_encode()|raw}};
+        var gridcolumns= {{gridcolumns|jscode()}};
         gridcolumns.push({
             menuDisabled: true,
             sortable: false,

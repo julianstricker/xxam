@@ -9,7 +9,7 @@
        if (typeof(ContactlistModel)=='undefined'){
             Ext.define('ContactlistModel',{
                  extend: 'Ext.data.Model',
-                 fields: {{modelfields|json_encode()|raw}},
+                 fields: {{modelfields|jscode()}},
                  idProperty: 'id',
                  proxy: {
                      type: 'rest',
@@ -17,7 +17,7 @@
                  }
              });
         }
-        var gridcolumns= {{gridcolumns|json_encode()|raw}};
+        var gridcolumns= {{gridcolumns|jscode()}};
         gridcolumns.push({
             menuDisabled: true,
             sortable: false,

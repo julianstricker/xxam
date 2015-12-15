@@ -12,7 +12,7 @@
         if (typeof(FilemanagerModel)=='undefined'){
           Ext.define('FilemanagerModel',{
              extend: 'Ext.data.Model',
-             fields: {{modelfields|json_encode(false)|raw}},
+             fields: {{modelfields|jscode(false)}},
              idProperty: 'id',
              proxy: {
                 type: 'rest',
@@ -24,7 +24,7 @@
             }
           });
         }
-        var filesystemadapters={{filesystemadapters|json_encode()|raw}};
+        var filesystemadapters={{filesystemadapters|jscode()}};
         var filesystemadaptersdata=[];
         Ext.Object.each(filesystemadapters, function(key,value){
             filesystemadaptersdata.push({'id':key,'value':key});
