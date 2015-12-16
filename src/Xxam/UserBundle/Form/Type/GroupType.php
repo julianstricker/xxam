@@ -1,7 +1,7 @@
 <?php
 
 namespace Xxam\UserBundle\Form\Type;
-use Xxam\UserBundle\Entity\Group;
+
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;

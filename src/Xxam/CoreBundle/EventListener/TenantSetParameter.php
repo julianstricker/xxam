@@ -12,23 +12,22 @@
 namespace Xxam\CoreBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 
 class TenantSetParameter
 {
-    protected $container;
+    protected $tenants;
     protected $em;
 
     /**
      * TenantSetParameter constructor.
-     * @param Container $container
+     * @param array $tenants
      * @param $em
      */
-    public function __construct(Container $container, EntityManager $em) {
-        $this->container = $container;
+    public function __construct(array $tenants, EntityManager $em) {
+        $this->tenants = $tenants;
         $this->em = $em;
     }
 
@@ -53,7 +52,7 @@ class TenantSetParameter
      * @return int|string
      */
     protected function getTenantIdForSubdomain($subdomain){
-        $tenants=$this->container->getParameter('tenants');
+        $tenants=$this->tenants;
         foreach($tenants as $id=>$tenant){
             if ($tenant['subdomain']==$subdomain) return $id;
         }

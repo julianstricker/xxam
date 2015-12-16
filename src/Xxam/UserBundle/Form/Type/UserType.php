@@ -2,7 +2,7 @@
 
 namespace Xxam\UserBundle\Form\Type;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Xxam\UserBundle\Entity\User;
+
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;

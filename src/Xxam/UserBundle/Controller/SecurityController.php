@@ -14,7 +14,7 @@ class SecurityController extends SecurityControllerOrig
     /**
      * Show login form
      * @Route("/login", name="login")
-     * @Method({"GET"})
+     * @Method("GET")
      */
     public function loginAction(Request $request)
     {
