@@ -23,10 +23,10 @@ class TenantSetParameter
 
     /**
      * TenantSetParameter constructor.
-     * @param array $tenants
+     * @param object $tenants
      * @param $em
      */
-    public function __construct(array $tenants, EntityManager $em) {
+    public function __construct(object $tenants, EntityManager $em) {
         $this->tenants = $tenants;
         $this->em = $em;
     }
