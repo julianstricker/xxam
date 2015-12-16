@@ -2,6 +2,7 @@
 namespace Xxam\UserBundle\Controller;
 
 
+use FOS\RestBundle\Controller\Annotations\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -12,8 +13,8 @@ class SecurityController extends SecurityControllerOrig
 {
     /**
      * Show login form
-     *
-     * @Method("GET")
+     * @Route("/login", name="login")
+     * @Method({"GET"})
      */
     public function loginAction(Request $request)
     {
@@ -35,6 +36,7 @@ class SecurityController extends SecurityControllerOrig
         }
         // last username entered by the user
         $lastUsername = (null === $session) ? '' : $session->get($lastUsernameKey);
+        $csrfToken=null;
         if ($this->has('security.csrf.token_manager')) {
             $csrfToken = $this->get('security.csrf.token_manager')->getToken('authenticate')->getValue();
         }
