@@ -26,7 +26,7 @@ class TenantSetParameter
      * @param object $tenants
      * @param $em
      */
-    public function __construct(object $tenants, EntityManager $em) {
+    public function __construct($tenants, EntityManager $em) {
         $this->tenants = $tenants;
         $this->em = $em;
     }
