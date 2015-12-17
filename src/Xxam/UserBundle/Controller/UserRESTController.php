@@ -2,8 +2,10 @@
 
 namespace Xxam\UserBundle\Controller;
 
+use FOS\UserBundle\Doctrine\UserManager;
 use Xxam\UserBundle\Entity\User;
-use Xxam\UserBundle\Form\UserType;
+use Xxam\UserBundle\Entity\UserRepository;
+use Xxam\UserBundle\Form\Type\UserType;
 
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
@@ -11,10 +13,7 @@ use FOS\RestBundle\Controller\Annotations\View;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\View\View as FOSView;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -64,11 +63,14 @@ class UserRESTController extends VoryxController
             $filters = !is_null($paramFetcher->get('filters')) ? $paramFetcher->get('filters') : array();
 
             $em = $this->getDoctrine()->getManager();
-            $entities = $em->getRepository('XxamUserBundle:User')->findBy($filters, $order_by, $limit, $offset);
+            /** @var UserRepository $repository */
+            $repository=$em->getRepository('XxamUserBundle:User');
+            $entities = $repository->findBy($filters, $order_by, $limit, $offset);
             if ($entities) {
                 //total:
-                $total = $em->getRepository('XxamUserBundle:User')->getTotalcount($filters);
+                $total = $repository->getTotalcount($filters);
                 $results=Array();
+                /** @var User $entity */
                 foreach($entities as $entity){
                     $results[]=$entity->toGridObject();
                 }
@@ -104,6 +106,7 @@ class UserRESTController extends VoryxController
             $em->persist($entity);
             $em->flush();
             if ($request->get('passwordplain')!=''){
+                /** @var UserManager $userManager */
                 $userManager = $this->get('fos_user.user_manager');
                 $user = $userManager->findUserByUsername($entity->getUsername());           
                 $user->setPlainPassword($request->get('passwordplain'));
@@ -140,6 +143,7 @@ class UserRESTController extends VoryxController
             if ($form->isValid()) {
                 $em->flush();
                 if ($request->get('passwordplain')!=''){
+                    /** @var UserManager $userManager */
                     $userManager = $this->get('fos_user.user_manager');
                     $user = $userManager->findUserByUsername($entity->getUsername());           
                     $user->setPlainPassword($request->get('passwordplain'));

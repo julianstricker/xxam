@@ -6,8 +6,8 @@ namespace Xxam\UserBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Xxam\UserBundle\Entity\Group;
 use Xxam\UserBundle\Entity\User;
 use Xxam\UserBundle\Entity\UserRepository;
 use Xxam\UserBundle\Form\Type\UserType;
@@ -30,7 +30,9 @@ class UserController extends Controller
      * @Method("GET")
      * 
      * @Security("has_role('ROLE_USER_LIST')")
-     * 
+
+     * @param Request $request
+     * @return Response
      */
     public function searchusersAction(Request $request)
     {
@@ -39,15 +41,18 @@ class UserController extends Controller
 
         $returnvalues=Array();
         $em = $this->getDoctrine()->getManager();
-        $query = $em->getRepository('XxamUserBundle:User')->createQueryBuilder('e');
+        /** @var UserRepository $repository */
+        $repository=$em->getRepository('XxamUserBundle:User');
+        $query = $repository->createQueryBuilder('e');
         $query->andWhere('(e.lastname LIKE :queryparam1 OR e.firstname LIKE :queryparam2)');
         $query->setParameter('queryparam1', '%'.$queryparam.'%');
         $query->setParameter('queryparam2', '%'.$queryparam.'%');
         $entities = $query->getQuery()->getResult();
         if ($entities) {
-            
+
+            /** @var User $entity */
             foreach($entities as $entity){
-                $returnvalues[]=Array('value'=>$entity->getLastname().' '.$entity->getFirstname());
+                $returnvalues[]=Array('value'=>$entity->getUsername());
             }
             
         }
@@ -64,10 +69,10 @@ class UserController extends Controller
      *
      * @Route("/", name="user")
      * @Method("GET")
-     * @Template()
      * @Security("has_role('ROLE_USER_LIST')")
      */
     public function indexAction() {
+        /** @var UserRepository $repository */
         $repository=$this->getDoctrine()->getManager()->getRepository('XxamUserBundle:User');
         return $this->render('XxamUserBundle:User:index.js.twig', array('modelfields'=>$repository->getModelFields(),'gridcolumns'=>$repository->getGridColumns()));
     }
@@ -77,10 +82,10 @@ class UserController extends Controller
      *
      * @Route("/edit", name="user_new")
      * @Method("GET")
-     * @Template()
      * @Security("has_role('ROLE_USER_CREATE')")
      */
     public function newAction() {
+        /** @var UserRepository $repository */
         $repository=$this->getDoctrine()->getManager()->getRepository('XxamUserBundle:User');
         $groups=$this->getDoctrine()->getManager()->getRepository('XxamUserBundle:Group')->findAll();
         $entity=new User();
@@ -95,8 +100,9 @@ class UserController extends Controller
      *
      * @Route("/edit/{id}", name="user_edit")
      * @Method("GET")
-     * @Template()
      * @Security("has_role('ROLE_USER_EDIT')")
+     * @param $id
+     * @return Response
      */
     public function editAction($id) {
         $em = $this->getDoctrine()->getManager();
@@ -114,7 +120,30 @@ class UserController extends Controller
 
         /** @var User $entity */
 
-        return $this->render('XxamUserBundle:User:edit.js.twig', array('entity'=>$entity,'groups'=>$groups,'form'=>$form,'roles'=>$this->getRolesFormatted($entity),'modelfields'=>$repository->getModelFields()));
+        return $this->render('XxamUserBundle:User:edit.js.twig', array('entity'=>$entity,'groups'=>$groups,'groupsformatted'=>$this->getGroupsFormatted($groups,$entity),'form'=>$form,'roles'=>$this->getRolesFormatted($entity),'modelfields'=>$repository->getModelFields()));
+    }
+
+    /**
+     * @param array $groups
+     * @param User $entity
+     * @return array
+     */
+    private function getGroupsFormatted(Array $groups, User $entity){
+        $returnarr=[];
+
+        $usergroups=$entity->getGroups();
+        /** @var Group $group */
+        foreach($groups as $group){
+
+            $returnarr[]=[
+                "boxLabel"=> $group->getName(),
+                "name"=> 'groups',
+                "inputValue"=>$group->getId(),
+                "checked"=>$usergroups->contains($group)
+            ];
+        }
+        return $returnarr;
+
     }
 
     private function getRolesFormatted(User $entity){

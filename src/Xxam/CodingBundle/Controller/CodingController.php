@@ -12,8 +12,8 @@ class CodingController extends Controller {
      * Show Coding
      *
      * @Security("has_role('ROLE_CODING_LIST')")
-     *
-     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction(Request $request) {
         $path=$request->get('path','');

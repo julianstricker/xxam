@@ -5,6 +5,7 @@ namespace Xxam\FilemanagerBundle\Controller;
 
 use Xxam\FilemanagerBundle\Entity\Filesystem;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Xxam\FilemanagerBundle\Entity\FilesystemRepository;
 
 
 class FilemanagerController extends FilemanagerBaseController {
@@ -15,6 +16,7 @@ class FilemanagerController extends FilemanagerBaseController {
      * @Security("has_role('ROLE_FILEMANAGER_ADMIN')")
      */
     public function adminAction() {
+        /** @var FilesystemRepository $repository */
         $repository=$this->getDoctrine()->getManager()->getRepository('XxamFilemanagerBundle:Filesystem');
         return $this->render('XxamFilemanagerBundle:Filemanager:admin.js.twig', array('modelfields'=>$repository->getModelFields(),'gridcolumns'=>$repository->getGridColumns()));
     }
@@ -36,6 +38,7 @@ class FilemanagerController extends FilemanagerBaseController {
      * @Security("has_role('ROLE_FILEMANAGER_CREATE')")
      */
     public function newAction() {
+        /** @var FilesystemRepository $repository */
         $repository=$this->getDoctrine()->getManager()->getRepository('XxamFilemanagerBundle:Filesystem');
         $entity=new Filesystem();
         return $this->render('XxamFilemanagerBundle:Filemanager:edit.js.twig', array('entity'=>$entity,'modelfields'=>$repository->getModelFields()));
@@ -45,9 +48,12 @@ class FilemanagerController extends FilemanagerBaseController {
      * Show create form.
      *
      * @Security("has_role('ROLE_FILEMANAGER_EDIT')")
+     * @param $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function editAction($id) {
         $em = $this->getDoctrine()->getManager();
+        /** @var FilesystemRepository $repository */
         $repository=$em->getRepository('XxamFilemanagerBundle:Filesystem');
 
         $entity = $repository->find($id);

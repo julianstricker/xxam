@@ -25,7 +25,7 @@ class FilesystemRepository extends EntityRepository
     }
     public function getModelFields(){
         $fields=Array();
-        $fields[]=Array('name'=> 'id','type'=>'string','type'=>'int');
+        $fields[]=Array('name'=> 'id','type'=>'int');
         $fields[]=Array('name'=> 'user_id','type'=>'int');
         $fields[]=Array('name'=> 'user','type'=>'string');
         $fields[]=Array('name'=> 'filesystemname','type'=>'string');

@@ -1,8 +1,6 @@
 {% set iconsize = '16x16' %}
 {% set buttonsize = 'medium' %}
-{% if buttonsize == 'large' %}
-    {% set iconsize = '32x32' %}
-{% endif %}
+
 {
     tabtitle: '{% if entity.id %}{% trans with {'%username%': entity.username } %}Edit %username%{% endtrans %}{% else %}{% trans %}Create new User{% endtrans %}{% endif %}',
     getitems: function (){
@@ -62,9 +60,7 @@
                 fieldLabel: 'Groups',
                 name: 'groups',
                 xtype: 'checkboxgroup',
-                items: [{% for group in groups %}
-                { boxLabel: '{{group.name}}', name: 'groups', inputValue: '{{group.id}}' {%if group in entity.getGroups %}, checked: true{% endif %}}{% if not loop.last %},{% endif %}
-                {% endfor%}],
+                items: {{groupsformatted|jscode}},
                 listeners:{
                     change: function(groupfield,newvalue){
                         var gr=[];

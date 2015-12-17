@@ -6,8 +6,12 @@ use League\Flysystem\PluginInterface;
 
 class ThumbnailDropbox implements PluginInterface
 {
+    /* @var FilesystemInterface $filesystem */
     protected $filesystem;
 
+    /**
+     * @param FilesystemInterface $filesystem
+     */
     public function setFilesystem(FilesystemInterface $filesystem)
     {
         $this->filesystem = $filesystem;
@@ -18,9 +22,14 @@ class ThumbnailDropbox implements PluginInterface
         return 'getThumbnail';
     }
 
-    public function handle($path = null,$size='s')
+    /**
+     * @param null $path
+     * @param string $size
+     * @return mixed
+     */
+    public function handle($path = null, $size='s')
     {
-        $contents = $this->filesystem->read($path);
+
         $adapter=$this->filesystem->getAdapter();
         if (get_class($adapter)=='League\Flysystem\Cached\CachedAdapter') $adapter=$adapter->getAdapter();
         $client=$adapter->getClient();

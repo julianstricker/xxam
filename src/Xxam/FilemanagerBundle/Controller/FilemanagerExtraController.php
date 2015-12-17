@@ -25,7 +25,7 @@ class FilemanagerExtraController extends FilemanagerBaseController
         } elseif ($filesystemid == false) {
             $returndata['children']=$this->getFilesystemsFolders($filesystems);
         } else {
-            $filesystem = isset($filesystems[$filesystemid]) ? $filesystems[$filesystemid] : false;
+            $filesystem = isset($filesystems[$filesystemid]) ? $filesystems[$filesystemid] : null;
             if (!$filesystem) {
                 return $this->throwJsonError('Filesystem not found');
             }
@@ -47,7 +47,7 @@ class FilemanagerExtraController extends FilemanagerBaseController
         } elseif ($filesystemid == false) {
             $returndata['children']=$this->getFilesystemsFolders($filesystems);
         } else {
-            $filesystem = isset($filesystems[$filesystemid]) ? $filesystems[$filesystemid] : false;
+            $filesystem = isset($filesystems[$filesystemid]) ? $filesystems[$filesystemid] : null;
             if (!$filesystem) {
                 return $this->throwJsonError('Filesystem not found');
             }
@@ -74,7 +74,7 @@ class FilemanagerExtraController extends FilemanagerBaseController
         if (count($filesystems) == 0) {
             return $this->throwJsonError('No Filesystem found');
         } else {
-            $filesystem = isset($filesystems[$filesystemid]) ? $filesystems[$filesystemid] : false;
+            $filesystem = isset($filesystems[$filesystemid]) ? $filesystems[$filesystemid] : null;
             if (!$filesystem) {
                 return $this->throwJsonError('Filesystem not found');
             }else {
@@ -93,7 +93,7 @@ class FilemanagerExtraController extends FilemanagerBaseController
         if (count($filesystems) == 0) {
             return $this->throwJsonError('No Filesystem found');
         } else {
-            $filesystem = isset($filesystems[$filesystemid]) ? $filesystems[$filesystemid] : false;
+            $filesystem = isset($filesystems[$filesystemid]) ? $filesystems[$filesystemid] : null;
             if (!$filesystem) {
                 return $this->throwJsonError('Filesystem not found');
             }else {
@@ -129,7 +129,7 @@ class FilemanagerExtraController extends FilemanagerBaseController
         if (count($filesystems) == 0) {
             return $this->throwJsonError('No Filesystem found');
         } else {
-            $filesystem = isset($filesystems[$filesystemid]) ? $filesystems[$filesystemid] : false;
+            $filesystem = isset($filesystems[$filesystemid]) ? $filesystems[$filesystemid] : null;
             if (!$filesystem) {
                 return $this->throwJsonError('Filesystem not found');
             }
@@ -151,7 +151,7 @@ class FilemanagerExtraController extends FilemanagerBaseController
                         return $this->throwJsonError($e->getMessage());
                     }
                 } else {
-                    $filesystem2 = isset($filesystems[$filesystemid2]) ? $filesystems[$filesystemid2] : false;
+                    $filesystem2 = isset($filesystems[$filesystemid2]) ? $filesystems[$filesystemid2] : null;
                     if (!$filesystem2) {
                         return $this->throwJsonError('Filesystem not found');
                     }
@@ -194,7 +194,7 @@ class FilemanagerExtraController extends FilemanagerBaseController
         if (count($filesystems) == 0) {
             return $this->throwJsonError('No Filesystem found');
         } else {
-            $filesystem = isset($filesystems[$filesystemid]) ? $filesystems[$filesystemid] : false;
+            $filesystem = isset($filesystems[$filesystemid]) ? $filesystems[$filesystemid] : null;
             if (!$filesystem) {
                 return $this->throwJsonError('Filesystem not found');
             }
@@ -216,7 +216,7 @@ class FilemanagerExtraController extends FilemanagerBaseController
                         return $this->throwJsonError($e->getMessage());
                     }
                 } else {
-                    $filesystem2 = isset($filesystems[$filesystemid2]) ? $filesystems[$filesystemid2] : false;
+                    $filesystem2 = isset($filesystems[$filesystemid2]) ? $filesystems[$filesystemid2] : null;
                     if (!$filesystem2) {
                         return $this->throwJsonError('Filesystem not found');
                     }
@@ -258,7 +258,7 @@ class FilemanagerExtraController extends FilemanagerBaseController
         if (count($filesystems) == 0) {
             return $this->throwJsonError('No Filesystem found');
         } else {
-            $filesystem = isset($filesystems[$filesystemid]) ? $filesystems[$filesystemid] : false;
+            $filesystem = isset($filesystems[$filesystemid]) ? $filesystems[$filesystemid] : null;
             if (!$filesystem) {
                 return $this->throwJsonError('Filesystem not found');
             }
@@ -281,7 +281,7 @@ class FilemanagerExtraController extends FilemanagerBaseController
         if (count($filesystems) == 0) {
             return $this->throwJsonError('No Filesystem found');
         } else {
-            $filesystem = isset($filesystems[$filesystemid]) ? $filesystems[$filesystemid] : false;
+            $filesystem = isset($filesystems[$filesystemid]) ? $filesystems[$filesystemid] : null;
             if (!$filesystem) {
                 return $this->throwJsonError('Filesystem not found');
             }

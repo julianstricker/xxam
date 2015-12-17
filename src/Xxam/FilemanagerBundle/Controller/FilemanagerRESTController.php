@@ -176,6 +176,7 @@ class FilemanagerRESTController extends VoryxController
      */
     public function deleteAction(Request $request, Filesystem $entity)
     {
+
         try {
             $em = $this->getDoctrine()->getManager();
             $em->remove($entity);

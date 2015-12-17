@@ -5,6 +5,8 @@ namespace Xxam\FilemanagerBundle\Entity;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping as ORM;
 use Xxam\CoreBundle\Entity\Base as Base;
+use Xxam\UserBundle\Entity\Group;
+use Xxam\UserBundle\Entity\User;
 
 /**
  * @ORM\Entity
@@ -75,9 +77,11 @@ class Filesystem implements Base\TenantInterface
     private $user;
     
     /**
+     * @var \Doctrine\Common\Collections\Collection $groups
+     *
      * @ORM\ManyToMany(targetEntity="Xxam\UserBundle\Entity\Group", mappedBy="filesystems")
      * @ORM\JoinTable(name="group_filesystem")
-     * */
+     */
     private $groups;
 
     public function __construct()
@@ -239,10 +243,10 @@ class Filesystem implements Base\TenantInterface
     /**
      * Set user
      *
-     * @param \Xxam\UserBundle\Entity\User $user
+     * @param User $user
      * @return Filesystem
      */
-    public function setUser(\Xxam\UserBundle\Entity\User $user = null)
+    public function setUser(User $user = null)
     {
         $this->user = $user;
 
@@ -262,10 +266,10 @@ class Filesystem implements Base\TenantInterface
     /**
      * Add groups
      *
-     * @param \Xxam\UserBundle\Entity\Group $groups
+     * @param Group $groups
      * @return Filesystem
      */
-    public function addGroup(\Xxam\UserBundle\Entity\Group $groups)
+    public function addGroup(Group $groups)
     {
         $this->groups[] = $groups;
 
@@ -275,9 +279,9 @@ class Filesystem implements Base\TenantInterface
     /**
      * Remove groups
      *
-     * @param \Xxam\UserBundle\Entity\Group $groups
+     * @param Group $groups
      */
-    public function removeGroup(\Xxam\UserBundle\Entity\Group $groups)
+    public function removeGroup(Group $groups)
     {
         $this->groups->removeElement($groups);
     }

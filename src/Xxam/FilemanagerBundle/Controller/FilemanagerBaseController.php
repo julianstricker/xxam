@@ -44,7 +44,8 @@ class FilemanagerBaseController extends Controller {
      * @return array
      */
     protected function getFilesystems(){
-        $user = $this->get('security.token_storage')->getToken()->getUser();
+        $token= $this->get('security.token_storage')->getToken();
+        $user = $token->getUser();
         $filesystems=Array();
         $fss=$user->getFilesystems();
         if (count($fss)>0){
