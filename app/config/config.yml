@@ -16,6 +16,9 @@ parameters:
     - de
     - it
 
+  exttheme: 'carbon' #carbon, aria, classic, gray, crisp, crisp-touch, neptune, neptune-touch
+
+
 framework:
     #esi:             ~
     translator:      { fallbacks: ["%locale%"] }
@@ -51,7 +54,6 @@ twig:
     strict_variables: "%kernel.debug%"
     globals:
         #menu: %menu%
-        exttheme: 'carbon' #carbon, aria, classic, gray, crisp, crisp-touch, neptune, neptune-touch
         tenants: %tenants%
     
     form:
@@ -64,7 +66,7 @@ twig:
 assetic:
     debug:          "%kernel.debug%"
     use_controller: false
-    bundles:        [ 'XxamCmsAdminBundle', CmfCreateBundle ]
+    bundles:        [ 'XxamCoreBundle','XxamCmsAdminBundle', CmfCreateBundle ]
     #java: /usr/bin/java
     filters:
         cssrewrite: ~

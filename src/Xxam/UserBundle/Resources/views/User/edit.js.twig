@@ -9,8 +9,8 @@
         if (typeof(UserModel)=='undefined'){
           Ext.define('UserModel',{
              extend: 'Ext.data.Model',
-             fields: [{% for mf in modelfields %}{ {% for key,field in mf %}{%if field|slice(0,8) == 'function'%}{{key}}:{{field|raw}}{%else%}{{key}}:"{{field}}"{%endif%}{% if not loop.last %},{% endif %}{% endfor %} }{% if not loop.last %},{% endif %}{% endfor %}],
-             idProperty: 'id',
+              fields: {{ modelfields|jsonwithfunctions }},
+              idProperty: 'id',
              proxy: {
                 type: 'rest',
                 url : '{{path('post_user')}}',

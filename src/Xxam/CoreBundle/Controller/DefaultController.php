@@ -37,7 +37,8 @@ class DefaultController extends DefaultBaseController
                 $menuitems=array_replace_recursive($menuitems,call_user_func($name.'::getMenu'));
             }
         }
-        //dump($menuitems);
+
+
         $menu=$this->getMenu($menuitems);
         $menu[]=Array('xtype'=>'tbfill','stateId'=>'xxam_menu_tbfill');
         $menu[]=Array(
@@ -64,8 +65,21 @@ class DefaultController extends DefaultBaseController
         $memcached=new \Memcached();
         $memcached->addServer('localhost', 11211);
         $memcached->add('chatid_'.$token,$userdata);
+        $environment= $this->container->get( 'kernel' )->getEnvironment();
+        $exttheme=$this->getParameter('exttheme');
+        /*$extthemecss='/assets/vendor/extjs/build/packages/ext-theme-'.$exttheme.'/build/resources/ext-theme-'.$exttheme.'-all.css';
+        $extthemejs='/assets/vendor/extjs/build/packages/ext-theme-'.$exttheme.'/build/ext-theme-'.$exttheme.'.js';
+        if ($exttheme=='carbon'){
+            $extthemecss='/ext-theme-carbon/resources/codaxy-theme-carbon-all.css';
+            $extthemejs='/ext-theme-carbon/codaxy-theme-carbon.js';
+        }*/
+        return $this->render('XxamCoreBundle:Default:index.html.twig', array(
+            'menu' => $menu,
+            'token'=>$token,
+            'tenant_id'=>$request->getSession()->get('tenant_id'),
+            'exttheme'=> $exttheme,
 
-        return $this->render('XxamCoreBundle:Default:index.html.twig', array('menu' => $menu,'token'=>$token,'tenant_id'=>$request->getSession()->get('tenant_id') ));
+        ));
     }
 
     public function portalAction() {

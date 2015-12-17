@@ -7,8 +7,11 @@
     tabtitle: 'Calendar',
     tabicon: '/bundles/xxamcalendar/icons/16x16/calendar.png',
     getitems: function (){
-         
-        var startwithmonday=true;
+        Xxam.appendHead({
+            css: ['/bundles/xxamcalendar/css/layout.css']
+        });
+
+    var startwithmonday=true;
         if (startwithmonday){
             var weekdays=['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
         }else{
