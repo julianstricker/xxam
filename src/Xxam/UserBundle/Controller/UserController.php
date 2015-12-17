@@ -9,6 +9,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Xxam\UserBundle\Entity\User;
+use Xxam\UserBundle\Entity\UserRepository;
 use Xxam\UserBundle\Form\Type\UserType;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -84,7 +85,7 @@ class UserController extends Controller
         $groups=$this->getDoctrine()->getManager()->getRepository('XxamUserBundle:Group')->findAll();
         $entity=new User();
         
-        return $this->render('XxamUserBundle:User:edit.js.twig', array('entity'=>$entity,'groups'=>$groups,'roles'=>$this->getRoles(),'modelfields'=>$repository->getModelFields()));
+        return $this->render('XxamUserBundle:User:edit.js.twig', array('entity'=>$entity,'groups'=>$groups,'roles'=>$this->getRolesFormatted($entity),'modelfields'=>$repository->getModelFields()));
     }
     
     
@@ -99,8 +100,10 @@ class UserController extends Controller
      */
     public function editAction($id) {
         $em = $this->getDoctrine()->getManager();
-        $repository=$this->getDoctrine()->getManager()->getRepository('XxamUserBundle:User');
-        $groups=$this->getDoctrine()->getManager()->getRepository('XxamUserBundle:Group')->findAll();
+        /** @var UserRepository $repository */
+        $repository=$em->getRepository('XxamUserBundle:User');
+
+        $groups=$em->getRepository('XxamUserBundle:Group')->findAll();
 
         $entity = $repository->find($id);
 
@@ -108,8 +111,35 @@ class UserController extends Controller
             throw $this->createNotFoundException('Unable to find User entity.');
         }
         $form   = $this->createForm(new UserType($this->getRoles()), $entity)->createView();
-        
-        return $this->render('XxamUserBundle:User:edit.js.twig', array('entity'=>$entity,'groups'=>$groups,'form'=>$form,'roles'=>$this->getRoles(),'modelfields'=>$repository->getModelFields()));
+
+        /** @var User $entity */
+
+        return $this->render('XxamUserBundle:User:edit.js.twig', array('entity'=>$entity,'groups'=>$groups,'form'=>$form,'roles'=>$this->getRolesFormatted($entity),'modelfields'=>$repository->getModelFields()));
+    }
+
+    private function getRolesFormatted(User $entity){
+        $returnarr=[];
+        $roles=$this->getRoles();
+        foreach($roles as $role){
+            $ischecked=false;
+            $isdisabled=false;
+            if (in_array($role,$entity->getDirectroles())){
+                $ischecked=true;
+                $isdisabled=false;
+            }else if (in_array($role,$entity->getRoles())){
+                $ischecked=true;
+                $isdisabled=true;
+            }
+            $returnarr[]=[
+                "boxLabel"=> ucfirst(strtolower(str_replace('_',' ',substr($role,5)))),
+                "name"=> 'roles',
+                "inputValue"=>$role,
+                "checked"=>$ischecked,
+                'disabled'=>$isdisabled
+            ];
+        }
+        return $returnarr;
+
     }
     
 }

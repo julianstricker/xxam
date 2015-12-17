@@ -3,22 +3,35 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <title>Xxam</title>
-        <!-- Ext -->
-        <link rel="stylesheet" type="text/css" href="/bundles/xxamcore/css/layout.css">
-        <link rel="stylesheet" type="text/css" href="/bundles/xxammailclient/css/layout.css">
-        <link rel="stylesheet" type="text/css" href="/bundles/xxamcalendar/css/layout.css">
-        {% set themename = 'ext-theme-' ~ exttheme %}
-        {% if exttheme == "carbon" %}
-            <link rel="stylesheet" type="text/css" href="/ext-theme-carbon/resources/codaxy-theme-carbon-all.css">
-        {% else %}
-            <link rel="stylesheet" type="text/css" href="/assets/vendor/extjs/build/packages/ext-theme-{{ exttheme }}/build/resources/{{ themename }}-all.css">
-        {% endif %}
-        <script type="text/javascript" src="/assets/vendor/extjs/build/ext-all{%if app.environment == 'dev' %}-debug{%endif%}.js"></script>
-        {% if exttheme == "carbon" %}
-            <script type="text/javascript" src="/ext-theme-carbon/codaxy-theme-carbon.js"></script>
-        {% else %}
-            <script type="text/javascript" src="/assets/vendor/extjs/build/packages/ext-theme-{{ exttheme }}/build/{{ themename }}.js"></script>
-        {% endif %}
+        {% block stylesheets %}
+            {% stylesheets
+            'bundles/xxamcore/css/*'
+            'ext-theme-carbon/resources/codaxy-theme-carbon-all.css'
+            filter='cssrewrite' %}
+            <link rel="stylesheet" type="text/css" href="{{ asset_url }}" />
+            {% endstylesheets %}
+        {% endblock %}
+
+        {% block javascripts %}
+            {%if app.environment == 'dev' %}
+                {% javascripts
+                'assets/vendor/extjs/build/ext-all-debug.js'
+                'ext-theme-carbon/codaxy-theme-carbon.js'
+                %}
+                <script type="text/javascript" src="{{ asset_url }}"></script>
+                {% endjavascripts %}
+            {% else %}
+                {% javascripts
+                'assets/vendor/extjs/build/ext-all.js'
+                'ext-theme-carbon/codaxy-theme-carbon.js'
+                %}
+
+                <script type="text/javascript" src="{{ asset_url }}"></script>
+                {% endjavascripts %}
+
+            {% endif %}
+        {% endblock %}
+
     </head>
     <body>
         {% if app.request.hasPreviousSession %}

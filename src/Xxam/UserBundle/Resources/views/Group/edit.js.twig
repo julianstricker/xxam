@@ -44,9 +44,7 @@
                 xtype: 'checkboxgroup',
                 columns: 2,
                 vertical: true,
-                items: [{% for role in roles %}
-                { boxLabel: '{{role|slice(5)|replace({'_':' '})|capitalize}}', name: 'roles', inputValue: '{{role}}' {%if role in entity.getRoles %}, checked: true{% endif %}}{% if not loop.last %},{% endif %}
-                {% endfor%}]
+                items: {{ roles|jscode }}
             }],
             buttons: [{
                 text: '{%trans%}Save{%endtrans%}',

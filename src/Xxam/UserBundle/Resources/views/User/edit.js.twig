@@ -92,9 +92,7 @@
                 columns: 4,
                 name:'rolesg',
                 vertical: true,
-                items: [{% for role in roles %}
-                { boxLabel: '{{role|slice(5)|replace({'_':' '})|capitalize}}', name: 'roles', inputValue: '{{role}}' {%if role in entity.getDirectroles %}, checked: true{% elseif role in entity.getRoles %}, checked: true, disabled: true{% endif %}}{% if not loop.last %},{% endif %}
-                {% endfor%}]
+                items{{ roles|jscode }}}]
             }],
             buttons: [{
                 text: '{%trans%}Save{%endtrans%}',
