@@ -110,7 +110,7 @@ class Mailaccountuser implements Base\TenantInterface
     }
 
     /**
-     * @return mixed
+     * @return Mailaccount
      */
     public function getMailaccount()
     {
@@ -118,7 +118,7 @@ class Mailaccountuser implements Base\TenantInterface
     }
 
     /**
-     * @param mixed $mailaccount
+     * @param Mailaccount $mailaccount
      */
     public function setMailaccount($mailaccount)
     {

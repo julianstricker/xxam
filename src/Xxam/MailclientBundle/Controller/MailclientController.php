@@ -365,9 +365,20 @@ class MailclientController extends MailclientBaseController {
         /* @var MailaccountuserRepository $repository */
         $repository=$this->getDoctrine()->getManager()->getRepository('XxamMailclientBundle:Mailaccountuser');
         $mailaccountusers=$repository->findByUserId($user->getId());
+
         foreach($mailaccountusers as $mailaccountuser){
             /* @var Mailaccountuser $mailaccountuser */
-            $params['mailaccounts'][]=$mailaccountuser->getMailaccount();
+            $mailaccount=$mailaccountuser->getMailaccount();
+            $params['mailaccounts'][]=[
+                'id'=>$mailaccount->getId(),
+                'name'=>$mailaccount->getAccountname()
+            ];
+            if ($mailaccount->getIsdefault()){
+                $params['defaultaccountid']=$mailaccount->getId();
+                $params['defaultaccountname']=$mailaccount->getAccountname();
+            }
+
+
         }
         return $this->render('XxamMailclientBundle:Mailclient:write.js.twig', $params);
     }

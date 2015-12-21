@@ -130,13 +130,7 @@
                                     allowBlank: false,
                                     store: {
                                         fields: ['id','name'],
-                                        data: [{% for mailaccount in mailaccounts %}
-                                            {% if not loop.first %},{% endif %}{"id": {{mailaccount.id}}, "name": "{{mailaccount.accountname}}"}
-                                            {% if (mailaccount.isdefault or defaultaccountid == "") %}
-                                                {% set defaultaccountid = mailaccount.id %}
-                                                {% set defaultaccountname = mailaccount.accountname %}
-                                            {% endif %}
-                                        {% endfor %}]
+                                        data: {{ mailaccounts|jscode }}
                                     },
                                     displayField: 'name',
                                     valueField: 'id',
