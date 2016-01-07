@@ -10,7 +10,7 @@
  */
 
 namespace Xxam\CoreBundle\Entity\Base;
-use Gedmo\Mapping\Annotation as Gedmo;
+
 use Doctrine\ORM\Mapping as ORM;
 
 /**

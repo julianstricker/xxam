@@ -331,6 +331,10 @@ class MailclientBaseController extends Controller {
         return true;
     }
 
+    /**
+     * @param Request $request
+     * @return \Swift_Message|Response
+     */
     protected function generateMailForRequest(Request $request){
         $fieldfrom=$request->get('fieldfrom',0);
         $mailaccount=$this->getUserMailaccountForId($fieldfrom);

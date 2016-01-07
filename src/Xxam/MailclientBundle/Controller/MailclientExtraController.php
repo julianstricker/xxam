@@ -228,7 +228,7 @@ class MailclientExtraController extends MailclientBaseController {
         }
 
         $resp=$this->sendmail($mailer,$message);
-        if (get_class($resp)=='Response'){ //on Error:
+        if ($resp!==true && get_class($resp)=='Response'){ //on Error:
             return $resp;
         }
         //move into sent folder:

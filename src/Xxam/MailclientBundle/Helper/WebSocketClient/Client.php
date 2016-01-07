@@ -3,7 +3,15 @@ namespace Xxam\MailclientBundle\Helper\WebSocketClient;
 
 
 
-use Xxam\MailclientBundle\Helper\WebSocketClient\WebSocketClientInterface;
+use Doctrine\ORM\EntityManager;
+use React\EventLoop\Factory;
+use React\SocketClient\Connector;
+use React\SocketClient\SecureConnector;
+use Xxam\MailclientBundle\Entity\Mailaccount;
+use Xxam\MailclientBundle\Entity\Mailaccountuser;
+use Xxam\MailclientBundle\Entity\MailaccountuserRepository;
+use Xxam\UserBundle\Entity\User;
+use Xxam\UserBundle\Entity\UserRepository;
 
 class Client implements WebSocketClientInterface
 {
@@ -39,22 +47,30 @@ class Client implements WebSocketClientInterface
     const MSG_VIDEOPHONECALLCANCEL = 103;
 
 
+    /* @var WebSocketClient $client */
     private $client;
-    private $tentant_id=1;
+    private $tenant_id=1;
     private $memcached;
+    /* @var EntityManager $em */
     private $em;
 
     private $imapaccounts=Array();
     private $_sessionids=Array();
     private $loop;
 
-    public function __construct($tenant_id,$em)
+    /**
+     * Client constructor.
+     * @param int $tenant_id
+     * @param EntityManager $em
+     */
+    public function __construct($tenant_id, EntityManager $em,$loop)
     {
-        $this->tentant_id=$tenant_id;
+        $this->tenant_id=$tenant_id;
         $this->em=$em;
         $this->memcached = new \Memcached;
         $this->memcached->addServer('localhost', 11211);
-        $this->loop = \React\EventLoop\Factory::create();
+        $this->loop = $loop;
+
     }
 
     public function receiveData($data)
@@ -88,7 +104,7 @@ class Client implements WebSocketClientInterface
     {
         $sessionid=$data[1]['id'];
         $this->memcached->add('chatsessionid_'.$sessionid,array(
-            'tenant_id'=>$this->tentant_id,
+            'tenant_id'=>$this->tenant_id,
             'user_id'=>null,
             'username'=>'Imapidle',
             'sessionid'=>$sessionid
@@ -126,6 +142,7 @@ class Client implements WebSocketClientInterface
 
     public function onSubscribed(array $data){
         //getonline:
+        /* @var WebSocketClient $client */
         $this->client->send([self::MSG_GETONLINE,["topic"=>'com.xxam.imap']]);
     }
 
@@ -159,9 +176,9 @@ class Client implements WebSocketClientInterface
         $this->client->call($proc, $args, $callback);
     }
 
-    public function publish($topic, $message)
+    public function publish($topic, $message, array $eligible = array())
     {
-        $this->client->publish($topic, $message);
+        $this->client->publish($topic, $message, [], $eligible);
     }
 
     public function setClient(WebSocketClient $client)
@@ -170,6 +187,10 @@ class Client implements WebSocketClientInterface
         echo 'setclient';
     }
 
+    /**
+     * @param String $sessionid
+     * @return mixed
+     */
     private function getUserdataForSessionid($sessionid){
         return $this->memcached->get('chatsessionid_'.$sessionid);
     }
@@ -177,7 +198,9 @@ class Client implements WebSocketClientInterface
 
 
     private function imapconnectChatuser($sessionid){
+        echo 'aa';
         $mailaccounts=$this->getMailaccountsForSessionid($sessionid);
+        echo 'xx';
         if ($mailaccounts){
             foreach($mailaccounts as $mailaccount){
                 echo 'X';
@@ -190,29 +213,30 @@ class Client implements WebSocketClientInterface
                         );
                         $this->createImapstream($this->imapaccounts[$mailaccount->getId()]);
                         //$this->imapaccounts[$mailaccount->getId()]['imaploop']->run();
-                    }else{
-                        $this->imapaccounts[$mailaccount->getId()]['users'][]=$sessionid;
                     }
+                    $this->imapaccounts[$mailaccount->getId()]['users'][]=$sessionid;
+
                     dump($this->imapaccounts[$mailaccount->getId()]['users']);
                 }
             }
         }
     }
 
-    private function imapdisconnectChatuser($chatuser){
+    private function imapdisconnectChatuser($sessionid){
 
-        $mailaccounts=$this->getMailaccountsForChatuser($chatuser);
+        $mailaccounts=$this->getMailaccountsForSessionid($sessionid);
         if ($mailaccounts){
             foreach($mailaccounts as $mailaccount){
                 if ($mailaccount->getImapserver()!=''){
                     if (isset($this->imapaccounts[$mailaccount->getId()])){
-                        //dump($this->imapaccounts[$mailaccount->getId()]);
-                        $key = array_search($chatuser->session, $this->imapaccounts[$mailaccount->getId()]['users']);
+                        dump($this->imapaccounts[$mailaccount->getId()]);
+                        $key = array_search($sessionid, $this->imapaccounts[$mailaccount->getId()]['users']);
                         if($key!==false) unset($this->imapaccounts[$mailaccount->getId()]['users'][$key]);
 
                         if(count($this->imapaccounts[$mailaccount->getId()]['users'])==0){
-                            //dump($this->imapaccounts[$mailaccount->getId()]);
-                            $this->imapaccounts[$mailaccount->getId()]['imapstream']->close();
+                            echo '$this->imapaccounts[$mailaccount->getId()]';
+                            dump($this->imapaccounts[$mailaccount->getId()]);
+                            if($this->imapaccounts[$mailaccount->getId()]['imapstream'])$this->imapaccounts[$mailaccount->getId()]['imapstream']->close();
                             //$this->loop->removeStream($this->imapaccounts[$mailaccount->getId()]['imapstream']);
 
                             unset($this->imapaccounts[$mailaccount->getId()]);
@@ -227,15 +251,26 @@ class Client implements WebSocketClientInterface
 
     /*todo ...*/
     private function notifychanges(&$imapaccount){
-        $this->publish("com.xxam.imap", ['updates'],$imapaccount['users']);
+        dump($imapaccount['users']);
+        $this->publish(['topic'=>"com.xxam.imap"], ['updates'],$imapaccount['users']);
     }
 
+    /**
+     * @param $sessionid
+     * @return Mailaccount[]|bool
+     */
     private function getMailaccountsForSessionid($sessionid){
         $userdata=$this->getUserdataForSessionid($sessionid);
-        $user=$this->em->getRepository('XxamUserBundle:User')->findOneByUsername($userdata['username']);
+        /** @var UserRepository $userrepository */
+        $userrepository=$this->em->getRepository('XxamUserBundle:User');
+        /** @var User $user */
+        $user=$userrepository->findOneByUsername($userdata['username']);
         if (!$user) return false;
-        $mailaccountusers=$this->em->getRepository('Xxam\MailclientBundle:Mailaccountuser')->findByUserId($user->getId());
+        /** @var MailaccountuserRepository $repository */
+        $repository=$this->em->getRepository('XxamMailclientBundle:Mailaccountuser');
+        $mailaccountusers=$repository->findByUserId($user->getId());
         $mailaccounts=false;
+        /** @var Mailaccountuser $mau */
         foreach ($mailaccountusers as $mau){
             $mailaccounts[]=$mau->getMailaccount();
         }
@@ -244,17 +279,31 @@ class Client implements WebSocketClientInterface
 
 
     private function createImapstream(&$imapaccount){
+        echo 'createImapstream';
         //$loop = \React\EventLoop\Factory::create();
         $dnsResolverFactory = new \React\Dns\Resolver\Factory();
         $dns = $dnsResolverFactory->createCached('8.8.8.8', $this->loop);
-        $imapconnector = new \React\SocketClient\Connector($this->loop, $dns);
-        $secureConnector = new \React\SocketClient\SecureConnector($imapconnector, $this->loop);
+
+        $imapconnector = new Connector($this->loop, $dns);
+
+        /** @var Mailaccount $mailaccount */
         $mailaccount=$imapaccount['mailaccount'];
-        echo $mailaccount->getImapserver(). ($mailaccount->getImapport() ? $mailaccount->getImapport() :993);
-        $secureConnector->create($mailaccount->getImapserver(), $mailaccount->getImapport() ? $mailaccount->getImapport() :993)->then(function (\React\Stream\Stream $imapstream) use(&$imapaccount) {
-            $uid=uniqid();
+        $imapport=$mailaccount->getImapport() ? $mailaccount->getImapport() :993;
+        //$imapport=143;
+        if ($imapport==993){ //secure
+            $secureConnector = new SecureConnector($imapconnector, $this->loop);
+            $conn= $secureConnector->create($mailaccount->getImapserver(), $imapport);
+        }else{
+            $conn=$imapconnector->create($mailaccount->getImapserver(), $imapport);
+        }
+
+        echo $mailaccount->getImapserver(). $imapport;
+        $conn->then(function (\React\Stream\Stream $imapstream) use(&$imapaccount) {
+
             echo 'Jojo';
+            $uid=uniqid();
             echo $imapaccount['mailaccount']->getImapserver().': '.$uid;
+
             $imapaccount['imapstream']=$imapstream;
             $login=$imapaccount['mailaccount']->getImapusername();
             $password=$imapaccount['mailaccount']->getImappassword();
@@ -298,6 +347,7 @@ class Client implements WebSocketClientInterface
         },
         function ($error) {
             echo "Call Error: \n";
+            dump($error);
         });
 
 
