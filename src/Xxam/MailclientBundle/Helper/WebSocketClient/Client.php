@@ -178,6 +178,7 @@ class Client implements WebSocketClientInterface
 
     public function publish($topic, $message, array $eligible = array())
     {
+        //publish($topicUri, $event, array $exclude = array(), array $eligible = array())
         $this->client->publish($topic, $message, [], $eligible);
     }
 
@@ -250,9 +251,9 @@ class Client implements WebSocketClientInterface
 
 
     /*todo ...*/
-    private function notifychanges(&$imapaccount){
+    private function notifychanges(&$imapaccount,$data){
         dump($imapaccount['users']);
-        $this->publish(['topic'=>"com.xxam.imap"], ['updates'],$imapaccount['users']);
+        $this->publish("com.xxam.imap", $data,array_values($imapaccount['users']));
     }
 
     /**
@@ -330,12 +331,12 @@ class Client implements WebSocketClientInterface
                         if(preg_match("/^\* (\d+) RECENT/", $dexpl,$countrecent)){ //login OK:
                             $countrecent=$countrecent[1];
                             echo 'RECENT:'.$countrecent;
-                            $this->notifychanges($imapaccount);
+                            $this->notifychanges($imapaccount,['mailaccount_id'=>$imapaccount['mailaccount']->getId(),'recent'=>$countrecent]);
                         }
-                        if(preg_match("/^\* (\d+) EXISTS/", $dexpl,$countrecent)){ //login OK:
-                            $countrecent=$countrecent[1];
-                            echo 'EXISTS'.$countrecent;
-                            $this->notifychanges($imapaccount);
+                        if(preg_match("/^\* (\d+) EXISTS/", $dexpl,$countexists)){ //login OK:
+                            $countexists=$countexists[1];
+                            echo 'EXISTS'.$countexists;
+                            $this->notifychanges($imapaccount,['mailaccount_id'=>$imapaccount['mailaccount']->getId(),'exists'=>$countexists]);
                         }
                     }
 
@@ -343,11 +344,14 @@ class Client implements WebSocketClientInterface
             });
             $imapstream->on('end', function () use ($uid, &$status, &$imapstream,&$imapaccount) {
                 echo 'END!!!!!';
+                $this->createImapstream($imapaccount);
             });
         },
-        function ($error) {
+        function ($error)  use(&$imapaccount) {
             echo "Call Error: \n";
-            dump($error);
+            dump($error->getMessage());
+            echo "trying again...\n";
+            $this->createImapstream($imapaccount);
         });
 
 

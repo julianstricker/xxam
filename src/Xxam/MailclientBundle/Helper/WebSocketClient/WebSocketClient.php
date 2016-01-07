@@ -181,10 +181,12 @@ class WebSocketClient
     {
         $this->sendData(array(
             self::MSG_PUBLISH,
-            $topicUri,
-            $event,
-            $exclude,
-            $eligible
+            [
+                'topic'=>$topicUri,
+                'message'=>$event,
+                'exclude'=>$exclude,
+                'receivers'=>$eligible
+            ]
         ));
     }
 

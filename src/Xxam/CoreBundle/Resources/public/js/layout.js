@@ -511,6 +511,20 @@ Ext.onReady(function() {
                         Ext.get(userhtml).addListener('click',onChatuserbuttonclicked);
                     });
 
+                }else if (data.topic=="com.xxam.imap") {
+                    console.log(data, from);
+                    if (!windowhasfocus) {
+                        notify('New mail found' ,'', '/bundles/xxammailclient/icons/32x32/email.png')
+                    }
+                    if (typeof(data.message)!= 'undefined' && typeof(data.message.recent)!='undefined' && data.message.recent > 0 ) {
+
+                        Xxam.msg('New mail found', '', '/bundles/xxammailclient/icons/32x32/email.png');
+                    }
+                    if (Ext.getCmp('mailclient_maillist') != undefined) {
+                        if(Ext.getCmp('mailclient_maillist').getStore().getProxy().extraParams.path==data.message.mailaccount_id.toString()){
+                            Ext.getCmp('mailclient_maillist').getStore().load();
+                        }
+                    }
                 }
 
             },

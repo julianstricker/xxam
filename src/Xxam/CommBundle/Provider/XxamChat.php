@@ -260,7 +260,7 @@ class XxamChat implements \Ratchet\MessageComponentInterface  {
             $users=$this->getUsersForTopic($conn->resourceId,$topic);
         }
         foreach ($this->clients as $client) {
-            if ($conn !== $client && (($topic!='' && isset($users[$client->resourceId])) || (count($receivers>0) && in_array($client->resourceId,$receivers)))) {
+            if ($conn !== $client && ((count($receivers)==0 && $topic!='' && isset($users[$client->resourceId])) || (count($receivers>0) && in_array($client->resourceId,$receivers)))) {
                 // The sender is not the receiver, send to each client connected
                 $userdata=$this->memcached->get('chatsessionid_'.$client->resourceId);
                 if($user['tenant_id']==null || $userdata['tenant_id']==null || $user['tenant_id']==$userdata['tenant_id'])

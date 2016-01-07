@@ -137,7 +137,8 @@
                  added: function(tab, container, pos ){
                     if (typeof mailclient_maillisttimeout == 'undefined'){
                         mailclient_maillisttimeoutfunction=function(){ 
-                            //if (!windowhasfocus){ //Ext.getCmp('mailclient_maillist').store.load(); 
+                            //if (!windowhasfocus){ //Ext.getCmp('mailclient_maillist').store.load();
+                            if ('Deaktiviert'==true){
                             
                                 Ext.Ajax.request({
                                     url: 'mailclient/getmailboxinfo?path='+Ext.getCmp('mailclient_folderlist').getSelection()[0].data.path,
@@ -160,7 +161,8 @@
                                     }
 
                                 });
-                           // }
+
+                            }
                             
                             
                             mailclient_maillisttimeout=setTimeout(mailclient_maillisttimeoutfunction, 10000);

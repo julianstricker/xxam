@@ -24,7 +24,7 @@
             if(typeof ace == 'undefined'){
                 window.setTimeout(waitforace,100);
             }else{
-                var editor_{{id}} = ace.edit("aceeditor_{{id}}-body");
+                editor_{{id}} = ace.edit("aceeditor_{{id}}-body");
                 editor_{{id}}.setTheme("ace/theme/monokai");
                 Ext.Object.each(extensionshighlighters,function(key,value){
                     if('{{path}}'.substr(-key.length)==key){
