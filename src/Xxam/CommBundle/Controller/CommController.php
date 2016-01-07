@@ -13,17 +13,7 @@ class CommController extends Controller
     {
         return $this->render('XxamCommBundle:Default:index.html.twig', array('name' => $name));
     }
-    
-    
-    private function getchatuser(){
-        $memcached = new \Memcached;
-        $memcached->addServer('localhost', 11211);
-        $details    = $this->get('thruway.details');
-        $sessionid=(string)$details->getDetails()->caller;
-        $user=$memcached->get('chatid_'.$sessionid);
-        return $user;
-    }
-    
+
     public function setchatidAction(Request $request){
         $sessionid=$request->get('sessionid');
         $memcached = new \Memcached;

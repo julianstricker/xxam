@@ -31,7 +31,6 @@ class AppKernel extends Kernel
             new FOS\RestBundle\FOSRestBundle(),
             new JMS\SerializerBundle\JMSSerializerBundle($this),
             new Nelmio\CorsBundle\NelmioCorsBundle(),
-            //new Voryx\ThruwayBundle\VoryxThruwayBundle($this),
             //new Oneup\FlysystemBundle\OneupFlysystemBundle(),
             //new FOS\RestBundle\FOSRestBundle(),
             //new Exercise\HTMLPurifierBundle\ExerciseHTMLPurifierBundle(),

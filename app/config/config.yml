@@ -295,18 +295,7 @@ stof_doctrine_extensions:
 #        listener1:
 #          class: Xxam\CoreBundle\Services\ChatWampServerService
             
-#voryx_thruway:
-#    realm: 'realm1'
-#    url: 'ws://xxam.com:1337' #The url that the clients will use to connect to the router
-#    router:
-#        ip: '85.25.199.157'  # the ip that the router should start on
-#        port: '1337'  # public facing port.  If authentication is enabled, this port will be protected
-#        trusted_port: '1338' # Bypasses all authentication.  Use this for trusted clients.
-##        authentication: false # true will load the AuthenticationManager
-#    locations:
-#        bundles: ["XxamCommBundle"]
-#        files:
-#            - "Xxam\\CommBundle\\Controller\\CommController"
+
           
 fos_rest:
     routing_loader:

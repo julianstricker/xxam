@@ -40,7 +40,6 @@
         "league/flysystem-cached-adapter": "@stable",
         "league/flysystem-eventable-filesystem": "@stable",
         "league/flysystem": "^1.0",
-        "voryx/thruway": "dev-master",
         "jackalope/jackalope-doctrine-dbal": "^1.2",
         "doctrine/phpcr-bundle": "^1.2",
         "symfony-cmf/symfony-cmf": "^1.2",
