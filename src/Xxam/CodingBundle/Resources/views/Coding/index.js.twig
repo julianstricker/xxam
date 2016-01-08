@@ -8,7 +8,8 @@
     tabicon: '/bundles/xxamcoding/icons/16x16/coding.png',
     getitems: function (){
         Xxam.appendHead({
-            js: ['/bundles/xxamcoding/ace/src-min-noconflict/ace.js']
+            js: ['/bundles/xxamcoding/ace/src-min-noconflict/ace.js'],
+            css: ['/bundles/xxamcoding/css/layout.css']
         });  
         
         var extensionshighlighters={
@@ -31,7 +32,7 @@
                         editor_{{id}}.getSession().setMode("ace/mode/"+value);
                     }
                 });
-                
+                var Range = ace.require('ace/range').Range
                 Ext.Ajax.request({
                     url: '{{path('filemanager_readfile')}}',
                     method: 'GET',
@@ -39,8 +40,95 @@
                         path: '{{path}}',
                     },
                     success: function(response, options) {
-                        editor_{{id}}.setValue(response.responseText);
-                        editor_{{id}}.gotoLine(1);
+                        var editor=editor_{{id}};
+                        editor.setValue(response.responseText);
+                        xxamws.subscribe('com.xxam.coding.{{id}}',editor)
+
+                        editor.getSession().selection.on('changeCursor', function(e,target) {
+                            console.log('onChangeCursor',target.getCursor());
+                            xxamws.publish('com.xxam.coding.{{id}}', {'changeCursor':target.getCursor()},[]);
+                        });
+                        editor.getSession().selection.on('changeSelection', function(e,target) {
+                            console.log('onChangeSelection',target.getRange());
+                            xxamws.publish('com.xxam.coding.{{id}}', {'changeSelection':{'start':target.getRange().start,'end':target.getRange().end }},[]);
+                        });
+                        editor.getSession().on('change',function(e){
+                            console.log('onChange',e);
+                        });
+
+                        //Selections:
+                        editor.selectionsmarker={};
+
+                        //Cursors:
+                        editor.cursormarker = {}
+                        editor.cursormarker.cursors = {}
+                        editor.cursormarker.update = function(html, markerLayer, session, config) {
+                            var start = config.firstRow, end = config.lastRow;
+                            var cursors = this.cursors
+                            var cursorcounter=0;
+                            Ext.Object.each(cursors,function(id,pos){
+                                cursorcounter++;
+
+                                if (pos.row < start) {
+                                    //do nothing
+                                } else if (pos.row > end) {
+                                    return false;
+                                } else {
+                                    var username = xxamws.getUsernameForId(id);
+                                    if (username) {
+
+                                        // compute cursor position on screen
+                                        // this code is based on ace/layer/marker.js
+                                        var screenPos = session.documentToScreenPosition(pos)
+
+                                        var height = config.lineHeight;
+                                        var width = config.characterWidth;
+                                        var top = markerLayer.$getTop(screenPos.row, config);
+                                        var left = markerLayer.$padding + screenPos.column * width;
+                                        // can add any html here
+                                        html.push(
+                                                '<div class="xxam_coding_cursor n'+cursorcounter+'" style="',
+                                                "height:", height, "px;",
+                                                "top:", top, "px;",
+                                                "left:", left, "px; width:", width, 'px"><div class="xxam_coding_cursor_bubble n'+cursorcounter+'">' + username + '</div></div>'
+                                        );
+                                    }
+                                }
+                            });
+                        }
+                        editor.cursormarker.redraw = function() {
+                            this.session._signal("changeFrontMarker");
+                        }
+                        editor.cursormarker.addCursor = function() {
+                            // add to this cursors
+
+                            // trigger redraw
+                            editor.cursormarker.redraw()
+                        }
+                        editor.cursormarker.session = editor.session;
+                        editor.cursormarker.session.addDynamicMarker(editor.cursormarker, true)
+
+                        editor.gotoLine(1);
+                        editor.onWsPublish=function(data,from,ws){
+                            console.log(data,from,ws);
+                            if (typeof(data.message.changeCursor)!='undefined') {
+                                editor.cursormarker.cursors[from]=data.message.changeCursor;
+                                editor.cursormarker.redraw();
+                            }else if (typeof(data.message.changeSelection)!='undefined') {
+                                console.log('changeSelection...');
+                                if (typeof(editor.selectionsmarker[from])!='undefined'){
+                                    editor.session.removeMarker(editor.selectionsmarker[from]);
+                                }
+                                editor.selectionsmarker[from]=editor.session.addMarker(new Range(
+                                        data.message.changeSelection.start.row,
+                                        data.message.changeSelection.start.column,
+                                        data.message.changeSelection.end.row,
+                                        data.message.changeSelection.end.column
+                                ),"xxam_coding_selection n"+Object.keys(editor.selectionsmarker).length,true);
+
+                            }
+
+                        }
 
                         
                     },
@@ -84,7 +172,15 @@
                         
                     }
                 }
-            }]
+            }],
+            listeners:{
+
+                beforedestroy: function(){
+                    console.log('close');
+                    editor_{{id}}.container.remove();
+                    delete editor_{{id}};
+                }
+            }
         }
     }
 }

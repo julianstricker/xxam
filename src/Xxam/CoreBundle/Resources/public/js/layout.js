@@ -341,6 +341,7 @@ Ext.onReady(function() {
         subscriptions:[],
         online:{},
         incomingvideophonecallwins:{},
+        subscriptiontargets:{},
         websocket: Ext.create ('Ext.ux.WebSocket', {
             url: 'wss://xxam.com/websocket' ,
             listeners: {
@@ -525,6 +526,12 @@ Ext.onReady(function() {
                             Ext.getCmp('mailclient_maillist').getStore().load();
                         }
                     }
+                }else{
+                    if (typeof(xxamws.subscriptiontargets[data.topic])!='undefined'){
+                        Ext.Array.each(xxamws.subscriptiontargets[data.topic],function(target){
+                            target.onWsPublish(data,from,ws);
+                        });
+                    }
                 }
 
             },
@@ -620,9 +627,15 @@ Ext.onReady(function() {
             }
 
         },
-        subscribe:function(topic){
+        subscribe:function(topic,target){
             var message=[32,{topic:topic}]
             this.websocket.send(Ext.JSON.encode(message));
+            if (target) {
+                if (typeof(xxamws.subscriptiontargets[topic]) == 'undefined') {
+                    xxamws.subscriptiontargets[topic] = []
+                }
+                xxamws.subscriptiontargets[topic].push(target);
+            }
 
         },
         getonline:function(topic){
