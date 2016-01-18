@@ -40,17 +40,13 @@
         "league/flysystem-cached-adapter": "@stable",
         "league/flysystem-eventable-filesystem": "@stable",
         "league/flysystem": "^1.0",
-        "jackalope/jackalope-doctrine-dbal": "^1.2",
-        "doctrine/phpcr-bundle": "^1.2",
-        "symfony-cmf/symfony-cmf": "^1.2",
-        "doctrine/phpcr-odm": "^1.2",
+
         "doctrine/doctrine-cache-bundle": "^1.0",
-        "lunetics/locale-bundle": "^2.4",
-        "symfony-cmf/routing-auto-bundle": "^1.0",
+
         "doctrine/data-fixtures": "^1.1",
         "jms/serializer": "^1.0",
         "jms/serializer-bundle": "^1.0",
-        "symfony-cmf/create-bundle": "dev-master",
+
         "phpunit/phpunit": "^4.8",
         "fxp/composer-asset-plugin": "~1.0",
         "npm-asset/extjs": "5.1.1",

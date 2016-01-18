@@ -35,23 +35,7 @@ class AppKernel extends Kernel
             //new FOS\RestBundle\FOSRestBundle(),
             //new Exercise\HTMLPurifierBundle\ExerciseHTMLPurifierBundle(),
             new Xxam\CommBundle\XxamCommBundle(),
-            new Xxam\CmsAdminBundle\XxamCmsAdminBundle(),
 
-            new Doctrine\Bundle\DoctrineCacheBundle\DoctrineCacheBundle(),
-            new Doctrine\Bundle\PHPCRBundle\DoctrinePHPCRBundle(),
-            new Symfony\Cmf\Bundle\RoutingBundle\CmfRoutingBundle(),
-            new Symfony\Cmf\Bundle\RoutingAutoBundle\CmfRoutingAutoBundle(),
-            new Symfony\Cmf\Bundle\CoreBundle\CmfCoreBundle(),
-            new Symfony\Cmf\Bundle\MenuBundle\CmfMenuBundle(),
-            new Symfony\Cmf\Bundle\ContentBundle\CmfContentBundle(),
-            new Symfony\Cmf\Bundle\BlockBundle\CmfBlockBundle(),
-            new Symfony\Cmf\Bundle\CreateBundle\CmfCreateBundle(),
-            // Dependencies of the CmfMenuBundle
-            new Knp\Bundle\MenuBundle\KnpMenuBundle(),
-            // Dependencies of the CmfBlockBundle
-            new Sonata\CoreBundle\SonataCoreBundle(),
-            new Sonata\BlockBundle\SonataBlockBundle(),
-            new Lunetics\LocaleBundle\LuneticsLocaleBundle(),
 
         );
 

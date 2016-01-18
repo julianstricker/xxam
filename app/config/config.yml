@@ -66,7 +66,7 @@ twig:
 assetic:
     debug:          "%kernel.debug%"
     use_controller: false
-    bundles:        [ 'XxamCoreBundle','XxamCmsAdminBundle', 'FOSUserBundle', CmfCreateBundle ]
+    bundles:        [ 'XxamCoreBundle', 'FOSUserBundle' ]
     #java: /usr/bin/java
     filters:
         cssrewrite: ~
@@ -114,101 +114,6 @@ doctrine:
                         alias: GedmoLoggable # this one is optional and will default to the name set for the mapping
                         is_bundle: false
 
-
-#CMS:
-
-doctrine_cache:
-    providers:
-        phpcr_meta:
-            type: file_system
-        phpcr_nodes:
-            type: file_system
-
-
-doctrine_phpcr:
-    session:
-        backend:
-            type: doctrinedbal
-            # requires DoctrineCacheBundle
-            caches:
-                 meta: doctrine_cache.providers.phpcr_meta
-                 nodes: doctrine_cache.providers.phpcr_nodes
-            # enable logging
-            logging: true
-            # enable profiling in the debug toolbar.
-            profiling: true
-        workspace: default
-        username: "%database_user%"
-        password: "%database_password%"
-    odm:
-        auto_mapping: true
-        auto_generate_proxy_classes: "%kernel.debug%"
-
-knp_menu:
-    twig: true
-
-cmf_core:
-    persistence:
-        phpcr:
-            enabled: true
-            translation_strategy: attribute
-            #block_basepath: /cms/content
-    multilang:
-        locales: "%locales%"
-
-cmf_routing:
-    chain:
-        routers_by_id:
-            router.default: 200
-            cmf_routing.dynamic_router: 100
-    dynamic:
-        enabled: true
-        controllers_by_class:
-            Xxam\CmsAdminBundle\Document\Page: Xxam\CmsAdminBundle\Controller\CmsAdminController::pageAction
-        persistence:
-            phpcr:
-                enabled: true
-                route_basepath: /cms/routes
-cmf_routing_auto:
-    persistence:
-        phpcr:
-            enabled: true
-
-cmf_block:
-    persistence:
-        phpcr:
-            block_basepath: /cms/content
-cmf_create:
-    security:
-        role:   ROLE_ADMIN
-        checker_service: ~
-
-sonata_block:
-    default_contexts: [cms]
-    blocks:
-        sonata.admin.block.admin_list:
-            contexts:   [admin]
-
-        #sonata.admin_doctrine_orm.block.audit:
-        #    contexts:   [admin]
-
-        sonata.block.service.text:
-        sonata.block.service.rss:
-
-        # Some specific block from the SonataMediaBundle
-        #sonata.media.block.media:
-        #sonata.media.block.gallery:
-        #sonata.media.block.feature_media:
-
-lunetics_locale:
-    guessing_order:
-        - query
-        - router
-        - session
-        - cookie
-        - browser
-    guessing_excluded_pattern: ^/api
-    allowed_locales: "%locales%"
 
 
 
