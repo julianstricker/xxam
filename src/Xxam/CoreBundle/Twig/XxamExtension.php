@@ -17,6 +17,7 @@ class XxamExtension extends \Twig_Extension
         return array(
             new \Twig_SimpleFilter('jscode', array($this, 'jscodeFilter'), array('is_safe' => array('all'))),
             new \Twig_SimpleFilter('jsonwithfunctions', array($this, 'jsonwithfunctionsFilter'), array('is_safe' => array('all'))),
+            new \Twig_SimpleFilter('mailaddrsasextdata', array($this, 'mailaddrsasextdataFilter'), array('is_safe' => array('all'))),
         );
     }
 
@@ -33,6 +34,19 @@ class XxamExtension extends \Twig_Extension
         $return = json_encode($data);
         $return=str_replace(['"$%&functionstart','functionend&%$"'],['',''],$return);
         return $return;
+    }
+
+    public function mailaddrsasextdataFilter($data){
+        $return=[];
+        foreach($data as $addr=>$name){
+            if (!empty($name)){
+                $return[]=$name.' <'.$addr.'>';
+            }else{
+                $return[]=$addr;
+            }
+        }
+        return json_encode($return);
+        //[{% if mail is defined and mail.replyTo is defined %}{% for addr,name in mail.replyTo %}{% if not loop.first %},{% endif %}'{% if name !='' %}{{name}} <{{addr}}>{% else %}{{addr}}{% endif %}'{% endfor %}{% endif %}]
     }
 
     public function getName()

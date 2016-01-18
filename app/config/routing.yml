@@ -27,10 +27,6 @@ xxam_coding:
 xxam_filemanager:
     resource: "@XxamFilemanagerBundle/Resources/config/routing.yml"
     prefix:   /
-
-xxam_cmsadmin:
-    resource: "@XxamCmsAdminBundle/Resources/config/routing.yml"
-    prefix:   /
     
 xxam_user:
     resource: "@XxamUserBundle/Resources/config/routing.yml"
@@ -69,8 +65,3 @@ xxam_thumbnail_y:
         #maxy: ~
         img: ".+"
 
-create:
-    resource: "@CmfCreateBundle/Resources/config/routing/rest.xml"
-
-#create_image:
-#    resource: "@CmfCreateBundle/Resources/config/routing/image.xml"
