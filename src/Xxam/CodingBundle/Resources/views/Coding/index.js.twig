@@ -27,6 +27,7 @@
             }else{
                 editor_{{id}} = ace.edit("aceeditor_{{id}}-body");
                 editor_{{id}}.setTheme("ace/theme/monokai");
+                editor_{{id}}.broadcastchanges=true;
                 Ext.Object.each(extensionshighlighters,function(key,value){
                     if('{{path}}'.substr(-key.length)==key){
                         editor_{{id}}.getSession().setMode("ace/mode/"+value);
@@ -53,7 +54,10 @@
                             xxamws.publish('com.xxam.coding.{{id}}', {'changeSelection':{'start':target.getRange().start,'end':target.getRange().end }},[]);
                         });
                         editor.getSession().on('change',function(e){
-                            console.log('onChange',e);
+                            if (editor.broadcastchanges==true) {
+                                console.log('onChange', e);
+                                xxamws.publish('com.xxam.coding.{{ id }}', {'change': e}, []);
+                            }
                         });
 
                         //Selections:
@@ -126,6 +130,26 @@
                                         data.message.changeSelection.end.column
                                 ),"xxam_coding_selection n"+Object.keys(editor.selectionsmarker).length,true);
 
+                            }else if (typeof(data.message.change)!='undefined'){
+                                editor.broadcastchanges=false;
+                                switch(data.message.change.action){
+                                    case 'remove':
+                                        //[16,{"topic":"com.xxam.coding.fd494bf1adcb177ae7292282622c7694","message":{"change":{"start":{"row":24,"column":0},"end":{"row":30,"column":5},"action":"remove","lines":["$kernel = new AppKernel('dev', true);","$kernel->loadClassCache();","$request = Request::createFromGlobals();","$response = $kernel->handle($request);","$response->send();","$kernel->terminate($request, $response);","<?php"]}},"receivers":[]}]
+
+                                        editor.session.remove(new Range(
+                                                data.message.change.start.row,
+                                                data.message.change.start.column,
+                                                data.message.change.end.row,
+                                                data.message.change.end.column
+                                        ));
+
+                                        break;
+                                    case 'insert':
+                                        //[16,{"topic":"com.xxam.coding.fd494bf1adcb177ae7292282622c7694","message":{"change":{"start":{"row":24,"column":0},"end":{"row":24,"column":1},"action":"insert","lines":["a"]}},"receivers":[]}]
+                                        editor.session.insert(data.message.change.start,data.message.change.lines.join("\n"))
+                                        break;
+                                }
+                                editor.broadcastchanges=true;
                             }
 
                         }
