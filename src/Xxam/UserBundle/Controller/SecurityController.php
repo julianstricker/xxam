@@ -14,7 +14,9 @@ class SecurityController extends SecurityControllerOrig
     /**
      * Show login form
      * @Route("/login", name="login")
-     * @Method("GET")
+     * @Method({"GET"})
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function loginAction(Request $request)
     {
