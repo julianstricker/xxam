@@ -456,6 +456,11 @@ Ext.onReady(function() {
                             });
                         }
                     }
+                    if (typeof(xxamws.subscriptiontargets[key])!='undefined'){
+                        Ext.Array.each(xxamws.subscriptiontargets[key],function(target){
+                            if (typeof(target.onWsSubscribedbroadcast)=='function') target.onWsSubscribedbroadcast(value,ws);
+                    });
+                    }
 
 
                 });

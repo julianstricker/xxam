@@ -1,12 +1,15 @@
 <?php
-namespace Xxam\MailclientBundle\Helper\WebSocketClient;
+namespace Xxam\MailclientBundle\Helper;
 
 
 
 use Doctrine\ORM\EntityManager;
-use React\EventLoop\Factory;
+//use React\EventLoop\Factory;
+use React\Dns\Resolver\Factory;
 use React\SocketClient\Connector;
 use React\SocketClient\SecureConnector;
+use Xxam\CommBundle\Helper\WebSocketClient\WebSocketClient;
+use Xxam\CommBundle\Helper\WebSocketClient\WebSocketClientInterface;
 use Xxam\MailclientBundle\Entity\Mailaccount;
 use Xxam\MailclientBundle\Entity\Mailaccountuser;
 use Xxam\MailclientBundle\Entity\MailaccountuserRepository;
@@ -282,7 +285,7 @@ class Client implements WebSocketClientInterface
     private function createImapstream(&$imapaccount){
         echo 'createImapstream';
         //$loop = \React\EventLoop\Factory::create();
-        $dnsResolverFactory = new \React\Dns\Resolver\Factory();
+        $dnsResolverFactory = new Factory();
         $dns = $dnsResolverFactory->createCached('8.8.8.8', $this->loop);
 
         $imapconnector = new Connector($this->loop, $dns);

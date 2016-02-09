@@ -1,5 +1,5 @@
 <?php
-namespace Xxam\MailclientBundle\Helper\WebSocketClient;
+namespace Xxam\CommBundle\Helper\WebSocketClient;
 
 interface WebSocketClientInterface
 {

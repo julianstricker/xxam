@@ -1,9 +1,9 @@
 <?php
-namespace Xxam\MailclientBundle\Helper\WebSocketClient;
+namespace Xxam\CommBundle\Helper\WebSocketClient;
 
 use React\EventLoop\LoopInterface;
 use React\Socket\Connection;
-use Xxam\MailclientBundle\Helper\WebSocketClient\Exception\ConnectionException;
+use Xxam\CommBundle\Helper\WebSocketClient\Exception\ConnectionException;
 
 class WebSocketClient
 {
