@@ -6,15 +6,15 @@ parameters:
 services:
 #    security.authentication.failure_handler:
 #        class: Xxam\UserBundle\Handler\AuthenticationFailureHandler
-#        arguments: [@kernel]
+#        arguments: ['@kernel']
 #    security.authentication.success_handler:
 #        class: Xxam\UserBundle\Handler\AuthenticationSuccessHandler
-#        arguments: [@kernel]
+#        arguments: ['@kernel']
     xxam_user.login_success_handler:
         class:  "%security.authentication.success_handler.class%"
         #abstract: false
         #public: false
-        arguments:  [@security.http_utils ]
+        arguments:  ['@security.http_utils' ]
         calls:
             - [setTranslator, ["@translator"]]
         tags:
@@ -29,7 +29,7 @@ services:
         class:  "%security.authentication.failure_handler.class%"
         #abstract: false
         #public: false
-        arguments:  [@http_kernel, @security.http_utils, [], @logger ]
+        arguments:  ['@http_kernel', '@security.http_utils', [], '@logger' ]
         calls:
             - [setTranslator, ["@translator"]]
         tags:

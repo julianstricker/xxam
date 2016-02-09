@@ -1,7 +1,7 @@
 services:
 #    xxam_core.example:
 #        class: Xxam\CoreBundle\Example
-#        arguments: [@service_id, "plain_value", %parameter%]
+#        arguments: ['@service_id', "plain_value", %parameter%]
 
 
 #every portal-widget must start with "xxamportalwidget...."
@@ -17,13 +17,13 @@ services:
             
     kernel.listener.tenantsetparameter:    
        class: Xxam\CoreBundle\EventListener\TenantSetParameter
-       arguments: [ '%tenants%', @doctrine.orm.entity_manager ]
+       arguments: [ '%tenants%', '@doctrine.orm.entity_manager' ]
        tags:
            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 20 }
            
     kernel.listener.command_tenantsetparameter:    
        class: Xxam\CoreBundle\EventListener\TenantSetParameter
-       arguments: [ @service_container, @doctrine.orm.entity_manager ]
+       arguments: [ '@service_container', '@doctrine.orm.entity_manager' ]
        tags:
            - { name: kernel.event_listener, event: console.command, method: onCommand, priority: 20 }
            
@@ -40,6 +40,6 @@ services:
 #            host: %bit_ratchet.websocket.host%
 #            port: %bit_ratchet.websocket.port%
 #          listeners: %bit_ratchet.listeners%
-#          logger: @logger
+#          logger: '@logger'
 #        tags:
 #            - { name: monolog.logger, channel: ratchet_server }
