@@ -166,7 +166,7 @@
                                             // reader configs
                                             fields: ['value']
                                         }),*/
-                                        value:  {% if mail is defined and mail.to is defined %}{{ mail.to|mailaddrsasextdata}}{% else %}[]{% endif %}
+                                        value:  {{ mail|mailaddrsasextdata('to') }}
                                     },{
                                         xtype: 'button',
                                         margin: '0 0 0 5',
@@ -201,7 +201,7 @@
                                     itemId: 'fieldcc',
                                     name: 'fieldcc',
                                     hidden: true,
-                                    value:  {% if mail is defined and mail.cc is defined %}{{ mail.cc|mailaddrsasextdata }}{% else %}[]{% endif %}
+                                    value: {{ mail|mailaddrsasextdata('cc') }}
                                 },
                                 {
                                     xtype: 'xxamtagfield',
@@ -209,7 +209,7 @@
                                     itemId: 'fieldbcc',
                                     name: 'fieldbcc',
                                     hidden: true,
-                                    value:  {% if mail is defined and mail.bcc is defined %}{{ mail.bcc|mailaddrsasextdata }}{% else %}[]{% endif %}
+                                    value:  {{ mail|mailaddrsasextdata('bcc') }}
                                 },
                                 {
                                     xtype: 'xxamtagfield',
@@ -217,7 +217,7 @@
                                     itemId: 'fieldreplyto',
                                     name: 'fieldreplyto',
                                     hidden: true,
-                                    value: {% if mail is defined and mail.replyTo is defined %}{{ mail.replyTo|mailaddrsasextdata }}{% else %}[]{% endif %}
+                                    value: {{ mail|mailaddrsasextdata('replyTo') }}
                                 },
                                 {
                                     xtype: 'textfield',
@@ -430,10 +430,6 @@
             listeners:{
                 afterrender: function(tab){
                   ttt=tab;
-                   /*{% if mail is defined and mail.to %}{% for key, val in mail.to %}
-                      Ext.getCmp('writeemailform'){{ val }}<{{key}}>
-                   {% endfor %}{% endif %}*/
-                                    
                 }
 
 

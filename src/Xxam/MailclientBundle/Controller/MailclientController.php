@@ -278,12 +278,13 @@ class MailclientController extends MailclientBaseController {
         }
         
     }
-    
+
     /**
      * Mailclient
      *
      * @Security("has_role('ROLE_MAILCLIENT_CREATE')")
-     *
+     * @param Request $request
+     * @return Response
      */
     public function writeAction(Request $request) {
         $path=$request->get('path','');
@@ -294,6 +295,7 @@ class MailclientController extends MailclientBaseController {
             'type'=>$type,
             'mailid'=>$mailid,
             'path'=>$path,
+            'mail'=>new \stdClass()
             
         );
         $mailaccountid=false;

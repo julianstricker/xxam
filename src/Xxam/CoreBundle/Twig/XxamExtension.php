@@ -36,13 +36,22 @@ class XxamExtension extends \Twig_Extension
         return $return;
     }
 
-    public function mailaddrsasextdataFilter($data){
+
+
+    /**
+     * @param \stdClass $mail
+     * @param string $fieldname
+     * @return string
+     */
+    public function mailaddrsasextdataFilter($mail, $fieldname){
         $return=[];
-        foreach($data as $addr=>$name){
-            if (!empty($name)){
-                $return[]=$name.' <'.$addr.'>';
-            }else{
-                $return[]=$addr;
+        if(property_exists($mail,$fieldname) && is_array($mail->{$fieldname})) {
+            foreach ($mail->{$fieldname} as $addr => $name) {
+                if (!empty($name)) {
+                    $return[] = $name . ' <' . $addr . '>';
+                } else {
+                    $return[] = $addr;
+                }
             }
         }
         return json_encode($return);
