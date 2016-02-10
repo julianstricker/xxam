@@ -1,3 +1,10 @@
+fos_user_security_login:
+    #path: /login
+    #defaults: { _controller: XxamUserBundle:Security:login }
+    #methods: [ GET ]
+    resource: "@XxamUserBundle/Controller/SecurityController.php"
+    type: annotation
+
 user:
     resource: "@XxamUserBundle/Controller/UserController.php"
     type: annotation
