@@ -102,7 +102,7 @@
                             displayimages=function(mailid,ele){
                                 Ext.get(Ext.dom.Query.select('.mailpanelheadernotice')[0]).destroy();
                                 Ext.getCmp('mailclient_mailpanelbody{{id}}').load('mailclient/getmailcontent?path='+path+'&externalsources=1&mailid='+mailid);
-                                Ext.getCmp('mailclient_mailpanel{{id}}').doLayout();
+                                Ext.getCmp('mailclient_mailpanel{{id}}').updateLayout();
                                 return false;
                             }
                             if(Ext.getCmp('mailclient_minimizeheaderbutton{{id}}').pressed){
@@ -127,7 +127,7 @@
                             Ext.getCmp('mailclient_mailpanel{{id}}').setCollapsed(false);
                             //if(responsejson.textHtml==null){
                             Ext.getCmp('mailclient_mailpanelbody{{id}}').load('mailclient/getmailcontent?path='+path+'&mailid='+mailid);
-                            Ext.getCmp('mailclient_mailpanel{{id}}').doLayout(); 
+                            Ext.getCmp('mailclient_mailpanel{{id}}').updateLayout();
                         }
                     });
                 }

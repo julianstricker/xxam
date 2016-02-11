@@ -8,7 +8,8 @@
         {% block stylesheets %}
             {% stylesheets
             'bundles/xxamcore/css/*'
-            'ext-theme-carbon/resources/codaxy-theme-carbon-all.css'
+            'assets/vendor/extjs/build/classic/theme-triton/resources/theme-triton-all_1.css'
+            'assets/vendor/extjs/build/classic/theme-triton/resources/theme-triton-all_2.css'
             filter='cssrewrite' %}
             <link rel="stylesheet" type="text/css" href="{{ asset_url }}" />
             {% endstylesheets %}
@@ -28,20 +29,20 @@
             {%if app.environment == 'dev' %}
                 {% javascripts
                     'assets/vendor/extjs/build/ext-all-debug.js'
-                    'ext-theme-carbon/codaxy-theme-carbon.js'
+                    'assets/vendor/extjs/build/classic/theme-triton/theme-triton-debug.js'
                     '@XxamCoreBundle/Resources/public/js/adapter.js'
                     '@XxamCoreBundle/Resources/public/js/layout.js'
-                    'assets/vendor/extjs/build/packages/sencha-charts/build/sencha-charts-debug.js'
+                    'assets/vendor/extjs/build/packages/charts/classic/charts-debug.js'
                 %}
                 <script type="text/javascript" src="{{ asset_url }}"></script>
                 {% endjavascripts %}
             {% else %}
                 {% javascripts
                 'assets/vendor/extjs/build/ext-all.js'
-                'ext-theme-carbon/codaxy-theme-carbon.js'
+                'assets/vendor/extjs/build/classic/theme-triton/theme-triton.js'
                 '@XxamCoreBundle/Resources/public/js/adapter.js'
                 '@XxamCoreBundle/Resources/public/js/layout.js'
-                'assets/vendor/extjs/build/packages/sencha-charts/build/sencha-charts.js'
+                'assets/vendor/extjs/build/packages/charts/classic/charts.js'
                 %}
 
                 <script type="text/javascript" src="{{ asset_url }}"></script>

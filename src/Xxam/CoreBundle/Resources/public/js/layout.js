@@ -5,7 +5,7 @@ Ext.Loader.setConfig({
         'Ext.ux.WebSocketManager': '/bundles/xxamcore/js/WebSocketManager.js'
     }
 });
-Ext.Loader.setPath('Ext.ux', '/assets/vendor/extjs/examples/ux');
+Ext.Loader.setPath('Ext.ux', '/assets/vendor/extjs/packages/ux/classic/src'); //'/assets/vendor/extjs/examples/ux');
 Ext.Loader.setPath('Portal.view', '/js/portal');
 Ext.Loader.setPath('widget.xxam', '/bundles');
 Ext.require([
@@ -1080,6 +1080,8 @@ function loadtab() {
                     if (active.removeAll) {
                         target.removeAll();
                     }
+                    iii=items;
+                    ttt=target;
                     if (typeof (items.getitems) != 'undefined')
                         target.add(items.getitems());
 

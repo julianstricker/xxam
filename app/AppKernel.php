@@ -27,7 +27,7 @@ class AppKernel extends Kernel
             new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
             new Just\ThumbnailBundle\JustThumbnailBundle(),
             //new BIT\RatchetBundle\BITRatchetBundle(),
-            new Voryx\RESTGeneratorBundle\VoryxRESTGeneratorBundle(),
+            //new Voryx\RESTGeneratorBundle\VoryxRESTGeneratorBundle(),
             new FOS\RestBundle\FOSRestBundle(),
             new JMS\SerializerBundle\JMSSerializerBundle($this),
             new Nelmio\CorsBundle\NelmioCorsBundle(),
@@ -47,6 +47,19 @@ class AppKernel extends Kernel
         }
 
         return $bundles;
+    }
+
+    public function getRootDir()
+    {
+        return __DIR__;
+    }
+    public function getCacheDir()
+    {
+        return dirname(__DIR__).'/var/cache/'.$this->getEnvironment();
+    }
+    public function getLogDir()
+    {
+        return dirname(__DIR__).'/var/logs';
     }
 
     public function registerContainerConfiguration(LoaderInterface $loader)

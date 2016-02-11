@@ -26,7 +26,13 @@
                 window.setTimeout(waitforace,100);
             }else{
                 editor_{{id}} = ace.edit("aceeditor_{{id}}-body");
-                editor_{{id}}.setTheme("ace/theme/monokai");
+                if (Ext.theme.name=='Carbon'){
+                    editor_{{id}}.setTheme("ace/theme/monokai");
+                } else if (Ext.theme.name=='Triton'){
+                    editor_{{id}}.setTheme("ace/theme/chrome");
+                }else{
+                    editor_{{id}}.setTheme("ace/theme/github");
+                }
                 editor_{{id}}.broadcastchanges=true;
                 Ext.Object.each(extensionshighlighters,function(key,value){
                     if('{{path}}'.substr(-key.length)==key){

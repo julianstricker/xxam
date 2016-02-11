@@ -103,7 +103,7 @@
                                         }else{
                                             Ext.get(Ext.getCmp('mailclient_mailpanel{{id}}').body.dom.querySelector('.mailpanelheader')).show();
                                         }
-                                        Ext.getCmp('mailclient_mailpanel{{id}}').doLayout();
+                                        Ext.getCmp('mailclient_mailpanel{{id}}').updateLayout();
                                     }
                                     this.fireEvent('press');
                                 }

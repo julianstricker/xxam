@@ -6,7 +6,7 @@
         {% block stylesheets %}
             {% stylesheets
             'bundles/xxamcore/css/*'
-            'ext-theme-carbon/resources/codaxy-theme-carbon-all.css'
+            'assets/vendor/extjs/build/classic/theme-triton/resources/theme-triton-all.css'
             filter='cssrewrite' %}
             <link rel="stylesheet" type="text/css" href="{{ asset_url }}" />
             {% endstylesheets %}
@@ -16,14 +16,14 @@
             {%if app.environment == 'dev' %}
                 {% javascripts
                 'assets/vendor/extjs/build/ext-all-debug.js'
-                'ext-theme-carbon/codaxy-theme-carbon.js'
+                'assets/vendor/extjs/build/classic/theme-triton/theme-triton-debug.js'
                 %}
                 <script type="text/javascript" src="{{ asset_url }}"></script>
                 {% endjavascripts %}
             {% else %}
                 {% javascripts
                 'assets/vendor/extjs/build/ext-all.js'
-                'ext-theme-carbon/codaxy-theme-carbon.js'
+                'assets/vendor/extjs/build/classic/theme-triton/theme-triton.js'
                 %}
 
                 <script type="text/javascript" src="{{ asset_url }}"></script>

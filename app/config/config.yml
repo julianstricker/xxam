@@ -16,7 +16,7 @@ parameters:
     - de
     - it
 
-  exttheme: 'carbon' #carbon, aria, classic, gray, crisp, crisp-touch, neptune, neptune-touch
+  exttheme: 'aria' #carbon, aria, classic, gray, crisp, crisp-touch, neptune, neptune-touch
 
 
 framework:

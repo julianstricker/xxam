@@ -43,6 +43,18 @@
                 ]
             });
         }
+    if (typeof(xxamfilemanager_filestreemodel)=='undefined'){
+        Ext.define('xxamfilemanager_filestreemodel',{
+            extend: 'Ext.data.Model',
+            fields: [
+                {name: 'name', type: 'string'},
+                {name: 'id', type: 'string'},
+                {name: 'basename', type: 'string'},
+                {name: 'leaf', type: 'boolean'},
+                {name:'timestamp', type:'date', dateFormat:'timestamp'}
+            ]
+        });
+    }
 
         
         
@@ -223,16 +235,7 @@
                     },
                     store: {
                         extend: 'Ext.data.TreeStore',
-                        model: {
-                            extend: 'Ext.data.Model',
-                            fields: [
-                                {name: 'name', type: 'string'},
-                                {name: 'id', type: 'string'},
-                                {name: 'basename', type: 'string'},
-                                {name: 'leaf', type: 'boolean'},
-                                {name:'timestamp', type:'date', dateFormat:'timestamp'}
-                            ]
-                        },
+                        model: xxamfilemanager_filestreemodel,
                         proxy:{
                             type: 'ajax',
                             url: '{{path('filemanager_listfolders')}}',
