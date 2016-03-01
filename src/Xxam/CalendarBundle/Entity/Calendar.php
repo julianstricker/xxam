@@ -2,6 +2,7 @@
 
 namespace Xxam\CalendarBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping as ORM;
 use Xxam\CoreBundle\Entity\Base as Base;
@@ -134,16 +135,6 @@ class Calendar implements Base\TenantInterface
      * @ORM\Column(type="datetime")
      */
     private $updated;
-
-    /**
-     * @ORM\OneToMany(targetEntity="Address", mappedBy="calendar", cascade={"persist", "remove"})
-     */
-    private $addresses;
-    
-    /**
-     * @ORM\OneToMany(targetEntity="Communicationdata", mappedBy="calendar", cascade={"persist", "remove"})
-     */
-    private $communicationdatas;
 
     /**
      * Get id
@@ -504,74 +495,10 @@ class Calendar implements Base\TenantInterface
      */
     public function __construct()
     {
-        $this->addresses = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->addresses = new ArrayCollection();
     }
 
-    /**
-     * Add addresses
-     *
-     * @param \Xxam\CalendarBundle\Entity\Address $addresses
-     * @return Calendar
-     */
-    public function addAddress(\Xxam\CalendarBundle\Entity\Address $addresses)
-    {
-        $this->addresses[] = $addresses;
 
-        return $this;
-    }
 
-    /**
-     * Remove addresses
-     *
-     * @param \Xxam\CalendarBundle\Entity\Address $addresses
-     */
-    public function removeAddress(\Xxam\CalendarBundle\Entity\Address $addresses)
-    {
-        $this->addresses->removeElement($addresses);
-    }
-
-    /**
-     * Get addresses
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getAddresses()
-    {
-        return $this->addresses;
-    }
-
-    /**
-     * Add communicationdatas
-     *
-     * @param \Xxam\CalendarBundle\Entity\Communicationdata $communicationdatas
-     * @return Calendar
-     */
-    public function addCommunicationdata(\Xxam\CalendarBundle\Entity\Communicationdata $communicationdatas)
-    {
-        $this->communicationdatas[] = $communicationdatas;
-
-        return $this;
-    }
-
-    /**
-     * Remove communicationdatas
-     *
-     * @param \Xxam\CalendarBundle\Entity\Communicationdata $communicationdatas
-     */
-    public function removeCommunicationdata(\Xxam\CalendarBundle\Entity\Communicationdata $communicationdatas)
-    {
-        $this->communicationdatas->removeElement($communicationdatas);
-    }
-
-    /**
-     * Get communicationdatas
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getCommunicationdatas()
-    {
-        return $this->communicationdatas;
-    }
-    
     
 }

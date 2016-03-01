@@ -1,0 +1,21 @@
+parameters:
+  fielddefinitiontypes:
+    1: string
+    2: text
+    3: date
+    4: integer
+    5: float
+    6: double
+    7: long
+    8: boolean
+    9: foreign_id
+    11: strings
+    12: texts
+    13: dates
+    14: integers
+    15: floats
+    16: doubles
+    17: longs
+    18: booleans
+    19: foreign_ids
+

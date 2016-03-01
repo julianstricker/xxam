@@ -1,0 +1,9 @@
+xxam_dynmod:
+    resource: "@XxamDynmodBundle/Controller/DynmodController.php"
+    type: annotation
+
+xxam_dynmod_api:
+    resource: "@XxamDynmodBundle/Controller/DynmodRESTController.php"
+    type:   rest
+    prefix:   /api
+

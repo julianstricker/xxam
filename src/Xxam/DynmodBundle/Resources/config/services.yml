@@ -1,0 +1,6 @@
+imports:
+    - { resource: parameters.yml }
+services:
+#    xxam_core.example:
+#        class: Xxam\DynmodBundle\Example
+#        arguments: [@service_id, "plain_value", %parameter%]
