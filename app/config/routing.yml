@@ -27,6 +27,10 @@ xxam_coding:
 xxam_filemanager:
     resource: "@XxamFilemanagerBundle/Resources/config/routing.yml"
     prefix:   /
+
+xxam_dynmod:
+    resource: "@XxamDynmodBundle/Resources/config/routing.yml"
+    prefix:   /
     
 xxam_user:
     resource: "@XxamUserBundle/Resources/config/routing.yml"

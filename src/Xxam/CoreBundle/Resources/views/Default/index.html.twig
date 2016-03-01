@@ -24,6 +24,8 @@
            var chattoken='{{token}}';
            var realm='realm{{tenant_id}}';
            var groups=[{% for group in app.user.groups %}{% if not loop.first %},{% endif %}'{{ group.name }}'{% endfor %}];
+           var xxam_core_getlogentries='{{path('xxam_core_getlogentries')}}';
+           var logentrieswindowtitle='{%trans%}Log entries{%endtrans%}';
         </script>
         {% block javascripts %}
             {%if app.environment == 'dev' %}

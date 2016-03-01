@@ -5,6 +5,7 @@
 {% endif %}
 {
     tabtitle: '{% if entity.id %}{% trans with {'%name%': entity.name } %}Edit %name%{% endtrans %}{% else %}{% trans %}Create new Group{% endtrans %}{% endif %}',
+    iconCls: 'x-fa fa-users',
     getitems: function (){
         if (typeof(GroupModel)=='undefined'){
           Ext.define('GroupModel',{

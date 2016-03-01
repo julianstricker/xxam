@@ -18,7 +18,7 @@ class XxamCoreBundle extends Bundle
     static function getMenu(){
         return Array('hauptmenu_1'=>Array(
             'text'=>       'Portal',
-            'iconCls'=>    'defaultmenuicon'  ,          
+            'iconCls'=>    'x-fa fa-th-large'  ,
             #'handler'=>    'function() { window.location.href="#portal"}',
             'href'=>       '#portal',
             'hrefTarget'=> '_self',

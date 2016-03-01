@@ -62,8 +62,7 @@ class FilemanagerExtraController extends FilemanagerBaseController
 
     public function getThumbnailAction(Request $request)
     {
-        $this->memcached = new \Memcached;
-        $this->memcached->addServer('localhost', 11211);
+        $this->memcached = $this->get('memcached');
         $tenant_id = $request->getSession()->get('tenant_id', 1);
         $originalpath = $request->get('path', '');
         $filesystemid = $this->extractFilesystemIdFromPath($request->get('path', ''));
@@ -288,11 +287,12 @@ class FilemanagerExtraController extends FilemanagerBaseController
             $fs = $this->getFs($filesystem);
             if ($fs->has($path)) {
                 $metadata = $fs->getMetadata($path);
+
                 $content = $fs->read($path);
                 $response = new Response($content);
-                if ($metadata['mimetype']) $response->headers->set('Content-Type', $metadata['mimetype']);
-                if ($metadata['size']) $response->headers->set('Content-Length', $metadata['size']);
-                $response->headers->set('Content-disposition', 'inline; filename="' . $metadata['basename'] . '"');
+                if (!empty($metadata['mimetype'])) $response->headers->set('Content-Type', $metadata['mimetype']);
+                if (!empty($metadata['size'])) $response->headers->set('Content-Length', $metadata['size']);
+                if (!empty($metadata['basename'])) $response->headers->set('Content-disposition', 'inline; filename="' . $metadata['basename'] . '"');
                 return $response;
             }
         }

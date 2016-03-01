@@ -14,6 +14,7 @@ use Xxam\CoreBundle\Entity\Base as Base;
  *       @ORM\Index(name="ix_tenant_id", columns={"tenant_id"})
  *     })
  * @ORM\Entity(repositoryClass="Xxam\ContactBundle\Entity\CommunicationdataRepository")
+ * @Gedmo\Loggable(logEntryClass="Xxam\CoreBundle\Entity\LogEntry")
  */
 class Communicationdata implements Base\TenantInterface
 {
@@ -32,6 +33,7 @@ class Communicationdata implements Base\TenantInterface
      * @var integer
      *
      * @ORM\Column(name="contact_id", type="integer", nullable=true)
+     * @Gedmo\Versioned
      */
     private $contact_id;
 
@@ -39,6 +41,7 @@ class Communicationdata implements Base\TenantInterface
      * @var integer
      *
      * @ORM\Column(name="communicationdatatype_id", type="integer", nullable=true)
+     * @Gedmo\Versioned
      */
     private $communicationdatatype_id;
 
@@ -46,6 +49,7 @@ class Communicationdata implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="value", type="string", length=255, nullable=true)
+     * @Gedmo\Versioned
      */
     private $value;
 

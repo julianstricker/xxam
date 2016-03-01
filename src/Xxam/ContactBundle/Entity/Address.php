@@ -14,6 +14,7 @@ use Xxam\CoreBundle\Entity\Base as Base;
  *       @ORM\Index(name="ix_tenant_id", columns={"tenant_id"})
  *     })
  * @ORM\Entity(repositoryClass="Xxam\ContactBundle\Entity\AddressRepository")
+ * @Gedmo\Loggable(logEntryClass="Xxam\CoreBundle\Entity\LogEntry")
  */
 class Address implements Base\TenantInterface
 {
@@ -31,6 +32,7 @@ class Address implements Base\TenantInterface
      * @var integer
      *
      * @ORM\Column(name="contact_id", type="integer", nullable=true)
+     * @Gedmo\Versioned
      */
     private $contact_id;
 
@@ -38,6 +40,7 @@ class Address implements Base\TenantInterface
      * @var integer
      *
      * @ORM\Column(name="addresstype_id", type="integer", nullable=true)
+     * @Gedmo\Versioned
      */
     private $addresstype_id;
 
@@ -45,6 +48,7 @@ class Address implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="address", type="string", length=511, nullable=true)
+     * @Gedmo\Versioned
      */
     private $address;
 
@@ -52,6 +56,7 @@ class Address implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="countrycode", type="string", length=5, nullable=true)
+     * @Gedmo\Versioned
      */
     private $countrycode;
 
@@ -59,6 +64,7 @@ class Address implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="region", type="string", length=255, nullable=true)
+     * @Gedmo\Versioned
      */
     private $region;
 
@@ -66,6 +72,7 @@ class Address implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="zip", type="string", length=255, nullable=true)
+     * @Gedmo\Versioned
      */
     private $zip;
 
@@ -73,6 +80,7 @@ class Address implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="locality", type="string", length=255, nullable=true)
+     * @Gedmo\Versioned
      */
     private $locality;
 
@@ -80,16 +88,19 @@ class Address implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="timezone", type="string", length=255, nullable=true)
+     * @Gedmo\Versioned
      */
     private $timezone;
     
     /**
      * @ORM\Column(type="decimal", scale=5, nullable=true)
+     * @Gedmo\Versioned
      */
     private $lat;
 
     /**
      * @ORM\Column(type="decimal", scale=5, nullable=true)
+     * @Gedmo\Versioned
      */
     private $lng;
 
@@ -97,6 +108,7 @@ class Address implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="tax", type="float", length=255, nullable=true)
+     * @Gedmo\Versioned
      */
     private $geolat;
 

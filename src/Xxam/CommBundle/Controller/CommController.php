@@ -16,8 +16,7 @@ class CommController extends Controller
 
     public function setchatidAction(Request $request){
         $sessionid=$request->get('sessionid');
-        $memcached = new \Memcached;
-        $memcached->addServer('localhost', 11211);
+        $memcached = $this->get('memcached');
         $user = $this->get('security.token_storage')->getToken()->getUser();
         if (!$user){
             $response = new Response(json_encode(Array('status'=>'ERROR')));

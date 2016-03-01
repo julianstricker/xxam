@@ -13,6 +13,7 @@ use Xxam\CoreBundle\Entity\Base as Base;
  *       @ORM\Index(name="ix_tenant_id", columns={"tenant_id"})
  *     })
  * @ORM\Entity(repositoryClass="Xxam\MailclientBundle\Entity\MailaccountuserRepository")
+ * @Gedmo\Loggable(logEntryClass="Xxam\CoreBundle\Entity\LogEntry")
  */
 class Mailaccountuser implements Base\TenantInterface
 {
@@ -29,6 +30,7 @@ class Mailaccountuser implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="user_id", type="integer")
+     * @Gedmo\Versioned
      */
     protected $user_id;
 

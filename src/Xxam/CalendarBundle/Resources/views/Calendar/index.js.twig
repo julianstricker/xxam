@@ -5,18 +5,170 @@
 {% endif %}
 {
     tabtitle: 'Calendar',
-    tabicon: '/bundles/xxamcalendar/icons/16x16/calendar.png',
+    //tabicon: '/bundles/xxamcalendar/icons/16x16/calendar.png',
+    iconCls: 'x-fa fa-calendar',
     getitems: function (){
         Xxam.appendHead({
             css: ['/bundles/xxamcalendar/css/layout.css']
         });
 
-    var startwithmonday=true;
+        var startwithmonday=true;
         if (startwithmonday){
             var weekdays=['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
         }else{
             var weekdays=Ext.Date.dayNames;
         }
+        if (typeof(XxamCalendarDrawSpriteInstancing)=='undefined') {
+            Ext.define('XxamCalendarDrawSpriteInstancing', {
+                override: 'Ext.draw.sprite.Instancing',
+                hitTest: function (point, options) {
+                    //ggg
+                    var me = this,
+                            template = me.getTemplate(),
+                            originalAttr = template.attr,
+                            instances = me.instances,
+                            ln = instances.length,
+                            i = 0,
+                            result = null;
+
+                    if (!me.isVisible()) {
+                        return result;
+                    }
+
+                    for (; i < ln; i++) {
+                        template.attr = instances[i];
+                        result = template.hitTest(point, options);
+                        if (result) {
+                            result.isInstance = true;
+                            result.template = result.sprite;
+                            result.sprite = this;
+                            result.instance = instances[i];
+                            result.index = i;
+                            return result;
+                        }
+                    }
+
+                    template.attr = originalAttr;
+                    return result;
+                },
+                isVisible: function () {
+                    var attr = this.attr,
+                            parent = this.getParent(),
+                            result;
+
+                    result = parent && parent.isSurface && !attr.hidden && attr.globalAlpha;
+
+                    return !!result;
+                }
+            });
+        }
+        if (typeof(XxamCalendarDrawSpritePath)=='undefined') {
+            Ext.define('EXTJS-18578.draw.sprite.Path', {
+                override: 'Ext.draw.sprite.Path',
+                hitTest: function (point, options) {
+                    var me = this,
+                            attr = me.attr,
+                            path = attr.path,
+                            matrix = attr.matrix,
+                            x = point[0],
+                            y = point[1],
+                            parentResult = me.callSuper([point, options]),
+                            result = null,
+                            params, isFilled;
+
+
+                    if (!parentResult) {
+                        // The sprite is not visible or bounding box wasn't hit.
+                        return result;
+                    }
+
+                    options = options || Ext.draw.sprite.Sprite.defaultHitTestOptions;
+
+                    if (!matrix.isIdentity()) {
+                        params = path.params.slice(0);
+                        path.transform(attr.matrix);
+                    }
+
+                    if (options.fill && options.stroke) {
+                        isFilled = attr.fillStyle !== Ext.draw.Color.NONE && attr.fillStyle !== Ext.draw.Color.RGBA_NONE;
+                        if (isFilled) {
+                            if (path.isPointInPath(x, y)) {
+                                result = {
+                                    sprite: me
+                                };
+                            }
+                        } else {
+                            if (path.isPointInPath(x, y) || path.isPointOnPath(x, y)) {
+                                result = {
+                                    sprite: me
+                                };
+                            }
+                        }
+                    } else if (options.stroke && !options.fill) {
+                        if (path.isPointOnPath(x, y)) {
+                            result = {
+                                sprite: me
+                            };
+                        }
+                    } else if (options.fill && !options.stroke) {
+                        if (path.isPointInPath(x, y)) {
+                            result = {
+                                sprite: me
+                            };
+                        }
+                    }
+
+                    if (params) {
+                        path.params = params;
+                    }
+
+                    return result;
+                }
+            })
+        }
+        if (typeof(XxamCalendarDrawSpriteSprite)=='undefined') {
+            Ext.define('XxamCalendarDrawSpriteSprite', {
+                override: 'Ext.draw.sprite.Sprite',
+                statics: {
+                    defaultHitTestOptions: {
+                        fill: true,
+                        stroke: true
+                    }
+                },
+                hitTest: function (point, options) {
+                    // Meant to be overridden in subclasses for more precise hit testing.
+                    // This version doesn't take any options and simply hit tests sprite's
+                    // bounding box, if the sprite is visible.
+                    if (this.isVisible()) {
+                        var x = point[0],
+                                y = point[1],
+                                bbox = this.getBBox(),
+                                isBBoxHit = bbox && x >= bbox.x && x <= (bbox.x + bbox.width) && y >= bbox.y && y <= (bbox.y + bbox.height);
+                        if (isBBoxHit) {
+                            return {
+                                sprite: this
+                            };
+                        }
+                    }
+                    return null;
+                },
+                isVisible: function () {
+                    var attr = this.attr,
+                            parent = this.getParent(),
+                            hasParent = parent && (parent.isSurface || parent.isVisible()),
+                            isSeen = hasParent && !attr.hidden && attr.globalAlpha,
+                            none1 = Ext.draw.Color.NONE,
+                            none2 = Ext.draw.Color.RGBA_NONE,
+                            hasFill = attr.fillOpacity && attr.fillStyle !== none1 && attr.fillStyle !== none2,
+                            hasStroke = attr.strokeOpacity && attr.strokeStyle !== none1 && attr.strokeStyle !== none2,
+                            result = isSeen && (hasFill || hasStroke);
+
+                    return !!result;
+                }
+            });
+        }
+
+
         var gotonextmonth = function (e) {
             var actualmonth=Ext.Date.add(startdate, Ext.Date.DAY, 15);
             var nextmonth= new Date(actualmonth.getFullYear(),actualmonth.getMonth()+1,1);
@@ -24,7 +176,7 @@
             
             if (startwithmonday){
                 firstdayofmonth--;
-                if (firstdayofmonth==-1){
+                    if (firstdayofmonth==-1){
                     firstdayofmonth=6;
                 }
             }
@@ -46,6 +198,18 @@
             }
             startdate= Ext.Date.subtract(nextmonth, Ext.Date.DAY, firstdayofmonth);
             var drawcontainer=Ext.getCmp('drawcontainer'); 
+            drawmonth(drawcontainer);
+        }
+        var gotoday= function(picker,day){
+            var firstdayofmonth=Ext.Date.getFirstDayOfMonth(day);
+            if (startwithmonday){
+                firstdayofmonth--;
+                if (firstdayofmonth==-1){
+                    firstdayofmonth=6;
+                }
+            }
+            startdate= Ext.Date.subtract(Ext.Date.getFirstDateOfMonth(day), Ext.Date.DAY, firstdayofmonth);
+            var drawcontainer=Ext.getCmp('drawcontainer');
             drawmonth(drawcontainer);
         }
         
@@ -90,10 +254,10 @@
         }
         var startdate= Ext.Date.subtract(Ext.Date.getFirstDateOfMonth(today), Ext.Date.DAY, firstdayofmonth);
         var calendarevents=[
-            {'calendar':'default','fromdate':'2015-09-03','todate':'2015-09-20','title':'Lei a test'},
-            {'fromdate':'2015-09-15','todate':'2015-09-15','title':'No a test2'},
-            {'calendar':'default','fromdate':'2015-09-05','todate':'2015-09-23','title':'No a test'},
-            {'fromdate':'2015-09-15','todate':'2015-09-15','title':'No a test2'}];
+            {'calendar':'default','fromdate':'2015-03-03','todate':'2017-03-20','title':'Lei a test'},
+            {'fromdate':'2016-03-15','todate':'2016-03-15','title':'No a test2'},
+            {'calendar':'default','fromdate':'2016-03-05','todate':'2016-03-23','title':'No a test'},
+            {'fromdate':'2016-03-15','todate':'2016-03-15','title':'No a test2'}];
         var eventsperday=[];
         var drawevents=function(drawcontainer){
             var surface=drawcontainer.getSurface('main');
@@ -230,8 +394,8 @@
             var eventspritescount=eventsprites.length;
             if (path!=''){
                 console.log(path);
-                eventsprites[eventspritescount]=Ext.create('Ext.draw.Sprite',{
-                    type: 'path',
+                eventsprites[eventspritescount]=Ext.create('Ext.draw.sprite.Path',{
+                    //type: 'path',
                     stroke: 'blue',     
                     'stroke-width': 1,
                     opacity: 1,          
@@ -245,13 +409,13 @@
                         ptype: 'spriteevents'
                     }],
                     listeners: {
-                        mouseover: function(ele){ 
+                        spritemouseover: function(ele){
                             console.log('over');
                             ele.setAttributes({
                                 'stroke-width': 3
                             },true)
                         },
-                        mouseout: function(ele){ 
+                        spritemouseout: function(ele){
                             console.log('out');
                             ele.setAttributes({
                                 'stroke-width': 1
@@ -264,7 +428,7 @@
                         }
                         
 
-                    },    */
+                    },*/
                     translationY: 0.5,
                     translationX: 0.5
                 });
@@ -459,7 +623,10 @@
                 margins: '0 2 2 2',
                 autoScroll: true,
                 items: [{
-                    xtype: 'datepicker'
+                    xtype: 'datepicker',
+                    handler: function(picker,date){
+                        gotoday(picker,date);
+                    }
                 }]
             },{
                 region: 'center',

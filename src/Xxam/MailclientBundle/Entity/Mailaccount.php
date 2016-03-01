@@ -12,6 +12,7 @@ use Xxam\CoreBundle\Entity\Base as Base;
  *     indexes={
  *       @ORM\Index(name="ix_tenant_id", columns={"tenant_id"})
  *     })
+ * @Gedmo\Loggable(logEntryClass="Xxam\CoreBundle\Entity\LogEntry")
  */
 class Mailaccount implements Base\TenantInterface
 {
@@ -28,6 +29,7 @@ class Mailaccount implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="accountname", type="string", length=50)
+     * @Gedmo\Versioned
      */
     protected $accountname;
     
@@ -35,6 +37,7 @@ class Mailaccount implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="accountemail", type="string", length=255)
+     * @Gedmo\Versioned
      */
     protected $accountemail;
     
@@ -42,6 +45,7 @@ class Mailaccount implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255)
+     * @Gedmo\Versioned
      */
     protected $name;
     
@@ -49,6 +53,7 @@ class Mailaccount implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="imapserver", type="string", length=255)
+     * @Gedmo\Versioned
      */
     protected $imapserver;
     
@@ -56,6 +61,7 @@ class Mailaccount implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="imapport", type="integer")
+     * @Gedmo\Versioned
      */
     protected $imapport=143;
     
@@ -63,6 +69,7 @@ class Mailaccount implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="imapusername", type="string", length=255)
+     * @Gedmo\Versioned
      */
     protected $imapusername;
     
@@ -70,6 +77,7 @@ class Mailaccount implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="imappassword", type="string", length=255)
+     * @Gedmo\Versioned
      */
     protected $imappassword;
     
@@ -77,6 +85,7 @@ class Mailaccount implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="imapsecurity", type="integer")
+     * @Gedmo\Versioned
      */
     protected $imapsecurity=0; //0=off, 1=ssl/tls, 2=ssl/tls alle zertifikate akzeptieren, 3=starttls, 4 starttls alle zertifikate akzeptieren
     
@@ -84,6 +93,7 @@ class Mailaccount implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="imappathprefix", type="string", length=255)
+     * @Gedmo\Versioned
      */
     protected $imappathprefix='INBOX';
     
@@ -91,6 +101,7 @@ class Mailaccount implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="smtpserver", type="string", length=255)
+     * @Gedmo\Versioned
      */
     protected $smtpserver;
     
@@ -98,6 +109,7 @@ class Mailaccount implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="smtpport", type="integer")
+     * @Gedmo\Versioned
      */
     protected $smtpport=25;
     
@@ -105,6 +117,7 @@ class Mailaccount implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="smtpusername", type="string", length=255, nullable=true)
+     * @Gedmo\Versioned
      */
     protected $smtpusername;
     
@@ -112,6 +125,7 @@ class Mailaccount implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="smtppassword", type="string", length=255, nullable=true)
+     * @Gedmo\Versioned
      */
     protected $smtppassword;
     
@@ -119,11 +133,13 @@ class Mailaccount implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="smtpsecurity", type="integer")
+     * @Gedmo\Versioned
      */
     protected $smtpsecurity=0; //0=off, 1=ssl/tls, 2=ssl/tls alle zertifikate akzeptieren, 3=starttls, 4 starttls alle zertifikate akzeptieren
     
     /**
      * @ORM\Column(type="boolean")
+     * @Gedmo\Versioned
      */
     protected $isdefault;
     
@@ -131,6 +147,7 @@ class Mailaccount implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="trashfolder", type="string", length=255)
+     * @Gedmo\Versioned
      */
     protected $trashfolder='.Trash';
     
@@ -138,6 +155,7 @@ class Mailaccount implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="junkfolder", type="string", length=255)
+     * @Gedmo\Versioned
      */
     protected $junkfolder='.Spam';
     
@@ -145,6 +163,7 @@ class Mailaccount implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="sentfolder", type="string", length=255)
+     * @Gedmo\Versioned
      */
     protected $sentfolder='.Sent';
     
@@ -152,6 +171,7 @@ class Mailaccount implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="draftfolder", type="string", length=255)
+     * @Gedmo\Versioned
      */
     protected $draftfolder='.Drafts';
     

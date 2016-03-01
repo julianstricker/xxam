@@ -3,6 +3,7 @@
 
 {
     tabtitle: '{% if entity.id %}{% trans with {'%username%': entity.username } %}Edit %username%{% endtrans %}{% else %}{% trans %}Create new User{% endtrans %}{% endif %}',
+    iconCls: 'x-fa fa-user',
     getitems: function (){
         if (typeof(UserModel)=='undefined'){
           Ext.define('UserModel',{

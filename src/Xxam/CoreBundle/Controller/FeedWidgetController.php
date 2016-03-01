@@ -23,6 +23,17 @@ class FeedWidgetController extends Controller
 {
 
 
+    private $securityTokenStorage;
+
+    /**
+     * FeedWidgetController constructor.
+     * @param $securityTokenStorage
+     */
+    public function __construct($securityTokenStorage=null)
+    {
+        $this->securityTokenStorage = $securityTokenStorage;
+    }
+
     /**
      * Returns the Portal Widget Template name
      * this function is required for every portalwidget

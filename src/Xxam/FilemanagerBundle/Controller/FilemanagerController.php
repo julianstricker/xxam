@@ -41,7 +41,7 @@ class FilemanagerController extends FilemanagerBaseController {
         /** @var FilesystemRepository $repository */
         $repository=$this->getDoctrine()->getManager()->getRepository('XxamFilemanagerBundle:Filesystem');
         $entity=new Filesystem();
-        return $this->render('XxamFilemanagerBundle:Filemanager:edit.js.twig', array('entity'=>$entity,'modelfields'=>$repository->getModelFields()));
+        return $this->render('XxamFilemanagerBundle:Filemanager:edit.js.twig', array('entity'=>$entity,'modelfields'=>$repository->getModelFields(),'filesystemadapters'=>$this->container->getParameter('filesystemadapters')));
     }
     
     /**

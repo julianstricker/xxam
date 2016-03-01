@@ -5,6 +5,7 @@
 {% endif %}
 {
     tabtitle: '{% if entity.id %}{% trans with {'%filesystemname%': entity.filesystemname} %}Edit %filesystemname%{% endtrans %}{% else %}{% trans %}Create new filesystem{% endtrans %}{% endif %}',
+    iconCls: 'x-fa fa-database',
     getitems: function(){
         Xxam.appendHead({
             css: ['/bundles/xxamfilemanager/css/layout.css']

@@ -11,8 +11,10 @@
 
 namespace Xxam\MailclientBundle\Controller;
 
+use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Xxam\MailclientBundle\Entity\Mailaccountuser;
 use Xxam\MailclientBundle\Entity\MailaccountuserRepository;
 
@@ -20,14 +22,17 @@ use Xxam\MailclientBundle\Entity\MailaccountuserRepository;
 class NewmailsWidgetController extends Controller
 {
     private $securityTokenStorage;
+    private $entityManager;
 
     /**
      * NewmailsWidgetController constructor.
-     * @param $securityTokenStorage
+     * @param TokenStorage $securityTokenStorage
+     * @param EntityManager $entityManager
      */
-    public function __construct($securityTokenStorage)
+    public function __construct($securityTokenStorage,$entityManager)
     {
         $this->securityTokenStorage = $securityTokenStorage;
+        $this->entityManager = $entityManager;
     }
 
 
@@ -44,9 +49,10 @@ class NewmailsWidgetController extends Controller
     //this function is required for every portalwidget:
     public function getDefinitionAction()
     {
-        $user = $this->get('security.token_storage')->getToken()->getUser();
-        //$user = $this->securityTokenStorage->getToken()->getUser();
-        $repository = $this->getDoctrine()->getManager()->getRepository('XxamMailclientBundle:Mailaccountuser');
+
+        $user = $this->securityTokenStorage->getToken()->getUser();
+
+        $repository = $this->entityManager->getRepository('XxamMailclientBundle:Mailaccountuser');
         /* @var MailaccountuserRepository $repository */
         $mailaccountusers=$repository->findByUserId($user->getId());
         $mailaccounts=Array();

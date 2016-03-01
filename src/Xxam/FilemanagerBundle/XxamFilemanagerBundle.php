@@ -10,14 +10,14 @@ class XxamFilemanagerBundle extends Bundle {
         return Array(
             'filemanagermenu' => Array(
                 'text' => 'Filemanager',
-                'iconCls' => 'defaultmenuicon',
+                'iconCls' => 'x-fa fa-database',
                 #'handler'=>    'function() { window.location.href="#portal"}',
                 'stateId' => 'xxam_menu_filemanager',
                 'role' => 'ROLE_FILEMANAGER_LIST',
                 'menu' => Array(
                     'menu_1' => Array(
                         'text' => 'Filemanager',
-                        'iconCls' => 'defaultmenuicon',
+                        'iconCls' => 'x-fa fa-database',
                         'href' => '#filemanager',
                         'role' => 'ROLE_FILEMANAGER_LIST'
                     )
@@ -25,14 +25,14 @@ class XxamFilemanagerBundle extends Bundle {
             ),
             'adminmenu' => Array(
                 'text' => 'Administration',
-                'iconCls' => 'defaultmenuicon',
+                'iconCls' => 'x-fa fa-database',
                 #'handler'=>    'function() { window.location.href="#portal"}',
                 'stateId' => 'xxam_menu_admin',
                 'role' => 'ROLE_ADMIN',
                 'menu' => Array(
                     'menu_filemanager_admin' => Array(
                         'text' => 'Filemanagers',
-                        'iconCls' => 'defaultmenuicon',
+                        'iconCls' => 'x-fa fa-database',
                         'href' => '#filemanager/admin',
                         'role' => 'ROLE_FILEMANAGER_ADMIN',
                     )

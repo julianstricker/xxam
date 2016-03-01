@@ -35,6 +35,10 @@ xxam_core_statefulservice:
     path:     /statefulservice
     defaults: { _controller: XxamCoreBundle:Default:statefulservice }
 
+xxam_core_getlogentries:
+    path:     /getlogentries
+    defaults: { _controller: XxamCoreBundle:Default:getlogentries }
+
 
 uploadfileprogress:
     path: /uploadfileprogress

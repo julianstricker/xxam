@@ -11,8 +11,10 @@
 
 namespace Xxam\CoreBundle\Controller;
 
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Xxam\CoreBundle\Entity\LogEntryRepository;
 use Xxam\CoreBundle\Entity\Widget;
 use Xxam\UserBundle\Entity\User;
 
@@ -62,8 +64,7 @@ class DefaultController extends DefaultBaseController
             //"authid" => $user->getTenantId().'|'.$user->getId().'|'.$user->getUsername()
         );
         $token=hash('sha256',rand(0,99999999999).$key);
-        $memcached=new \Memcached();
-        $memcached->addServer('localhost', 11211);
+        $memcached = $this->get('memcached');
         $memcached->add('chatid_'.$token,$userdata);
         $environment= $this->container->get( 'kernel' )->getEnvironment();
         $exttheme=$this->getParameter('exttheme');
@@ -163,13 +164,14 @@ class DefaultController extends DefaultBaseController
      *
      * @return Response
      */
-    public function getwidgetsAction(){
+    public function getwidgetsAction(Request $request){
         $returnvalue=Array();
         $registeredwidgets=$this->getRegisteredWidgets();
         foreach($registeredwidgets as $registeredwidget){
             $definition=$this->get($registeredwidget)->getDefinitionAction();
             $definition['service']=$registeredwidget;
             $returnvalue[]=$definition;
+
         }
         $response = new Response(json_encode(Array('widgets'=>$returnvalue)));
         $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
@@ -197,5 +199,39 @@ class DefaultController extends DefaultBaseController
             return $this->statefulDeleteResponse($user,$request->get('key',false));
         }
         return true;
+    }
+
+    /**
+     * @param Request $request
+     * @return Response
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     */
+    public function getlogentriesAction(Request $request) {
+
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+        $entityname=$request->get('entityname','');
+        $id=$request->get('id',null);
+        /** @var EntityManager $em */
+        $em = $this->getDoctrine()->getManager();
+        /** @var LogEntryRepository $logrepo */
+        $logrepo=$em->getRepository('XxamCoreBundle:LogEntry');
+        $entity= $em->find($entityname,$id);
+        $logs = $logrepo->getLogEntries($entity);
+        $returnvalues=[];
+        foreach($logs as $log){
+            $returnvalues[]=[
+                'logged_at'=>$log->getLoggedAt()->format('Y-m-d H:i:s'),
+                'action'=>$log->getAction(),
+                'object_id'=>$log->getObjectId(),
+                'username'=>$log->getUsername(),
+                'version'=>$log->getVersion()
+            ];
+        }
+
+        $response = new Response(json_encode(Array('logentries'=>$returnvalues)));
+        $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
+        return $response;
     }
 }

@@ -1,22 +1,21 @@
 <?php
 
-namespace Xxam\ContactBundle\Entity;
+namespace Xxam\CalendarBundle\Entity;
 
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping as ORM;
 use Xxam\CoreBundle\Entity\Base as Base;
 
 /**
- * Contact
+ * Calendar
  *
- * @ORM\Table(name="contact",
+ * @ORM\Table(name="calendar",
  *     indexes={
  *       @ORM\Index(name="ix_tenant_id", columns={"tenant_id"})
  *     })
- * @ORM\Entity(repositoryClass="Xxam\ContactBundle\Entity\ContactRepository")
- * @Gedmo\Loggable(logEntryClass="Xxam\CoreBundle\Entity\LogEntry")
+ * @ORM\Entity(repositoryClass="Xxam\CalendarBundle\Entity\CalendarRepository")
  */
-class Contact implements Base\TenantInterface
+class Calendar implements Base\TenantInterface
 {
     use Base\TenantTrait;
     
@@ -32,24 +31,21 @@ class Contact implements Base\TenantInterface
     /**
      * @var integer
      *
-     * @ORM\Column(name="contact_id", type="integer", nullable=true)
-     * @Gedmo\Versioned
+     * @ORM\Column(name="calendar_id", type="integer", nullable=true)
      */
-    private $contact_id;
+    private $calendar_id;
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="contacttype_id", type="integer", nullable=true)
-     * @Gedmo\Versioned
+     * @ORM\Column(name="calendartype_id", type="integer", nullable=true)
      */
-    private $contacttype_id;
+    private $calendartype_id;
 
     /**
      * @var string
      *
      * @ORM\Column(name="organizationname", type="string", length=255, nullable=true)
-     * @Gedmo\Versioned
      */
     private $organizationname;
 
@@ -57,7 +53,6 @@ class Contact implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="lastname", type="string", length=255, nullable=true)
-     * @Gedmo\Versioned
      */
     private $lastname;
 
@@ -65,7 +60,6 @@ class Contact implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="firstname", type="string", length=255, nullable=true)
-     * @Gedmo\Versioned
      */
     private $firstname;
 
@@ -73,7 +67,6 @@ class Contact implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="nameprefix", type="string", length=255, nullable=true)
-     * @Gedmo\Versioned
      */
     private $nameprefix;
 
@@ -81,7 +74,6 @@ class Contact implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="initials", type="string", length=255, nullable=true)
-     * @Gedmo\Versioned
      */
     private $initials;
 
@@ -89,7 +81,6 @@ class Contact implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="nickname", type="string", length=255, nullable=true)
-     * @Gedmo\Versioned
      */
     private $nickname;
 
@@ -97,7 +88,6 @@ class Contact implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="vat", type="string", length=255, nullable=true)
-     * @Gedmo\Versioned
      */
     private $vat;
 
@@ -105,7 +95,6 @@ class Contact implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="tax", type="string", length=255, nullable=true)
-     * @Gedmo\Versioned
      */
     private $tax;
 
@@ -113,7 +102,6 @@ class Contact implements Base\TenantInterface
      * @var \DateTime
      *
      * @ORM\Column(name="birthday", type="date", nullable=true)
-     * @Gedmo\Versioned
      */
     private $birthday;
 
@@ -121,7 +109,6 @@ class Contact implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="photo", type="string", length=255, nullable=true)
-     * @Gedmo\Versioned
      */
     private $photo;
 
@@ -129,7 +116,6 @@ class Contact implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="organizationfunction", type="string", length=255, nullable=true)
-     * @Gedmo\Versioned
      */
     private $organizationfunction;
     
@@ -150,12 +136,12 @@ class Contact implements Base\TenantInterface
     private $updated;
 
     /**
-     * @ORM\OneToMany(targetEntity="Address", mappedBy="contact", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity="Address", mappedBy="calendar", cascade={"persist", "remove"})
      */
     private $addresses;
     
     /**
-     * @ORM\OneToMany(targetEntity="Communicationdata", mappedBy="contact", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity="Communicationdata", mappedBy="calendar", cascade={"persist", "remove"})
      */
     private $communicationdatas;
 
@@ -170,56 +156,56 @@ class Contact implements Base\TenantInterface
     }
 
     /**
-     * Set contact_id
+     * Set calendar_id
      *
-     * @param integer $contactId
-     * @return Contact
+     * @param integer $calendarId
+     * @return Calendar
      */
-    public function setContactId($contactId)
+    public function setCalendarId($calendarId)
     {
-        $this->contact_id = $contactId;
+        $this->calendar_id = $calendarId;
 
         return $this;
     }
 
     /**
-     * Get contact_id
+     * Get calendar_id
      *
      * @return integer 
      */
-    public function getContactId()
+    public function getCalendarId()
     {
-        return $this->contact_id;
+        return $this->calendar_id;
     }
 
     /**
-     * Set contacttype_id
+     * Set calendartype_id
      *
-     * @param integer $contacttypeId
-     * @return Contact
+     * @param integer $calendartypeId
+     * @return Calendar
      */
-    public function setContacttypeId($contacttypeId)
+    public function setCalendartypeId($calendartypeId)
     {
-        $this->contacttype_id = $contacttypeId;
+        $this->calendartype_id = $calendartypeId;
 
         return $this;
     }
 
     /**
-     * Get contacttype_id
+     * Get calendartype_id
      *
      * @return integer 
      */
-    public function getContacttypeId()
+    public function getCalendartypeId()
     {
-        return $this->contacttype_id;
+        return $this->calendartype_id;
     }
 
     /**
      * Set organizationname
      *
      * @param string $organizationname
-     * @return Contact
+     * @return Calendar
      */
     public function setOrganizationname($organizationname)
     {
@@ -242,7 +228,7 @@ class Contact implements Base\TenantInterface
      * Set lastname
      *
      * @param string $lastname
-     * @return Contact
+     * @return Calendar
      */
     public function setLastname($lastname)
     {
@@ -265,7 +251,7 @@ class Contact implements Base\TenantInterface
      * Set firstname
      *
      * @param string $firstname
-     * @return Contact
+     * @return Calendar
      */
     public function setFirstname($firstname)
     {
@@ -288,7 +274,7 @@ class Contact implements Base\TenantInterface
      * Set nameprefix
      *
      * @param string $nameprefix
-     * @return Contact
+     * @return Calendar
      */
     public function setNameprefix($nameprefix)
     {
@@ -311,7 +297,7 @@ class Contact implements Base\TenantInterface
      * Set initials
      *
      * @param string $initials
-     * @return Contact
+     * @return Calendar
      */
     public function setInitials($initials)
     {
@@ -334,7 +320,7 @@ class Contact implements Base\TenantInterface
      * Set nickname
      *
      * @param string $nickname
-     * @return Contact
+     * @return Calendar
      */
     public function setNickname($nickname)
     {
@@ -357,7 +343,7 @@ class Contact implements Base\TenantInterface
      * Set vat
      *
      * @param string $vat
-     * @return Contact
+     * @return Calendar
      */
     public function setVat($vat)
     {
@@ -380,7 +366,7 @@ class Contact implements Base\TenantInterface
      * Set tax
      *
      * @param string $tax
-     * @return Contact
+     * @return Calendar
      */
     public function setTax($tax)
     {
@@ -403,7 +389,7 @@ class Contact implements Base\TenantInterface
      * Set birthday
      *
      * @param \DateTime $birthday
-     * @return Contact
+     * @return Calendar
      */
     public function setBirthday($birthday)
     {
@@ -426,7 +412,7 @@ class Contact implements Base\TenantInterface
      * Set photo
      *
      * @param string $photo
-     * @return Contact
+     * @return Calendar
      */
     public function setPhoto($photo)
     {
@@ -449,7 +435,7 @@ class Contact implements Base\TenantInterface
      * Set organizationfunction
      *
      * @param string $organizationfunction
-     * @return Contact
+     * @return Calendar
      */
     public function setOrganizationfunction($organizationfunction)
     {
@@ -472,7 +458,7 @@ class Contact implements Base\TenantInterface
      * Set created
      *
      * @param \DateTime $created
-     * @return Contact
+     * @return Calendar
      */
     public function setCreated($created)
     {
@@ -495,7 +481,7 @@ class Contact implements Base\TenantInterface
      * Set updated
      *
      * @param \DateTime $updated
-     * @return Contact
+     * @return Calendar
      */
     public function setUpdated($updated)
     {
@@ -524,10 +510,10 @@ class Contact implements Base\TenantInterface
     /**
      * Add addresses
      *
-     * @param \Xxam\ContactBundle\Entity\Address $addresses
-     * @return Contact
+     * @param \Xxam\CalendarBundle\Entity\Address $addresses
+     * @return Calendar
      */
-    public function addAddress(\Xxam\ContactBundle\Entity\Address $addresses)
+    public function addAddress(\Xxam\CalendarBundle\Entity\Address $addresses)
     {
         $this->addresses[] = $addresses;
 
@@ -537,9 +523,9 @@ class Contact implements Base\TenantInterface
     /**
      * Remove addresses
      *
-     * @param \Xxam\ContactBundle\Entity\Address $addresses
+     * @param \Xxam\CalendarBundle\Entity\Address $addresses
      */
-    public function removeAddress(\Xxam\ContactBundle\Entity\Address $addresses)
+    public function removeAddress(\Xxam\CalendarBundle\Entity\Address $addresses)
     {
         $this->addresses->removeElement($addresses);
     }
@@ -557,10 +543,10 @@ class Contact implements Base\TenantInterface
     /**
      * Add communicationdatas
      *
-     * @param \Xxam\ContactBundle\Entity\Communicationdata $communicationdatas
-     * @return Contact
+     * @param \Xxam\CalendarBundle\Entity\Communicationdata $communicationdatas
+     * @return Calendar
      */
-    public function addCommunicationdata(\Xxam\ContactBundle\Entity\Communicationdata $communicationdatas)
+    public function addCommunicationdata(\Xxam\CalendarBundle\Entity\Communicationdata $communicationdatas)
     {
         $this->communicationdatas[] = $communicationdatas;
 
@@ -570,9 +556,9 @@ class Contact implements Base\TenantInterface
     /**
      * Remove communicationdatas
      *
-     * @param \Xxam\ContactBundle\Entity\Communicationdata $communicationdatas
+     * @param \Xxam\CalendarBundle\Entity\Communicationdata $communicationdatas
      */
-    public function removeCommunicationdata(\Xxam\ContactBundle\Entity\Communicationdata $communicationdatas)
+    public function removeCommunicationdata(\Xxam\CalendarBundle\Entity\Communicationdata $communicationdatas)
     {
         $this->communicationdatas->removeElement($communicationdatas);
     }

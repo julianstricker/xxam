@@ -150,10 +150,9 @@ class FilemanagerBaseController extends Controller {
                 break;
         }
         if(!$adapter) return false;
-        if ($settings['cache']){
-            $memcached = new \Memcached;
-            $memcached->addServer('localhost', 11211);
-
+        if (!empty($settings['cache']) && $settings['cache']){
+            $memcached = $this->get('memcached');
+            dump($memcached);
             $cadapter = new CachedAdapter(
                 $adapter,
                 new Cache($memcached, 'xxam_filemanager_'.$filesystem->getId(), 300)
@@ -247,7 +246,7 @@ class FilemanagerBaseController extends Controller {
                     'basename' => $content['basename'],
                     'name' => $content['basename'],
                     'icon' => '/bundles/xxamcore/icons/16x16/folder.png',
-                    'timestamp' => $content['timestamp']
+                    'timestamp' => isset($content['timestamp']) ? $content['timestamp'] : null
                 );
             }
         }
@@ -266,9 +265,9 @@ class FilemanagerBaseController extends Controller {
             $children[] = Array(
                 'id' => (string)$filesystem->getId() . '/' . $content['path'],
                 'name' => $content['basename'],
-                'timestamp' => $content['timestamp'],
+                'timestamp' => isset($content['timestamp']) ? $content['timestamp'] : null,
                 'type' => $content['type'],
-                'size' => $content['size'],
+                'size' => isset($content['size']) ? $content['size'] : null,
                 //'thumbnail'=>$fs->getThumbnail($content['path'],'s')
             );
         }

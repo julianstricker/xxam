@@ -17,7 +17,6 @@ Ext.require([
     'Ext.ux.PreviewPlugin',
     'Ext.ux.RowExpander',
     'Ext.ux.IFrame'
-
 ]);
 
 Ext.Component.override({
@@ -310,7 +309,6 @@ Ext.onReady(function() {
                         activeTab: 0, // First tab active by default
                         plugins: [tabReorder],
                         items: []
-
 
                     },
                     {
@@ -1077,6 +1075,8 @@ function loadtab() {
                         loader.getTarget().setTitle(items.tabtitle);
                     if (typeof (items.tabicon) != 'undefined')
                         loader.getTarget().setIcon(items.tabicon);
+                    if (typeof (items.iconCls) != 'undefined')
+                        loader.getTarget().setIconCls(items.iconCls);
                     if (active.removeAll) {
                         target.removeAll();
                     }
@@ -1090,7 +1090,17 @@ function loadtab() {
                 return success;
             },
             failure: function(loader, response) {
-                Ext.Msg.alert('Failed', response ? response : 'No response');
+                Ext.create('Ext.window.MessageBox', {
+                    resizable: true,
+                    scrollable: true,
+                    maxWidth: 1000
+                }).show({
+                    title:'Failed',
+                    message: response ? response : 'No response',
+                    buttons: Ext.Msg.OK,
+                    icon: Ext.Msg.ALERT
+                });
+
                 loader.target.close();
             }
         },
@@ -1098,7 +1108,13 @@ function loadtab() {
             beforeactivate: function(tab) {
                 window.location.hash = '#' + tab.loader.url.substring(xxam_core_homepage.length);
                 return true;
+            },
+            beforeclose: function(tab) {
+                if (tab.up('tabpanel').items.length==1) window.location.hash = '#';
+                //window.location.hash = '#' + tab.loader.url.substring(xxam_core_homepage.length);
+                return true;
             }
+
 
         }
     });
@@ -1110,6 +1126,77 @@ function loadtab() {
     });
 }
 
+function showlogentries(entityname,id) {
+    if (typeof(LogentrieslistModel) == 'undefined') {
+        Ext.define('LogentrieslistModel', {
+            extend: 'Ext.data.Model',
+            fields: [
+                {name: 'logged_at', type: 'date', dateFormat:"Y-m-d H:i:s"},
+                {name: 'action', type: 'string'},
+                {name: 'object_id', type: 'int'},
+                {name: 'username', type: 'string'},
+                {name: 'version', type: 'int'}
+            ],
+            idProperty: 'version'
+        });
+    }
+    var logentrieslist_store = Ext.create('Ext.data.Store', {
+        model: 'LogentrieslistModel',
+        remoteSort: false,
+        pageSize: 100,
+
+        proxy: {
+            type: 'ajax',
+            url: xxam_core_getlogentries,
+            extraParams:{
+                entityname: entityname,
+                id: id
+            },
+            reader: {
+                type: 'json',
+                rootProperty: 'logentries',
+
+            }
+        },
+        autoLoad: true
+    });
+
+    Ext.create('Ext.window.Window', {
+        title: logentrieswindowtitle,
+        height: 200,
+        width: 500,
+        layout: 'fit',
+        items: {  // Let's put an empty grid in just to illustrate fit layout
+            xtype: 'grid',
+            border: false,
+            columns: [
+                {"text":"Id","dataIndex":"id","filter":{"type":"number"}, flex: 1, "hidden":true},
+                {'text': 'Version','dataIndex':'version',"filter":{"type":"number"}, flex: 1, "hidden":false},
+                {"text":"Time","dataIndex":"logged_at","xtype":"datecolumn", flex: 2, "format":"Y-m-d H:i:s","hidden":false},
+                {'text': 'Action','dataIndex':'action',"filter":{"type":"string"}, flex: 2, "hidden":false},
+                {'text': 'User','dataIndex':'username',"filter":{"type":"string"}, flex: 2, "hidden":false},
+                {
+                    menuDisabled: true,
+                    sortable: false,
+                    xtype: 'actioncolumn',
+                    width: 100,
+                    flex: 1,
+                    items: [{
+                        //icon: '/bundles/xxamdynmod/icons/16x16/user_edit.png',
+                        iconCls: 'x-fa fa-edit',
+                        tooltip: 'get version',
+                        handler: function (grid, rowIndex, colIndex) {
+                            var rec = grid.getStore().getAt(rowIndex);
+                            window.location.href = '#dynmod/edit/' + rec.get('object_id') + '?version=' + rec.get('version');
+                        }
+                    }]
+                }
+            ],
+            store: logentrieslist_store
+        }
+    }).show();
+
+}
 
 if ('onhashchange' in window) {
     window.onhashchange = function() {

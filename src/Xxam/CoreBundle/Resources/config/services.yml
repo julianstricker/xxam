@@ -7,13 +7,12 @@ services:
 #every portal-widget must start with "xxamportalwidget...."
     xxamportalwidget.core.feed:
         class: Xxam\CoreBundle\Controller\FeedWidgetController
-       # arguments: ["@templating"]
+        # arguments: ["@templating"]
+        arguments: ["@security.token_storage"]
         tags:
             -  { name: xxamportalwidget }
             
-    
-        
-        
+
             
     kernel.listener.tenantsetparameter:    
        class: Xxam\CoreBundle\EventListener\TenantSetParameter
@@ -31,6 +30,12 @@ services:
         class: Xxam\CoreBundle\EventListener\TenantSetter
         tags:
             - { name: doctrine.event_listener, event: prePersist }
+
+    memcached:
+        class: Xxam\CoreBundle\Services\MemcachedService
+        arguments: [ '%memcached_persistent_id%','%memcached_server_host%','%memcached_server_port%','%memcached_options%' ]
+        tags:
+           - { name: xxammemcached}
             
             
 #    xxam_bit_ratchet_server:

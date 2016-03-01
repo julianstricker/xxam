@@ -35,6 +35,7 @@ class AppKernel extends Kernel
             //new FOS\RestBundle\FOSRestBundle(),
             //new Exercise\HTMLPurifierBundle\ExerciseHTMLPurifierBundle(),
             new Xxam\CommBundle\XxamCommBundle(),
+            new Xxam\DynmodBundle\XxamDynmodBundle(),
 
 
         );

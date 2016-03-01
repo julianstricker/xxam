@@ -63,7 +63,7 @@
         "react/react": "^0.4.2",
         "friendsofsymfony/rest-bundle": "^1.7",
         "nelmio/cors-bundle": "^1.4",
-        "symfony/assetic-bundle": "^2.7",
+        "symfony/assetic-bundle": "dev-master",
         "sensio/generator-bundle": "~2.5",
         "twig/extensions": "^1.3",
         "voryx/restgeneratorbundle": "^0.3.0"

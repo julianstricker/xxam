@@ -7,7 +7,8 @@
 {% set defaultaccountname = '' %}
 {
     tabtitle: '{% trans %}Write Mail{% endtrans %}',
-    tabicon: '/bundles/xxammailclient/icons/16x16/email_edit.png',
+    //tabicon: '/bundles/xxammailclient/icons/16x16/email_edit.png',
+    iconCls: 'x-fa fa-envelope',
     getitems: function (){
         if (typeof(Xxam.form) == 'undefined' || typeof(Xxam.form.field) == 'undefined' || typeof(Xxam.form.field.tag) == 'undefined'){
             Ext.define('Xxam.form.field.tag', {

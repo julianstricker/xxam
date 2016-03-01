@@ -15,6 +15,7 @@ use Xxam\UserBundle\Entity\User;
  *       @ORM\Index(name="ix_tenant_id", columns={"tenant_id"})
  *     })
  * @ORM\Entity(repositoryClass="Xxam\FilemanagerBundle\Entity\FilesystemRepository")
+ * @Gedmo\Loggable(logEntryClass="Xxam\CoreBundle\Entity\LogEntry")
  */
 class Filesystem implements Base\TenantInterface
 {
@@ -29,6 +30,7 @@ class Filesystem implements Base\TenantInterface
     
     /**
      * @ORM\Column(type="integer", nullable=true)
+     * @Gedmo\Versioned
      */
     private $user_id;
     
@@ -36,6 +38,7 @@ class Filesystem implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="filesystemname", type="string", length=50)
+     * @Gedmo\Versioned
      */
     protected $filesystemname;
     
@@ -43,6 +46,7 @@ class Filesystem implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="adapter", type="string", length=50)
+     * @Gedmo\Versioned
      */
     protected $adapter;
     
@@ -50,6 +54,7 @@ class Filesystem implements Base\TenantInterface
      * @var string
      *
      * @ORM\Column(name="settings", type="string", length=1023)
+     * @Gedmo\Versioned
      */
     protected $settings;
     

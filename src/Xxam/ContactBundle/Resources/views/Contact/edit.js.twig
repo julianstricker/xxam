@@ -5,6 +5,7 @@
 {% endif %}
 {
     tabtitle: '{% if entity.id %}{% trans with {'%firstname%': entity.firstname, '%lastname%': entity.lastname} %}Edit %firstname% %lastname%{% endtrans %}{% else %}{% trans %}Create new contact{% endtrans %}{% endif %}',
+    iconCls: 'x-fa fa-users',
     getitems: function(){
         if (typeof(ContactModel)=='undefined'){
           Ext.define('ContactModel',{

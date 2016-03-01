@@ -18,6 +18,12 @@ parameters:
 
   exttheme: 'aria' #carbon, aria, classic, gray, crisp, crisp-touch, neptune, neptune-touch
 
+  memcached_persistent_id: xxam
+  memcached_server_host:  localhost
+  memcached_server_port: 11211
+  memcached_options: {  }
+
+
 
 framework:
     #esi:             ~
@@ -110,8 +116,9 @@ doctrine:
                     gedmo_loggable:
                         type: annotation
                         prefix: Gedmo\Loggable\Entity
-                        dir: "%kernel.root_dir%/../vendor/gedmo/doctrine-extensions/lib/Gedmo/Loggable/Entity"
-                        alias: GedmoLoggable # this one is optional and will default to the name set for the mapping
+                        #dir: "%kernel.root_dir%/../vendor/gedmo/doctrine-extensions/lib/Gedmo/Loggable/Entity"
+                        dir: "%kernel.root_dir%/../src/Xxam/CoreBundle/Entity"
+                        alias: GedmoLoggable # this one is optional and will default to the nae set for the mapping
                         is_bundle: false
 
 
@@ -145,6 +152,7 @@ stof_doctrine_extensions:
         default: 
           timestampable: true
           softdeleteable: true
+          loggable: true
           
 #fos_rest:
 #    view:

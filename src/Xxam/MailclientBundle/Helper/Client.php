@@ -70,8 +70,7 @@ class Client implements WebSocketClientInterface
     {
         $this->tenant_id=$tenant_id;
         $this->em=$em;
-        $this->memcached = new \Memcached;
-        $this->memcached->addServer('localhost', 11211);
+        $this->memcached = $this->get('memcached');
         $this->loop = $loop;
 
     }
@@ -106,12 +105,15 @@ class Client implements WebSocketClientInterface
     public function onWelcome(array $data)
     {
         $sessionid=$data[1]['id'];
-        $this->memcached->add('chatsessionid_'.$sessionid,array(
+        $storedata=array(
             'tenant_id'=>$this->tenant_id,
             'user_id'=>null,
             'username'=>'Imapidle',
             'sessionid'=>$sessionid
-        ));
+        );
+
+        $this->memcached->add('chatsessionid_'.$sessionid,$storedata);
+        dump($storedata);
         $this->subscribe('com.xxam.imap');
         //$this->client->send([self::MSG_GETONLINE,["topic"=>'com.xxam.imap']]);
     }
