@@ -28,14 +28,11 @@
         xtype: 'form',
         layout: 'form',
         defaultType: 'textfield',
+        scrollable: true,
         defaults: {
             labelWidth: 120
         },
         items: [{
-            xtype: 'display',
-            name: 'id',
-            value: '{{entity.id}}'
-        },{
             xtype: 'hiddenfield',
             name: 'id',
             value: '{{entity.id}}'
@@ -56,53 +53,66 @@
             name: 'help',
             value: '{{entity.help}}'
         }],
-        buttons: [{
-            text: '{%trans%}Save{%endtrans%}',
-            handler: function() {
-                // The getForm() method returns the Ext.form.Basic instance:
-                var form = this.up('form').getForm();
-                if (form.isValid()) {
-                    console.log(typeof(DynmodModel));
-                    var newdynmod=Ext.create('DynmodModel',form.getValues());
-                    console.log(newdynmod);
+        dockedItems: [{
+            xtype: 'toolbar',
+            dock: 'bottom',
+            ui: 'footer',
+            //defaults: {minWidth: minButtonWidth},
+            items: [{% if log %}
+                { xtype: 'tbtext', html: 'Version {{ log.getVersion() }} from {{ log.getLoggedAt()|localizeddate('short','short') }} created by {{ log.getUsername() }}' },
+                {% endif %}
+                { xtype: 'component', flex: 1 },
+                {
+                    xtype: 'button',
+                    text: '{%trans%}Save{%endtrans%}',
+                    handler: function() {
+                        // The getForm() method returns the Ext.form.Basic instance:
+                        var form = this.up('form').getForm();
+                        if (form.isValid()) {
+                            console.log(typeof(DynmodModel));
+                            var newdynmod=Ext.create('DynmodModel',form.getValues());
+                            console.log(newdynmod);
 
-                    // Submit the Ajax request and handle the response
-                    newdynmod.save({
-                        scope: this.up('form'),
-                        success: function(dynmod) {
-                            ttt=this;
-                            this.up('panel').close();
-                            if (typeof Ext.getCmp('dynmodlist') !='undefined'){
-                                Ext.getCmp('dynmodlist').getStore().load({
-                                    callback: function(records, operation, success) {
-                                        //Ext.getCmp('mailclient_maillist').view.scrollTo(0,scrollpos);
+                            // Submit the Ajax request and handle the response
+                            newdynmod.save({
+                                scope: this.up('form'),
+                                success: function(dynmod) {
+                                    ttt=this;
+                                    this.up('panel').close();
+                                    if (typeof Ext.getCmp('dynmodlist') !='undefined'){
+                                        Ext.getCmp('dynmodlist').getStore().load({
+                                            callback: function(records, operation, success) {
+                                                //Ext.getCmp('mailclient_maillist').view.scrollTo(0,scrollpos);
+                                            }
+                                        });
                                     }
-                                });
-                            }
-                            //Ext.Msg.alert('Success', action.result.message);
-                        },
-                        failure: function(dynmod, operation) {
-                            ttt=this;
-                            ddd=dynmod;
-                            ooo=operation;
-                            console.log(this,dynmod,operation.error.response.responseText);
-                            var error=Ext.JSON.decode(operation.error.response.responseText);
-                            if (error){
-                                if(error.errors && error.errors.form && error.errors.form.children){
-                                    var errors=[];
-                                    Ext.Object.each(error.errors.form.children,function(key,value){
-                                        errors.push({field:key,message:value.errors});
-                                    });
-                                    this.getForm().markInvalid(errors);
-                                    console.log(errors);
+                                    //Ext.Msg.alert('Success', action.result.message);
+                                },
+                                failure: function(dynmod, operation) {
+                                    ttt=this;
+                                    ddd=dynmod;
+                                    ooo=operation;
+                                    console.log(this,dynmod,operation.error.response.responseText);
+                                    var error=Ext.JSON.decode(operation.error.response.responseText);
+                                    if (error){
+                                        if(error.errors && error.errors.form && error.errors.form.children){
+                                            var errors=[];
+                                            Ext.Object.each(error.errors.form.children,function(key,value){
+                                                errors.push({field:key,message:value.errors});
+                                            });
+                                            this.getForm().markInvalid(errors);
+                                            console.log(errors);
+                                        }
+                                    }
+                                    //Ext.Msg.alert('Failed', action.result ? action.result.message : 'No response');
                                 }
-                            }
-                            //Ext.Msg.alert('Failed', action.result ? action.result.message : 'No response');
+                            });
                         }
-                    });
+                    }
                 }
-            }
+            ]
         }]
+
     }
 }
 }
