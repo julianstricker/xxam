@@ -1,0 +1,3 @@
+xxam_help:
+    resource: "@XxamHelpBundle/Controller/HelpController.php"
+    type: annotation
