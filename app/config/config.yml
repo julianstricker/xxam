@@ -62,11 +62,7 @@ twig:
         #menu: %menu%
         tenants: %tenants%
     
-    form:
-      resources:
-        #- SimpleThingsFormExtraBundle:Form:translation_domain.html.twig
-        #- SimpleThingsFormExtraBundle:Form:field_type_help.html.twig
-        #- XxamCoreBundle:Form:extformfields.js.twig
+
 
 # Assetic Configuration
 assetic:
