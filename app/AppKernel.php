@@ -34,9 +34,10 @@ class AppKernel extends Kernel
             //new Oneup\FlysystemBundle\OneupFlysystemBundle(),
             //new FOS\RestBundle\FOSRestBundle(),
             //new Exercise\HTMLPurifierBundle\ExerciseHTMLPurifierBundle(),
+            new Knp\Bundle\MarkdownBundle\KnpMarkdownBundle(), //fürs HelpBundle
             new Xxam\CommBundle\XxamCommBundle(),
             new Xxam\DynmodBundle\XxamDynmodBundle(),
-
+            new Xxam\HelpBundle\XxamHelpBundle(),
 
         );
 

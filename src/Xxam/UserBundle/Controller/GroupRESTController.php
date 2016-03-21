@@ -2,6 +2,7 @@
 
 namespace Xxam\UserBundle\Controller;
 
+use Xxam\CoreBundle\Controller\Base\BaseRestController;
 use Xxam\UserBundle\Entity\Group;
 use Xxam\UserBundle\Form\Type\GroupType;
 
@@ -18,13 +19,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
-use Voryx\RESTGeneratorBundle\Controller\VoryxController;
 
 /**
  * Group controller.
  * @RouteResource("Group")
  */
-class GroupRESTController extends VoryxController
+class GroupRESTController extends BaseRestController
 {
     use Base\UserTrait;
     /**

@@ -2,6 +2,7 @@
 
 namespace Xxam\FilemanagerBundle\Controller;
 
+use Xxam\CoreBundle\Controller\Base\BaseRestController;
 use Xxam\FilemanagerBundle\Entity\Filesystem;
 
 
@@ -16,7 +17,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-use Voryx\RESTGeneratorBundle\Controller\VoryxController;
 use Xxam\FilemanagerBundle\Entity\FilesystemRepository;
 use Xxam\FilemanagerBundle\Form\Type\FilesystemType;
 
@@ -24,7 +24,7 @@ use Xxam\FilemanagerBundle\Form\Type\FilesystemType;
  * Filemanager controller.
  * @RouteResource("Filemanager")
  */
-class FilemanagerRESTController extends VoryxController
+class FilemanagerRESTController extends BaseRestController
 {
     /**
      * Get a Filesystem entity

@@ -19,5 +19,4 @@ class MemcachedService extends \Memcached
         $this->addServer($this->server_host,$this->server_port);
         $this->setOptions($this->options);
     }
-
 }

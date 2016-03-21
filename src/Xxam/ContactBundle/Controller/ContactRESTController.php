@@ -3,6 +3,7 @@
 namespace Xxam\ContactBundle\Controller;
 
 use Xxam\ContactBundle\Entity\Contact;
+use Xxam\ContactBundle\Entity\ContactRepository;
 use Xxam\ContactBundle\Form\Type\ContactType;
 
 use FOS\RestBundle\Controller\Annotations\QueryParam;
@@ -15,13 +16,13 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-use Voryx\RESTGeneratorBundle\Controller\VoryxController;
+use Xxam\CoreBundle\Controller\Base\BaseRestController;
 
 /**
  * Contact controller.
  * @RouteResource("Contact")
  */
-class ContactRESTController extends VoryxController
+class ContactRESTController extends BaseRestController
 {
     /**
      * Get a Contact entity
@@ -64,7 +65,9 @@ class ContactRESTController extends VoryxController
             $entities = $em->getRepository('XxamContactBundle:Contact')->findBy($filters, $order_by, $limit, $offset);
             if ($entities) {
                 //total:
-                $total = $em->getRepository('XxamContactBundle:Contact')->getTotalcount($filters);
+                /** @var ContactRepository $repository */
+                $repository=$em->getRepository('XxamContactBundle:Contact');
+                $total = $repository->getTotalcount($filters);
                 return array('contacts'=>$entities, 'limit'=>$limit,'offset'=>$offset, 'totalCount'=>$total);
             }
 
@@ -156,7 +159,6 @@ class ContactRESTController extends VoryxController
      *
      * @View(statusCode=204)
      *
-     * @param Request $request
      * @param $entity
      * @internal param $id
      *
@@ -164,7 +166,7 @@ class ContactRESTController extends VoryxController
      * 
      * @Security("has_role('ROLE_CONTACT_DELETE')")
      */
-    public function deleteAction(Request $request, Contact $entity)
+    public function deleteAction(Contact $entity)
     {
         try {
             $em = $this->getDoctrine()->getManager();

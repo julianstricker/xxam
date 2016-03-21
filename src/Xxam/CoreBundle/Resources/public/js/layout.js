@@ -260,9 +260,9 @@ Ext.onReady(function() {
 
                 items: [{
 
-                         id: 'header',
-                         region: 'north',
-                         tbar: {
+                    id: 'header',
+                    region: 'north',
+                    tbar: {
                         weight: -100,
                         defaults: {
                             reorderable: true,
@@ -283,6 +283,7 @@ Ext.onReady(function() {
                             stateful: true
                         },
                         id: 'xxam_menu',
+                        overflowHandler: 'menu',
                         plugins: Ext.create('Ext.ux.BoxReorderer', {
                             listeners: {
                                 drop: function(source, container, dragCmp, startIdx, idx, eOpts) {

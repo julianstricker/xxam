@@ -3,6 +3,7 @@
 namespace Xxam\DynmodBundle\Controller;
 
 
+use Xxam\CoreBundle\Controller\Base\BaseRestController;
 use Xxam\DynmodBundle\Entity\Dynmod;
 use Xxam\DynmodBundle\Form\Type\DynmodType;
 
@@ -16,13 +17,11 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-use Voryx\RESTGeneratorBundle\Controller\VoryxController;
-
 /**
  * Dynmod controller.
  * @RouteResource("Dynmod")
  */
-class DynmodRESTController extends VoryxController
+class DynmodRESTController extends BaseRestController
 {
     /**
      * Get a Dynmod entity

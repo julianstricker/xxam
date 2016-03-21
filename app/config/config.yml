@@ -247,3 +247,6 @@ just_thumbnail:
     #placeholder: "/path/to/a/placeholder/image.jpg"
     expiretime: 86400
     
+knp_markdown:
+    parser:
+        service: markdown.parser.max

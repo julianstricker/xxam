@@ -3,6 +3,7 @@
 namespace Xxam\UserBundle\Controller;
 
 use FOS\UserBundle\Doctrine\UserManager;
+use Xxam\CoreBundle\Controller\Base\BaseRestController;
 use Xxam\UserBundle\Entity\User;
 use Xxam\UserBundle\Entity\UserRepository;
 use Xxam\UserBundle\Form\Type\UserType;
@@ -17,13 +18,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-use Voryx\RESTGeneratorBundle\Controller\VoryxController;
 
 /**
  * User controller.
  * @RouteResource("User")
  */
-class UserRESTController extends VoryxController
+class UserRESTController extends BaseRestController
 {
     use Base\UserTrait;
     /**
