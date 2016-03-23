@@ -88,7 +88,8 @@ class DynmodRESTController extends BaseRestController
     public function postAction(Request $request)
     {
         $entity = new Dynmod();
-        $form = $this->createForm(new DynmodType(), $entity, array("method" => $request->getMethod()));
+        $dynmodType=new DynmodType();
+        $form = $this->createForm('Xxam\DynmodBundle\Form\Type\DynmodType', $entity, array("method" => $request->getMethod()));
         $this->removeExtraFields($request, $form);
         $form->handleRequest($request);
 
@@ -120,7 +121,7 @@ class DynmodRESTController extends BaseRestController
             $em = $this->getDoctrine()->getManager();
             
             //$request->setMethod('PATCH'); //Treat all PUTs as PATCH
-            $form = $this->createForm(new DynmodType(), $entity, array("method" => $request->getMethod()));
+            $form = $this->createForm('Xxam\DynmodBundle\Form\Type\DynmodType', $entity, array("method" => $request->getMethod()));
             $this->removeExtraFields($request, $form);
             $form->handleRequest($request);
             

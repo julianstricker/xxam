@@ -49,7 +49,7 @@ class DynmodController extends Controller
         /** @var DynmodRepository $repository */
         $repository=$this->getDoctrine()->getManager()->getRepository('XxamDynmodBundle:Dynmod');
         $entity=new Dynmod();
-        return $this->render('XxamDynmodBundle:Dynmod:edit.js.twig', array('entity'=>$entity,'modelfields'=>$repository->getModelFields()));
+        return $this->render('XxamDynmodBundle:Dynmod:edit.js.twig', array('entity'=>$entity,'modelfields'=>$repository->getModelFields(),'log'=>null));
     }
 
     /**

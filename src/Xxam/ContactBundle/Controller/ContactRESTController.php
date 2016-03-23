@@ -90,7 +90,8 @@ class ContactRESTController extends BaseRestController
     public function postAction(Request $request)
     {
         $entity = new Contact();
-        $form = $this->createForm(new ContactType($this->container->getParameter('contacttypes')), $entity, array("method" => $request->getMethod()));
+        //new ContactType($this->container->getParameter('contacttypes')
+        $form = $this->createForm('Xxam\ContactBundle\Form\Type\ContactType', $entity, array("method" => $request->getMethod(),'contacttypes' => $this->container->getParameter('contacttypes')));
         $this->removeExtraFields($request, $form);
         $form->handleRequest($request);
 

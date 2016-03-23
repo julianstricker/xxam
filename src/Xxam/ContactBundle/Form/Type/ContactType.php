@@ -4,7 +4,7 @@ namespace Xxam\ContactBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ContactType extends AbstractType
 {
@@ -34,13 +34,16 @@ class ContactType extends AbstractType
         ;
     }
     
+
+
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Xxam\ContactBundle\Entity\Contact'
+            'data_class' => 'Xxam\ContactBundle\Entity\Contact',
+            'contacttypes' => []
         ));
     }
 
@@ -56,9 +59,9 @@ class ContactType extends AbstractType
     protected $em;
     protected $contacttypes;
     
-    public function __construct($contacttypes)
+    public function __construct()
     {
         //$this->em = $em;
-        $this->contacttypes = $contacttypes;
+        //$this->contacttypes = $contacttypes;
     }
 }
