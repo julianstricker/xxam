@@ -123,7 +123,8 @@ class ContactRESTController extends BaseRestController
             $em = $this->getDoctrine()->getManager();
             
             //$request->setMethod('PATCH'); //Treat all PUTs as PATCH
-            $form = $this->createForm(new ContactType($this->container->getParameter('contacttypes')), $entity, array("method" => $request->getMethod()));
+            $form = $this->createForm('Xxam\ContactBundle\Form\Type\ContactType', $entity, array("method" => $request->getMethod(),'contacttypes' => $this->container->getParameter('contacttypes')));
+
             $this->removeExtraFields($request, $form);
             $form->handleRequest($request);
             

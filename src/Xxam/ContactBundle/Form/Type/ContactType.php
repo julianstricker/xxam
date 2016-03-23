@@ -3,6 +3,8 @@
 namespace Xxam\ContactBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -14,9 +16,10 @@ class ContactType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $contacttypes=array_flip($options['contacttypes']);
         $builder
             ->add('contact_id')
-            ->add('contacttype_id', 'choice', array('required' => true,'choices'=> $this->contacttypes, 'empty_value' => '', 'empty_data'  => null))
+            ->add('contacttype_id', ChoiceType::class, array('required' => true,'choices'=> $contacttypes, 'placeholder' => '', 'empty_data'  => null))
             ->add('organizationname')
             ->add('lastname')
             ->add('firstname')
@@ -25,7 +28,7 @@ class ContactType extends AbstractType
             ->add('nickname')
             ->add('vat')
             ->add('tax')
-            ->add('birthday','date',array('input'=>'datetime', /*'format' => 'dd.MM.yyyy',*/ 'widget'=>'single_text'))
+            ->add('birthday',DateType::class, array('input'=>'datetime', /*'format' => 'dd.MM.yyyy',*/ 'widget'=>'single_text'))
             ->add('photo')
             ->add('organizationfunction')
             //->add('addresses')
@@ -54,14 +57,5 @@ class ContactType extends AbstractType
     {
         return 'xxam_contactbundle_contact';
     }
-    
-    
-    protected $em;
-    protected $contacttypes;
-    
-    public function __construct()
-    {
-        //$this->em = $em;
-        //$this->contacttypes = $contacttypes;
-    }
+
 }
