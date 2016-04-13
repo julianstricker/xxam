@@ -87,10 +87,15 @@ class MailclientController extends MailclientBaseController {
                         $subfolder['leaf']=false;
                         $subfolder['loaded']=false;
                         $subfolder['expanded']=false;
-                        if ($mailaccountid.$mailaccount->getTrashfolder()==$path) $subfolder['children'][$fexp]['icon']='/bundles/xxammailclient/icons/16x16/bin.png';
+                        /*if ($mailaccountid.$mailaccount->getTrashfolder()==$path) $subfolder['children'][$fexp]['icon']='/bundles/xxammailclient/icons/16x16/bin.png';
                         if ($mailaccountid.$mailaccount->getJunkfolder()==$path) $subfolder['children'][$fexp]['icon']='/bundles/xxammailclient/icons/16x16/spam_assassin.png';
                         if ($mailaccountid.$mailaccount->getSentfolder()==$path) $subfolder['children'][$fexp]['icon']='/bundles/xxammailclient/icons/16x16/email_go.png';
-                        if ($mailaccountid.$mailaccount->getDraftfolder()==$path) $subfolder['children'][$fexp]['icon']='/bundles/xxammailclient/icons/16x16/email_edit.png';
+                        if ($mailaccountid.$mailaccount->getDraftfolder()==$path) $subfolder['children'][$fexp]['icon']='/bundles/xxammailclient/icons/16x16/email_edit.png';*/
+
+                        if ($mailaccountid.$mailaccount->getTrashfolder()==$path) $subfolder['children'][$fexp]['iconCls']='fa fa-recycle';
+                        if ($mailaccountid.$mailaccount->getJunkfolder()==$path) $subfolder['children'][$fexp]['iconCls']='fa fa-trash-o';
+                        if ($mailaccountid.$mailaccount->getSentfolder()==$path) $subfolder['children'][$fexp]['iconCls']='fa fa-send-o';
+                        if ($mailaccountid.$mailaccount->getDraftfolder()==$path) $subfolder['children'][$fexp]['iconCls']='fa fa-pencil-square-o';
                     }
                     $subfolder = &$subfolder['children'][$fexp];
                 }
@@ -212,13 +217,15 @@ class MailclientController extends MailclientBaseController {
         unset($mail->textPlain);
         $attachments=Array();
         foreach($mail->getAttachments() as $attachment){
-            $attachments[]=Array(
-                'id'=>$attachment->id,
-                'name'=>$attachment->name,
-                'filesize'=>0, //$attachment->fileSize,
-                'filepath'=>str_replace($this->attachments_dir,$this->attachmentsbase_dir,$attachment->filePath)
-                
-            );
+            if ($attachment->disposition=='attachment') {
+                $attachments[] = Array(
+                    'id' => $attachment->id,
+                    'name' => $attachment->name,
+                    'filesize' => 0, //$attachment->fileSize,
+                    'filepath' => str_replace($this->attachments_dir, $this->attachmentsbase_dir, $attachment->filePath)
+
+                );
+            }
         }
         $mail->files=$attachments;
         $returndata=$mail;

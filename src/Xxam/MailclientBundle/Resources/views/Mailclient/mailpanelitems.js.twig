@@ -167,8 +167,10 @@
                                 tpl: new Ext.XTemplate(
                                     '<tpl for=".">',
                                         '<div style="margin: 2px;" class="mailclient_attachment thumb-wrap">',
+                                          '<a href="{filepath}" target="_blank">',
                                           '<img src="{thumbnail}" />',
                                           '<span class="filename">{name}</span><br/><span class="filesize">{[this.formatFilesize(values.filesize)]}</span>',
+                                          '</a>',
                                           '<div style="clear:both"></div>',
                                         '</div>',
                                     '</tpl>',

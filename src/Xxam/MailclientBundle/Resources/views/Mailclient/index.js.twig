@@ -122,7 +122,8 @@
                     text: '{%trans%}Refresh{%endtrans%}', 
                     tooltip: '{%trans%}Check for new messages{%endtrans%}', 
                     scale: '{{buttonsize}}', 
-                    icon: '/bundles/xxammailclient/icons/{{iconsize}}/arrow_refresh.png',
+                    //icon: '/bundles/xxammailclient/icons/{{iconsize}}/arrow_refresh.png',
+                    iconCls: 'x-fa fa-refresh',
                     handler: function(){
                         Ext.getCmp('mailclient_maillist').store.load();
                     }
@@ -132,13 +133,20 @@
                     text: '{%trans%}New{%endtrans%}', 
                     tooltip: '{%trans%}Create new message{%endtrans%}', 
                     scale: '{{buttonsize}}', 
-                    icon: '/bundles/xxammailclient/icons/{{iconsize}}/email_edit.png',
+                    //icon: '/bundles/xxammailclient/icons/{{iconsize}}/email_edit.png',
+                    iconCls: 'x-fa fa-pencil',
                     handler: function(){
                         window.location.href='#mailclient/write';
                     }
                 },
                 { xtype: 'tbfill'},
-                { xtype: 'button', text: '{%trans%}Settings{%endtrans%}', tooltip: '{%trans%}Settings{%endtrans%}', scale: '{{buttonsize}}', icon: '/bundles/xxammailclient/icons/{{iconsize}}/email_setting.png',
+                {
+                    xtype: 'button',
+                    text: '{%trans%}Settings{%endtrans%}',
+                    tooltip: '{%trans%}Settings{%endtrans%}',
+                    scale: '{{buttonsize}}',
+                    //icon: '/bundles/xxammailclient/icons/{{iconsize}}/email_setting.png',
+                    iconCls: 'x-fa fa-gears',
                     handler: function(){
                         window.location.href='#mailclient/settings';
                     }
@@ -355,7 +363,7 @@
                     bbar: mailclient_maillist_pagingtoolbar,
                     columns: [
                         { 
-                            text: 'Subject',  
+                            text: '{% trans %}Subject{% endtrans %}',
                             dataIndex: 'subject', 
                             stateId: 'mailclient_maillist_subject',
                             stateful: true,
@@ -363,15 +371,14 @@
                             cellWrap: true, 
                             filter: {type: 'string'},
                             renderer: function(value, metaData, record) {
-                                if(record.data.seen==true){
-                                    return Ext.String.htmlEncode(value);
-                                }else{
-                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                if(record.data.seen==false){
+                                    metaData.tdStyle = 'font-weight: bold;';
                                 }
+                                return Ext.String.htmlEncode(value);
                             } 
                         },
                         { 
-                            text: 'From', 
+                            text: '{% trans %}From{% endtrans %}',
                             dataIndex: 'from', 
                             stateId: 'mailclient_maillist_from',
                             stateful: true, 
@@ -379,86 +386,80 @@
                             renderer: function(value, metaData, record) {
                                 var from=Ext.String.trim(value.split('<')[0]).replace(/"/g,'');
                                 if(from=='') from = value;
-                                if(record.data.seen==true){
-                                    return Ext.String.htmlEncode(from);
-                                }else{
-                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(from));
+                                if(record.data.seen==false){
+                                    metaData.tdStyle = 'font-weight: bold;';
                                 }
+                                return Ext.String.htmlEncode(from);
                             } 
                         },
                         { 
-                            text: 'To', 
+                            text: '{% trans %}To{% endtrans %}',
                             dataIndex: 'to', 
                             stateId: 'mailclient_maillist_to',
                             stateful: true, 
                             hidden: true, 
                             filter: {type: 'string'},
                             renderer: function(value, metaData, record) {
-                                if(record.data.seen==true){
-                                    return Ext.String.htmlEncode(value);
-                                }else{
-                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                if(record.data.seen==false){
+                                    metaData.tdStyle = 'font-weight: bold;';
                                 }
+                                return Ext.String.htmlEncode(value);
                             } 
                         },
                         { 
-                            text: 'Date', 
+                            text: '{% trans %}Date{% endtrans %}',
                             dataIndex: 'date', 
                             stateId: 'mailclient_maillist_date',
                             stateful: true, 
                             filter: {type: 'date'},
                             renderer: function(value, metaData, record) {
-                                if(record.data.seen==true){
-                                    return Ext.String.htmlEncode(value);
-                                }else{
-                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                if(record.data.seen==false){
+                                    metaData.tdStyle = 'font-weight: bold;';
                                 }
+                                return Ext.String.htmlEncode(value);
                             } 
                         },
                         { 
-                            text: 'Message Id', 
+                            text: '{% trans %}Message Id{% endtrans %}',
                             dataIndex: 'message_id', 
                             stateId: 'mailclient_maillist_message_id',
                             stateful: true, 
                             hidden: true,
                             renderer: function(value, metaData, record) {
-                                if(record.data.seen==true){
-                                    return Ext.String.htmlEncode(value);
-                                }else{
-                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                if(record.data.seen==false){
+                                    metaData.tdStyle = 'font-weight: bold;';
                                 }
+                                return Ext.String.htmlEncode(value);
                             }  
                         },
                         { 
-                            text: 'References', 
+                            text: '{% trans %}References{% endtrans %}',
                             dataIndex: 'references', 
                             stateId: 'mailclient_maillist_references',
                             stateful: true, 
                             hidden: true,
                             renderer: function(value, metaData, record) {
-                                if(record.data.seen==true){
-                                    return Ext.String.htmlEncode(value);
-                                }else{
-                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                if(record.data.seen==false){
+                                    metaData.tdStyle = 'font-weight: bold;';
                                 }
+                                return Ext.String.htmlEncode(value);
                             }  
                         },
                         { 
-                            text: 'In reply to', 
+                            text: '{% trans %}In reply to{% endtrans %}',
                             dataIndex: 'in_reply_to', 
                             stateId: 'mailclient_maillist_in_reply_to',
                             stateful: true, 
                             hidden: true,
                             renderer: function(value, metaData, record) {
-                                if(record.data.seen==true){
-                                    return Ext.String.htmlEncode(value);
-                                }else{
-                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                if(record.data.seen==false){
+                                    metaData.tdStyle = 'font-weight: bold;';
                                 }
+                                return Ext.String.htmlEncode(value);
                             }  
                         },
                         { 
-                            text: 'Size', 
+                            text: '{% trans %}Size{% endtrans %}',
                             dataIndex: 'size', 
                             stateId: 'mailclient_maillist_size',
                             stateful: true,
@@ -473,43 +474,41 @@
                                 else{
                                     valuestring= '0 ' + 'bytes';
                                 }
-                                if(record.data.seen==true){
-                                    return Ext.String.htmlEncode(valuestring);
-                                }else{
-                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(valuestring));
+                                if(record.data.seen==false){
+                                    metaData.tdStyle = 'font-weight: bold;';
                                 }
+                                return Ext.String.htmlEncode(valuestring);
                             }  
                         },
                         { 
-                            text: 'Uid', 
+                            text: '{% trans %}Uid{% endtrans %}',
                             dataIndex: 'uid', 
                             stateId: 'mailclient_maillist_uid',
                             stateful: true, 
                             hidden: true,
                             renderer: function(value, metaData, record) {
-                                if(record.data.seen==true){
-                                    return Ext.String.htmlEncode(value);
-                                }else{
-                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                if(record.data.seen==false){
+                                    metaData.tdStyle = 'font-weight: bold;';
                                 }
+                                return Ext.String.htmlEncode(value);
                             }  
                         },
                         { 
-                            text: 'Msgno', 
+                            text: '{% trans %}Msgno{% endtrans %}',
                             dataIndex: 'msgno', 
                             stateId: 'mailclient_maillist_msgno',
                             stateful: true, 
                             hidden: true,
                             renderer: function(value, metaData, record) {
-                                if(record.data.seen==true){
-                                    return Ext.String.htmlEncode(value);
-                                }else{
-                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                if(record.data.seen==false){
+                                    metaData.tdStyle = 'font-weight: bold;';
                                 }
+                                return Ext.String.htmlEncode(value);
                             }  
                         },
-                        { 
-                            text: 'Recent', 
+                        {
+                            xtype: 'booleancolumn',
+                            text: '{% trans %}Recent{% endtrans %}',
                             dataIndex: 'recent', 
                             stateId: 'mailclient_maillist_recent',
                             stateful: true, 
@@ -517,14 +516,19 @@
                             filter: {type: 'boolean'},
                             renderer: function(value, metaData, record) {
                                 if(record.data.seen==true){
-                                    return Ext.String.htmlEncode(value);
+                                    //return Ext.String.htmlEncode(value);
+                                    return
                                 }else{
-                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                    //return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                    metaData.tdAttr = 'data-qtip={% trans %}Recent{% endtrans %}';
+                                    metaData.tdStyle = 'font-weight: bold;';
+                                    return '<div class="fa fa-star"></div>';
                                 }
                             }  
                         },
-                        { 
-                            text: 'Flagged', 
+                        {
+                            xtype: 'booleancolumn',
+                            text: '{% trans %}Flagged{% endtrans %}',
                             dataIndex: 'flagged', 
                             stateId: 'mailclient_maillist_flagged',
                             stateful: true, 
@@ -532,75 +536,87 @@
                             filter: {type: 'boolean'},
                             renderer: function(value, metaData, record) {
                                 if(value==true){
-                                    return '<img title="{% trans %}Flagged{% endtrans %}" alt="{% trans %}Flagged{% endtrans %}" src="/bundles/xxammailclient/icons/16x16/star.png" />';
+                                    //return '<img title="{% trans %}Flagged{% endtrans %}" alt="{% trans %}Flagged{% endtrans %}" src="/bundles/xxammailclient/icons/16x16/star.png" />';
+                                    //metaData.tdCls='fa fa-edit ' + Ext.baseCSSPrefix + 'action-col-cell';
+                                    metaData.tdAttr = 'data-qtip={% trans %}Flagged{% endtrans %}';
+                                    return '<div class="fa fa-bookmark"></div>';
+
                                 }else{
                                     return ' ';
                                 }
                             }  
                         },
-                        { 
-                            text: 'Answered', 
+                        {
+                            xtype: 'booleancolumn',
+                            text: '{% trans %}Answered{% endtrans %}',
                             dataIndex: 'answered', 
                             stateId: 'mailclient_maillist_answered',
                             stateful: true, 
                             hidden: true, 
                             filter: {type: 'boolean'},
                             renderer: function(value, metaData, record) {
-                                if(record.data.seen==true){
-                                    return Ext.String.htmlEncode(value);
+                                if(value==true){
+                                    metaData.tdAttr = 'data-qtip={% trans %}Answered{% endtrans %}';
+                                    return '<div class="fa fa-check"></div>';
                                 }else{
-                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                    return ' ';
                                 }
                             } 
                         },
-                        { 
-                            text: 'Deleted', 
+                        {
+                            xtype: 'booleancolumn',
+                            text: '{% trans %}Deleted{% endtrans %}',
                             dataIndex: 'deleted', 
                             stateId: 'mailclient_maillist_deleted',
                             stateful: true, 
                             hidden: true, 
                             filter: {type: 'boolean'},
                             renderer: function(value, metaData, record) {
-                                if(record.data.seen==true){
-                                    return Ext.String.htmlEncode(value);
+                                if(value==true){
+                                    metaData.tdAttr = 'data-qtip={% trans %}Deleted{% endtrans %}';
+                                    return '<div class="fa fa-check"></div>';
                                 }else{
-                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                    return ' ';
                                 }
                             }  
                         },
-                        { 
-                            text: 'Seen', 
+                        {
+                            xtype: 'booleancolumn',
+                            text: '{% trans %}Seen{% endtrans %}',
                             dataIndex: 'seen', 
                             stateId: 'mailclient_maillist_seen',
                             stateful: true, 
                             hidden: true, 
                             filter: {type: 'boolean'},
                             renderer: function(value, metaData, record) {
-                                if(record.data.seen==true){
-                                    return Ext.String.htmlEncode(value);
+                                if(value==true){
+                                    metaData.tdAttr = 'data-qtip={% trans %}Seen{% endtrans %}';
+                                    return '<div class="fa fa-check"></div>';
                                 }else{
-                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                    return ' ';
                                 }
                             }  
                         },
-                        { 
-                            text: 'Draft', 
+                        {
+                            xtype: 'booleancolumn',
+                            text: '{% trans %}Draft{% endtrans %}',
                             dataIndex: 'draft', 
                             stateId: 'mailclient_maillist_draft',
                             stateful: true, 
                             hidden: true,
                             renderer: function(value, metaData, record) {
-                                if(record.data.seen==true){
-                                    return Ext.String.htmlEncode(value);
+                                if(value==true){
+                                    metaData.tdAttr = 'data-qtip={% trans %}Draft{% endtrans %}';
+                                    return '<div class="fa fa-check"></div>';
                                 }else{
-                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                    return ' ';
                                 }
                             }  
                         },
-                        { 
-                            //text: 'Attachments', 
-                            header: '<img class="header-icon" src="/bundles/xxammailclient/icons/16x16/attach.png" />',
-                            
+                        {
+                            xtype: 'booleancolumn',
+                            //header: '<img class="header-icon" src="/bundles/xxammailclient/icons/16x16/attach.png" />',
+                            header: '<div class="fa fa-paperclip"></div>',
                             dataIndex: 'hasattachment', 
                             stateId: 'mailclient_maillist_hasattachment',
                             stateful: true, 
@@ -608,24 +624,24 @@
                             filter: {type: 'boolean'},
                             renderer: function(value, metaData, record) {
                                 if(value==true){
-                                    return '<img title="{% trans %}Attachment{% endtrans %}" alt="{% trans %}Attachment{% endtrans %}" src="/bundles/xxammailclient/icons/16x16/attach.png" />';
+                                    metaData.tdAttr = 'data-qtip={% trans %}Attachment{% endtrans %}';
+                                    return '<div class="fa fa-paperclip"></div>';
                                 }else{
                                     return ' ';
                                 }
                             }  
                         },
                         { 
-                            text: 'Udate', 
+                            text: '{% trans %}Udate{% endtrans %}',
                             dataIndex: 'udate', 
                             stateId: 'mailclient_maillist_udate',
                             stateful: true, 
                             hidden: true,
                             renderer: function(value, metaData, record) {
-                                if(record.data.seen==true){
-                                    return Ext.String.htmlEncode(value);
-                                }else{
-                                    return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
+                                if(record.data.seen==false){
+                                    metaData.tdStyle = 'font-weight: bold;';
                                 }
+                                return Ext.String.htmlEncode(value);
                             }  
                         }
                     ],
@@ -921,7 +937,11 @@
 
                                             });
                                             Ext.getCmp('mailclient_mailpanelattachments{{id}}').store.setData(storedata);
-                                            Ext.getCmp('mailclient_mailpanelattachments{{id}}').up('panel').expand();
+                                            if (storedata.length>0) {
+                                                Ext.getCmp('mailclient_mailpanelattachments{{ id }}').up('panel').expand();
+                                            }else{
+                                                Ext.getCmp('mailclient_mailpanelattachments{{ id }}').up('panel').collapse();
+                                            }
                                         }
                                         
                                         

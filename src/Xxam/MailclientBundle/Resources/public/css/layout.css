@@ -44,3 +44,20 @@
 .mailclient_attachment .filesize{
     font-style: italic;
 }
+.fa-trash-o:before {
+    content: "\f014" !important;
+}
+.fa-send-o:before {
+    content: "\f1d9" !important;
+}
+.fa-pencil-square-o:before {
+    content: "\f044" !important;
+}
+.fa-recycle:before {
+    content: "\f1b8" !important;
+}
+
+.x-tree-icon.x-tree-icon-custom.fa {
+    font-size: 16px;
+    line-height: 32px;
+}
