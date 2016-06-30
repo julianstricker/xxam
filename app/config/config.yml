@@ -119,6 +119,18 @@ doctrine:
 
 
 
+doctrine_cache:
+    aliases:
+        cache_apc: apc_cache
+
+    providers:
+        apc_cache:
+            type: apc
+            namespace: xxam
+        memcached_cache:
+            memcached:
+                servers:
+                    localhost: 11211
 
 
 
@@ -239,9 +251,10 @@ sensio_framework_extra:
     router:  { annotations: true }
     
 just_thumbnail:
-    #imagesrootdir: "/var/www/vhosts/xxam.com/xxam/web/"
-    #placeholder: "/path/to/a/placeholder/image.jpg"
-    expiretime: 86400
+    defaults:
+        #imagesrootdir: "/var/www/vhosts/xxam.com/xxam/web/"
+        #placeholder: "/path/to/a/placeholder/image.jpg"
+        expiretime: 86400
     
 knp_markdown:
     parser:

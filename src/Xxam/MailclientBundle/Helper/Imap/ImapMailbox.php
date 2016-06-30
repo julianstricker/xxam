@@ -102,6 +102,68 @@ class ImapMailbox extends Mbox{
         return imap_sort($this->getImapStream(), $criteria, $reverse, SE_UID, $searchcriteria, $this->serverEncoding);
     }
 
+    /**
+     * Get mail data and full headers
+     *
+     * @param $mailId
+     * @param bool $markAsSeen
+     * @return IncomingMail
+     */
+
+    public function getMail($mailId, $markAsSeen = true) {
+        $head = imap_rfc822_parse_headers(imap_fetchheader($this->getImapStream(), $mailId, FT_UID));
+
+        $mail = new IncomingMail();
+        $mail->id = $mailId;
+        $mail->date = date('Y-m-d H:i:s', isset($head->date) ? strtotime(preg_replace('/\(.*?\)/', '', $head->date)) : time());
+        $mail->subject = isset($head->subject) ? $this->decodeMimeStr($head->subject, $this->serverEncoding) : null;
+        $mail->fromName = isset($head->from[0]->personal) ? $this->decodeMimeStr($head->from[0]->personal, $this->serverEncoding) : null;
+        $mail->fromAddress = strtolower($head->from[0]->mailbox . '@' . $head->from[0]->host);
+        $mail->headers=$head;
+
+        if(isset($head->to)) {
+            $toStrings = array();
+            foreach($head->to as $to) {
+                if(!empty($to->mailbox) && !empty($to->host)) {
+                    $toEmail = strtolower($to->mailbox . '@' . $to->host);
+                    $toName = isset($to->personal) ? $this->decodeMimeStr($to->personal, $this->serverEncoding) : null;
+                    $toStrings[] = $toName ? "$toName <$toEmail>" : $toEmail;
+                    $mail->to[$toEmail] = $toName;
+                }
+            }
+            $mail->toString = implode(', ', $toStrings);
+        }
+
+        if(isset($head->cc)) {
+            foreach($head->cc as $cc) {
+                $mail->cc[strtolower($cc->mailbox . '@' . $cc->host)] = isset($cc->personal) ? $this->decodeMimeStr($cc->personal, $this->serverEncoding) : null;
+            }
+        }
+
+        if(isset($head->reply_to)) {
+            foreach($head->reply_to as $replyTo) {
+                $mail->replyTo[strtolower($replyTo->mailbox . '@' . $replyTo->host)] = isset($replyTo->personal) ? $this->decodeMimeStr($replyTo->personal, $this->serverEncoding) : null;
+            }
+        }
+
+        if(isset($head->message_id)) {
+            $mail->messageId = $head->message_id;
+        }
+
+        $mailStructure = imap_fetchstructure($this->getImapStream(), $mailId, FT_UID);
+
+        if(empty($mailStructure->parts)) {
+            $this->initMailPart($mail, $mailStructure, 0, $markAsSeen);
+        }
+        else {
+            foreach($mailStructure->parts as $partNum => $partStructure) {
+                $this->initMailPart($mail, $partStructure, $partNum + 1, $markAsSeen);
+            }
+        }
+
+        return $mail;
+    }
+
 
     /*
      * add a Swiftmailer Email to Folder

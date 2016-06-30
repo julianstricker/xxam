@@ -74,7 +74,7 @@
                 tooltip: '{%trans%}Log entries{%endtrans%}',
                 handler: function(grid, rowIndex, colIndex) {
                     var rec = grid.getStore().getAt(rowIndex);
-                    showlogentries('Xxam\\DynmodBundle\\Entity\\Dynmod',rec.get('id'));
+                    showlogentries('Xxam\\DynmodBundle\\Entity\\Dynmod',rec.get('id'),'dynmod/edit');
 
                 }
             }]

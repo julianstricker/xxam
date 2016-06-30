@@ -3,6 +3,9 @@
 namespace Xxam\FilemanagerBundle\Controller;
 
 
+
+use Symfony\Component\HttpFoundation\Request;
+use Xxam\CoreBundle\Entity\LogEntryRepository;
 use Xxam\FilemanagerBundle\Entity\Filesystem;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Xxam\FilemanagerBundle\Entity\FilesystemRepository;
@@ -41,7 +44,7 @@ class FilemanagerController extends FilemanagerBaseController {
         /** @var FilesystemRepository $repository */
         $repository=$this->getDoctrine()->getManager()->getRepository('XxamFilemanagerBundle:Filesystem');
         $entity=new Filesystem();
-        return $this->render('XxamFilemanagerBundle:Filemanager:edit.js.twig', array('entity'=>$entity,'modelfields'=>$repository->getModelFields(),'filesystemadapters'=>$this->container->getParameter('filesystemadapters')));
+        return $this->render('XxamFilemanagerBundle:Filemanager:edit.js.twig', array('entity'=>$entity,'modelfields'=>$repository->getModelFields(),'filesystemadapters'=>$this->container->getParameter('filesystemadapters'),'log'=>null));
     }
     
     /**
@@ -51,18 +54,37 @@ class FilemanagerController extends FilemanagerBaseController {
      * @param $id
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function editAction($id) {
+    public function editAction($id,Request $request) {
         $em = $this->getDoctrine()->getManager();
         /** @var FilesystemRepository $repository */
         $repository=$em->getRepository('XxamFilemanagerBundle:Filesystem');
+        $data=[];
+        $version=$request->get('version',null);
+        if ($version){
+            $entityname='Xxam\FilemanagerBundle\Entity\Filesystem';
+            /** @var LogEntryRepository $logrepo */
+            $logrepo=$em->getRepository('XxamCoreBundle:LogEntry');
+            $entity= $em->find($entityname,$id);
+            $logs = $logrepo->getLogEntries($entity);
+            $logrepo->revert($entity, $version);
+            foreach($logs as $log) {
+                if ($log->getVersion()==$version){
+                    $data['log']=$log;
+                    break;
+                }
+            }
 
-        $entity = $repository->find($id);
-
+        }else{
+            $entity = $repository->find($id);
+            $data['log']=null;
+        }
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Filesystem entity.');
         }
-        
-        return $this->render('XxamFilemanagerBundle:Filemanager:edit.js.twig', array('entity'=>$entity,'modelfields'=>$repository->getModelFields(),'filesystemadapters'=>$this->container->getParameter('filesystemadapters')));
+        $data['entity']=$entity;
+        $data['modelfields']=$repository->getModelFields();
+        $data['filesystemadapters']=$this->container->getParameter('filesystemadapters');
+        return $this->render('XxamFilemanagerBundle:Filemanager:edit.js.twig', $data);
     }
     
 }

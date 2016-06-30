@@ -10,6 +10,10 @@ parameters:
                 DISALLOW_LINKS: Disallow
                 SKIP_LINKS: Skip
             help: The Local adapter doesn’t support links, this violates the root path constraint which is enforces throughout Flysystem. By default, when links are encountered an exception is thrown.
+        locks:
+                type: checkbox
+                default: true
+                help: By default this adapter uses a lock during writes and updates.
         cache:
             type: checkbox
             help: Use Memcached to cache file system meta-data to boost performance. 
@@ -97,6 +101,25 @@ parameters:
         proxy:
             type: text
             help: The Proxy URL, eg. "localhost:8888"
+        cache:
+            type: checkbox
+            help: Use Memcached to cache file system meta-data to boost performance.
+    aws_s3:
+        key:
+            type: text
+            help: The AWS S3 Key
+        secred:
+            type: text
+            help: The AWS S3 Secret
+        region:
+            type: text
+            help: The AWS S3 region
+        base_url:
+            type: text
+            help: If you’re using a storage service which implements the S3 protocols (e.g. Google Cloud Storage), you can set the base_url configuration option when constructing the client.
+        reduced_redunancy_storage:
+            type: checkbox
+            help: Enable reduced redunancy storage. http://aws.amazon.com/s3/details/#RRS
         cache:
             type: checkbox
             help: Use Memcached to cache file system meta-data to boost performance.

@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Xxam\MailclientBundle\Entity\Mailaccountuser;
 use Xxam\MailclientBundle\Entity\MailaccountuserRepository;
+use Xxam\MailclientBundle\Helper\Imap\IncomingMail;
 
 class MailclientController extends MailclientBaseController {
     
@@ -208,7 +209,7 @@ class MailclientController extends MailclientBaseController {
         $mail->hasexternallinks=false;
         if ($mail->textHtml){
             //clean html:
-            $fetchedHtml=$this->cleanHtml($mail,false);
+            $fetchedHtml=$this->cleanHtml($mail->textHtml,false,$mail->getAttachments());
             if(strpos($fetchedHtml,$this->imageplaceholder)!==false){
                 $mail->hasexternallinks=true;
             }
@@ -244,14 +245,16 @@ class MailclientController extends MailclientBaseController {
         $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
         return $response; 
     }
-    
+
     /**
      * Mailclient
      *
      * @Security("has_role('ROLE_MAILCLIENT_LIST')")
-     *
+     * @param Request $request
+     * @return Response
      */
     public function getmailcontentAction(Request $request){
+
         $path=$request->get('path','');
         $externalsources=$request->get('externalsources',false);
         $mailaccountid=false;
@@ -273,15 +276,36 @@ class MailclientController extends MailclientBaseController {
            return $this->throwJsonError('Mailaccount not found');
         }
         $mailbox = $this->getImapMailbox($mailaccount,$path);
-        $mail = $mailbox->getMail($mailid); 
+        $mail = $mailbox->getMail($mailid);
+
+
         if ($mail->textHtml){
+
             //clean html:
-            $fetchedHtml=$this->cleanHtml($mail,$externalsources);
+            $fetchedHtml=$this->cleanHtml($mail->textHtml,$externalsources,$mail->getAttachments());
             $response = new Response($fetchedHtml);
             $response->headers->set('Content-Type', 'text/html; charset=UTF-8');
             return $response;
-        }else{
+        }else if ($mail->textPlain){
             return $this->render('XxamMailclientBundle:Mailclient:mailbody.html.twig', array('mailcontent' => '<pre>'.$mail->textPlain.'</pre>'));
+        }else{
+
+            $attachments=$mail->getAttachments();
+            if(isset($attachments['html-body'])){
+                $content=file_get_contents($attachments['html-body']->filePath);
+                $fetchedHtml=$this->cleanHtml($content,$externalsources,$mail->getAttachments());
+                $response = new Response($fetchedHtml);
+                $response->headers->set('Content-Type', 'text/html; charset=UTF-8');
+                return $response;
+            }else if (isset($attachments['text-body'])){
+                $content=file_get_contents($attachments['text-body']->filePath);
+                if (!$content) $content='';
+                return $this->render('XxamMailclientBundle:Mailclient:mailbody.html.twig', array('mailcontent' => '<pre>'.$content.'</pre>'));
+            }
+            var_dump($mail);
+            $response = new Response('jojo');
+            $response->headers->set('Content-Type', 'text/html; charset=UTF-8');
+            return $response;
         }
         
     }
@@ -298,11 +322,12 @@ class MailclientController extends MailclientBaseController {
         $mailid=$request->get('mailid','');
         $type=$request->get('type','');
         $user = $this->get('security.token_storage')->getToken()->getUser();
+        $session  = $this->get("session");
         $params=array(
             'type'=>$type,
             'mailid'=>$mailid,
             'path'=>$path,
-            'mail'=>new \stdClass()
+            'mail'=>new IncomingMail()
             
         );
         $mailaccountid=false;
@@ -325,13 +350,14 @@ class MailclientController extends MailclientBaseController {
             }
 
             $mailbox = $this->getImapMailbox($mailaccount,$path);
-            $mail = $mailbox->getMail($mailid);  
-            
+            $mail = $mailbox->getMail($mailid);
+
             $mail->hasexternallinks=false;
             $fetchedHtml='';
             if ($mail->textHtml){
                 //clean html:
-                $fetchedHtml=$this->cleanHtml($mail,false,'On.......wrote:');
+
+                $fetchedHtml=$this->cleanHtml($mail->textHtml,false,[],'On.......wrote:');
                 if(strpos($fetchedHtml,$this->imageplaceholder)!==false){
                     $mail->hasexternallinks=true;
                 }
@@ -340,33 +366,67 @@ class MailclientController extends MailclientBaseController {
             //unset($mail->textPlain);
             $mail->textHtml=$fetchedHtml;
             $attachments=Array();
+            $attachmentsgridStoreData=[];
+            $fieldattachments=[];
+            $fileuploads=$session->get('mailclient_fileuploads',Array());
             foreach($mail->getAttachments() as $attachment){
                 $attachments[]=Array(
                     'id'=>$attachment->id,
                     'name'=>$attachment->name,
-                    'filesize'=> 0, //$attachment->fileSize,
-                    'filepath'=>str_replace($this->attachments_dir,$this->attachmentsbase_dir,$attachment->filePath)
+                    'filesize'=> filesize($attachment->filePath), //$attachment->fileSize,
+                    'filepath'=>$this->get('kernel')->getRootDir().'/../web'.str_replace($this->attachments_dir,$this->attachmentsbase_dir,$attachment->filePath)
 
                 );
+                $newfilename=md5($user->getId().microtime().rand(0,100000));
+
+                $fileuploads[$newfilename]=['filename'=>$attachment->name,'filepath'=>$this->get('kernel')->getRootDir().'/../web'.str_replace($this->attachments_dir,$this->attachmentsbase_dir,$attachment->filePath)];
+
+
+                $attachmentsgridStoreData[]=['name'=>$attachment->name,'size'=>filesize($attachment->filePath),'hash'=>$newfilename,'status'=>100];
+                $fieldattachments[]=$newfilename;
             }
+            $session->set('mailclient_fileuploads',$fileuploads);
+            //var_dump($fileuploads);
+            $session->save();
             $mail->files=$attachments;
             $params['mail']=$mail;
+            $params['attachmentsgridStoreData']=$attachmentsgridStoreData;
+            $params['fieldattachments']=$fieldattachments;
         }
+        $params['mail']->in_reply_to = '';
+        $params['mail']->references = '';
         if ($type=='reply' || $type=='replyall'){
             $params['mail']->subject='Re: '.$params['mail']->subject;
-            $from=$params['mail']->to;
-            $to = property_exists($params['mail'], 'fromAddress') ? Array($params['mail']->fromAddress => (property_exists($params['mail'], 'fromName') ? $params['mail']->fromName : $params['mail']->fromAddress) ) : '';
+            $from=isset($mailaccount) ? $mailaccount->getId() : null;
+
+            $toaddr = property_exists($params['mail'], 'fromAddress') ? Array($params['mail']->fromAddress => (property_exists($params['mail'], 'fromName') ? $params['mail']->fromName : $params['mail']->fromAddress) ) : '';
+            $to=$this->cleanEmailaddress($toaddr);
             if ( property_exists($params['mail'], 'replyTo') ){
                 $to=$params['mail']->replyTo;
             }
+            if ($type=='replyall'){
+                $oldto= $params['mail']->to;
+
+                foreach ($oldto as $key => $value){
+                    if (isset($mailaccount) && $key!=$mailaccount->getAccountemail()) $to[$key] = $value;
+                }
+
+            }
+
+
             $params['mail']->from=$from;
             $params['mail']->to=$to;
             unset($params['mail']->fromName);
             unset($params['mail']->fromAddress);
             unset($params['mail']->toString);
-            unset($params['mail']->replyTo);
+            //unset($params['mail']->replyTo);
+            $params['mail']->replyTo=[];
             if ($type=='reply'){
                 $params['mail']->cc=Array();
+            }
+            if(isset($mail)) {
+                $params['mail']->in_reply_to = $mail->headers->message_id;
+                $params['mail']->references = isset($mail->headers->references) ? $mail->headers->references . ' ' . $mail->headers->message_id : $mail->headers->message_id;
             }
         }
         

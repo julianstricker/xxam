@@ -13,7 +13,7 @@ services:
             - { name: serializer.normalizer }
 
     cache:
-        class: Doctrine\Common\Cache\ApcCache
+        class: Doctrine\Common\Cache\ApcuCache
 
 
     xxam.twig_extension:

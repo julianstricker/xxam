@@ -2,7 +2,6 @@
 
 namespace Xxam\MailclientBundle\Controller;
 
-use PhpImap\IncomingMail;
 use Swift_Mailer;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Xxam\MailclientBundle\Entity\Mailaccountuser;
@@ -11,7 +10,6 @@ use Xxam\MailclientBundle\Helper\Imap\ImapMailbox;
 use Xxam\MailclientBundle\Entity\Mailaccount;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-//use Symfony\Component\HttpFoundation\Session;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 class MailclientBaseController extends Controller {
@@ -131,28 +129,64 @@ class MailclientBaseController extends Controller {
     
     protected function removeHtmltag( \DOMDocument &$doc, $tagname){
         $tags=$doc->getElementsByTagName($tagname);
-        $length = $tags->length;
+
         // for each tag, remove it from the DOM
-        if ($length>0){
-            for ($i = 0; $i < $length; $i++) {
-              if($tags->item($i)->parentNode){ 
-                  $tags->item($i)->parentNode->removeChild($tags->item($i));
-              }
+
+
+        if ($tags->length>0){
+            for ($i = $tags->length; --$i >= 0; ) {
+                $tag= $tags->item($i);
+                  $tag->parentNode->removeChild($tag);
             }
         }
         //return $doc;
     }
-    
-    protected function cleanHtml(IncomingMail $mail,$externalsources,$quotetext=''){
+
+
+    /**
+     * Get array of internal HTML links placeholders
+     * @param string $textHtml
+     * @return array attachmentId => link placeholder
+     */
+    public function getInternalLinksPlaceholders($textHtml) {
+        return preg_match_all('/=["\'](ci?d:([\w\.%*@-]+))["\']/i', $textHtml, $matches) ? array_combine($matches[2], $matches[1]) : array();
+
+    }
+
+    /**
+     * @param string $textHtml
+     * @param string $baseUri
+     * @param array $attachments
+     * @return mixed
+     */
+    public function replaceInternalLinks($textHtml, $baseUri, $attachments) {
+        $baseUri = rtrim($baseUri, '\\/') . '/';
+        $fetchedHtml = $textHtml;
+        foreach($this->getInternalLinksPlaceholders($textHtml) as $attachmentId => $placeholder) {
+            if(isset($attachments[$attachmentId])) {
+                $fetchedHtml = str_replace($placeholder, $baseUri . basename($attachments[$attachmentId]->filePath), $fetchedHtml);
+            }
+        }
+        return $fetchedHtml;
+    }
+
+    /**
+     * @param string $textHtml
+     * @param bool $externalsources
+     * @param array $attachments
+     * @param string $quotetext
+     * @return mixed|string
+     */
+    protected function cleanHtml($textHtml, $externalsources, $attachments, $quotetext=''){
         
-        $fetchedHtml=$mail->replaceInternalLinks($this->attachmentsbase_dir);
+        $fetchedHtml=$this->replaceInternalLinks($textHtml,$this->attachmentsbase_dir,$attachments);
         
         if (!$externalsources){
             $baseUriesc=str_replace('/','\/', $this->attachmentsbase_dir);
-            $fetchedHtml=preg_replace('/(src[\s]*=[\s]*\")((?!'.$baseUriesc.')[^"]+)(\")/i', "$1".$this->imageplaceholder."\"", $fetchedHtml);
+            $fetchedHtml=preg_replace('/(src[\s]*=[\s]*["|\'])((?!'.$baseUriesc.')[^"|\']+)("|\')/i', "$1".$this->imageplaceholder. "$3", $fetchedHtml);
             $fetchedHtml=preg_replace('/(url[\s]*\()((?!'.$baseUriesc.')[^\)]+)(\))/i', "$1'".$this->imageplaceholder."'$3", $fetchedHtml);
         }
-        
+
         //metas:
         //$fetchedHtml=preg_replace('/<meta[^>]*>/i', "", $fetchedHtml);
         //$fetchedHtml=preg_replace('/<body[^>]*>/is', "", $fetchedHtml);
@@ -320,10 +354,16 @@ class MailclientBaseController extends Controller {
             $user = $this->get('security.token_storage')->getToken()->getUser();
             $session  = $this->get("session");
             $fileuploads=$session->get('mailclient_fileuploads',Array());
+
             if (count($attachments)>0){
                 foreach($attachments as $attachment){
-                    $file=$this->get('kernel')->getCacheDir() . '/mailclient_fileuploads/'.$user->getId().'/'.$attachment;
-                    $filename=isset($fileuploads[$attachment]) ? $fileuploads[$attachment] : $attachment;
+                    if (isset($fileuploads[$attachment])){
+                        $filename=$fileuploads[$attachment]['filename'];
+                        $file=$fileuploads[$attachment]['filepath'];
+                    }else{
+                        $file=$this->get('kernel')->getCacheDir() . '/mailclient_fileuploads/'.$user->getId().'/'.$attachment;
+                        $filename=$attachment;
+                    }
                     $message->attach(\Swift_Attachment::fromPath($file)->setFilename($filename));
                 }
             }
@@ -347,7 +387,7 @@ class MailclientBaseController extends Controller {
             ->setSubject($request->get('fieldsubject',''))
             ->setFrom(array($mailaccount->getAccountemail()=>$mailaccount->getName()));
         try {
-            if ($request->get('fieldreplyto',false)) $message->setReplyto($this->cleanEmailaddress($request->get('fieldreplyto',false)));
+            if ($request->get('fieldreplyto',false)) $message->setReplyTo($this->cleanEmailaddress($request->get('fieldreplyto',false)));
             //dump($this->cleanEmailaddress($request->get('fieldto',false)));
             if ($request->get('fieldto',false)) $message->setTo($this->cleanEmailaddress($request->get('fieldto',false)));
             if ($request->get('fieldbcc',false)) $message->setBcc($this->cleanEmailaddress($request->get('fieldbcc',false)));
@@ -366,6 +406,25 @@ class MailclientBaseController extends Controller {
         }else{
             if ($request->get('fieldtext','') != '') $message->setContentType("text/plain")->setBody($request->get('fieldtext',''), 'text/plain');
         }
+        $headers = $message->getHeaders();
+        if ($request->get('fieldinreplyto','')!='') {
+
+            $inreplyto=$headers->get('in_reply_to');
+            if ($inreplyto){
+                $inreplyto->setValue($request->get('fieldinreplyto',''));
+            }else{
+                $headers->addTextHeader('in_reply_to', $request->get('fieldinreplyto',''));
+            }
+        }
+        if ($request->get('fieldreferences','')!='') {
+            $references=$headers->get('references');
+            if ($references){
+                $references->setValue($request->get('fieldreferences',''));
+            }else{
+                $headers->addTextHeader('references', $request->get('fieldreferences',''));
+            }
+        }
+
         //attachments:
         $this->addAttachmentsToMessage($message,$request->get('fieldattachments',''));
 

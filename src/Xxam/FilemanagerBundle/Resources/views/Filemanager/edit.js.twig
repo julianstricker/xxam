@@ -13,7 +13,7 @@
         if (typeof(FilemanagerModel)=='undefined'){
           Ext.define('FilemanagerModel',{
              extend: 'Ext.data.Model',
-             fields: {{modelfields|jscode(false)}},
+             fields: {{modelfields|jsonwithfunctions()}},
              idProperty: 'id',
              proxy: {
                 type: 'rest',
@@ -25,6 +25,8 @@
             }
           });
         }
+
+
         var filesystemadapters={{filesystemadapters|jscode()}};
         var filesystemadaptersdata=[];
         Ext.Object.each(filesystemadapters, function(key,value){
@@ -36,10 +38,18 @@
             data : filesystemadaptersdata
         });
 
+        var entitysettings=Ext.JSON.decode('{{entity.settings}}',true);
+    console.log(entitysettings);
         var generateField=function(filesystemadapterfield,name){
             var fieldconf={'name':name,'fieldLabel':formatLabel(name)};
             var field={};
-            if (filesystemadapterfield.help) fieldconf.afterBodyEl= '<span class="x-form-helptext">'+filesystemadapterfield.help+'</span>';
+            if (filesystemadapterfield.help) {
+                if (filesystemadapterfield.type=='checkbox'){
+                    fieldconf.boxLabel=filesystemadapterfield.help;
+                }else {
+                    fieldconf.afterBodyEl = '<span class="x-form-helptext">' + filesystemadapterfield.help + '</span>';
+                }
+            }
             switch(filesystemadapterfield.type){
                 case 'text':
                     field=new Ext.form.TextField(fieldconf);
@@ -53,8 +63,8 @@
                     field=new Ext.form.TextField(fieldconf);
                     break;
                 case 'checkbox':
-                    fieldconf.inputType='checkbox';
-                    field=new Ext.form.TextField(fieldconf);
+                    //fieldconf.inputType='checkbox';
+                    field=new Ext.form.field.Checkbox(fieldconf);
                     break;
                 case 'select':
                     fieldconfdata=[];
@@ -70,6 +80,11 @@
                     fieldconf.displayField= 'name';
                     field=new Ext.form.field.ComboBox(fieldconf);
                     break;
+            }
+            if(entitysettings && typeof entitysettings[fieldconf.name]!='undefined'){
+
+                field.setValue(entitysettings[fieldconf.name]);
+
             }
             return field;
         }
@@ -105,13 +120,19 @@
                 name: 'id',
                 value: '{{entity.id}}'
             },{
+                xtype: 'textfield',
+                name: 'filesystemname',
+                fieldLabel: 'Name',
+                value: '{{entity.filesystemname}}'
+            },{
                 xtype: 'combo',
                 fieldLabel: 'Type',
-                name: 'Adapter',
+                name: 'adapter',
                 store: filesystemadaptersStore,
                 queryMode: 'local',
                 displayField: 'value',
                 valueField: 'id',
+                itemId: 'fieldAdapter',
                 value: '{{entity.getAdapter()}}',
                 listeners: {
                     'select': function(){
@@ -145,47 +166,84 @@
                         flex: 1
                     },
                     items: [{
-                        fieldLabel: 'Field 1',
-                        name: 'field1'
-                    }, {
-                        fieldLabel: 'Field 2',
-                        name: 'field2'
+                        fieldLabel: 'Field',
+                        name: 'field'
                     }]
                 }
             }],
-            buttons: [{
-                text: '{%trans%}Save{%endtrans%}',
-                handler: function() {
-                    // The getForm() method returns the Ext.form.Basic instance:
-                    var form = this.up('form').getForm();
-                    if (form.isValid()) {
-                        console.log(typeof(FilemanagerModel));
-                        var newfilesystem=Ext.create('FilemanagerModel',form.getValues());
-                        console.log(newfilesystem);
-                        
-                        // Submit the Ajax request and handle the response
-                        newfilesystem.save({
-                            scope: this.up('form'),
-                            success: function(filesystem) {
-                                ttt=this;
-                                this.up('panel').close();
-                                if (typeof Ext.getCmp('filesystem_filesystemlist') !='undefined'){
-                                    Ext.getCmp('filesystem_filesystemlist').getStore().load({
-                                        callback: function(records, operation, success) {
-                                            //Ext.getCmp('mailclient_maillist').view.scrollTo(0,scrollpos);
-                                        }
-                                    });
-                                }
-                               //Ext.Msg.alert('Success', action.result.message);
-                            },
-                            failure: function(filesystem) {
-                            
-                                //Ext.Msg.alert('Failed', action.result ? action.result.message : 'No response');
-                            }
-                        });
+            listeners: {
+                'added': function() {
+                    ttt = this;
+                    var fields = generateFields(this.getComponent('fieldAdapter').getValue());
+                    this.down('fieldset').removeAll();
+                    for (var i = 0; i < fields.length; i++) {
+                        this.down('fieldset').add(fields[i]);
                     }
                 }
+            },
+            dockedItems: [{
+                xtype: 'toolbar',
+                dock: 'bottom',
+                ui: 'footer',
+                //defaults: {minWidth: minButtonWidth},
+                items: [{% if log %}
+                    { xtype: 'tbtext', html: 'Version {{ log.getVersion() }} from {{ log.getLoggedAt()|localizeddate('short','short') }} created by {{ log.getUsername() }}' },
+                    {% endif %}
+                    { xtype: 'component', flex: 1 },
+                    {
+                        xtype: 'button',
+                        text: '{%trans%}Save{%endtrans%}',
+
+                        handler: function() {
+                            // The getForm() method returns the Ext.form.Basic instance:
+                            var form = this.up('form').getForm();
+                            fff=form;
+                            console.log(form);
+                            if (form.isValid()) {
+                                console.log(typeof(FilemanagerModel));
+                                formvalues=form.getValues();
+                                formsettings=form.getValues();
+                                delete formsettings.id;
+                                delete formsettings.adapter;
+
+                                var newfilesystem=Ext.create('FilemanagerModel',{id:formvalues.id,filesystemname: formvalues.filesystemname, adapter:formvalues.adapter,settings:Ext.JSON.encode(formsettings)});
+                                console.log(newfilesystem);
+
+                                // Submit the Ajax request and handle the response
+                                newfilesystem.save({
+                                    scope: this.up('form'),
+                                    success: function(filesystem) {
+                                        ttt=this;
+                                        this.up('panel').close();
+                                        if (typeof Ext.getCmp('filemanager_filesystemlist') !='undefined'){
+                                            Ext.getCmp('filemanager_filesystemlist').getStore().load({
+                                                callback: function(records, operation, success) {
+                                                    //Ext.getCmp('mailclient_maillist').view.scrollTo(0,scrollpos);
+                                                }
+                                            });
+                                        }
+                                       //Ext.Msg.alert('Success', action.result.message);
+                                    },
+                                    failure: function(filesystem, operation) {
+                                        var error=Ext.JSON.decode(operation.error.response.responseText);
+                                        if (error){
+                                            if(error.errors && error.errors.form && error.errors.form.children){
+                                                var errors=[];
+                                                Ext.Object.each(error.errors.form.children,function(key,value){
+                                                    errors.push({field:key,message:value.errors});
+                                                });
+                                                this.getForm().markInvalid(errors);
+                                            }
+                                        }
+                                        //Ext.Msg.alert('Failed', action.result ? action.result.message : 'No response');
+                                    }
+                                });
+                            }
+                        }
+                    }
+                ]
             }]
         }
+
     }
 }

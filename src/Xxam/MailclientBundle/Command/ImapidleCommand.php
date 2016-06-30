@@ -49,7 +49,7 @@ class ImapidleCommand extends ContainerAwareCommand {
 
         $loop = Factory::create();
         //WebSocketClientInterface $client, LoopInterface $loop, $host = '127.0.0.1', $port = 8080, $path = '/', $origin = null
-        $client = new WebSocketClient(new Client( $this->tenant_id,$this->em,$loop), $loop, '127.0.0.1',1337);
+        $client = new WebSocketClient(new Client( $this->tenant_id,$this->em,$loop,$container->get('memcached')), $loop, '127.0.0.1',1337);
         if ($client) echo 'loop run...';
         $loop->run();
 

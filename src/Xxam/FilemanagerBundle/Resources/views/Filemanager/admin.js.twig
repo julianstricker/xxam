@@ -23,7 +23,7 @@
             xtype: 'actioncolumn',
             width: 100,
             items: [{
-                icon: '/bundles/xxamfilemanager/icons/16x16/drive_edit.png',
+                iconCls: 'x-fa fa-edit',
                 tooltip: '{%trans%}Edit{%endtrans%}',
                 handler: function(grid, rowIndex, colIndex) {
                     var rec = grid.getStore().getAt(rowIndex);
@@ -31,7 +31,7 @@
                     window.location.href='#filemanager/edit/'+rec.get('id');
                 }
             },{
-                icon: '/bundles/xxamfilemanager/icons/16x16/drive_delete.png',
+                iconCls: 'x-fa fa-trash-o',
                 tooltip: '{%trans%}Remove{%endtrans%}',
                 handler: function(grid, rowIndex, colIndex) {
                     var rec = grid.getStore().getAt(rowIndex);
@@ -63,6 +63,15 @@
                     
                     
                 }
+            },{
+                //icon: '/bundles/xxamdynmod/icons/16x16/user_edit.png',
+                iconCls: 'x-fa fa-history',
+                tooltip: '{%trans%}Log entries{%endtrans%}',
+                handler: function(grid, rowIndex, colIndex) {
+                    var rec = grid.getStore().getAt(rowIndex);
+                    showlogentries('Xxam\\FilemanagerBundle\\Entity\\Filesystem',rec.get('id'),'filemanager/edit');
+
+                }
             }]
         });
         
@@ -71,7 +80,7 @@
             tbar: [{ 
                 xtype: 'button', 
                 text: '{%trans%}Add new Filesystem{%endtrans%}',
-                icon: '/bundles/xxamfilemanager/icons/{{iconsize}}/drive_add.png',
+                iconCls: 'x-fa fa-plus',
                 handler: function(){
                         window.location.href='#filemanager/edit';
                     }

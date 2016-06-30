@@ -23,13 +23,30 @@
                                 window.location.href='#mailclient/write?type=reply&path='+path+'&mailid='+mailid;
                             } 
                         },
-                        { xtype: 'button', text: '{%trans%}Reply all{%endtrans%}', tooltip: '{%trans%}Reply to list or to sender and all recipients{%endtrans%}', scale: '{{buttonsize}}', icon: '/bundles/xxammailclient/icons/{{iconsize}}/outlook_reply_all.png',
-                            menu: [
-                                { text: '{%trans%}Reply all{%endtrans%}' },
-                                { text: '{%trans%}Reply list{%endtrans%}' }
-                            ]
+                        {
+                            xtype: 'button',
+                            text: '{%trans%}Reply all{%endtrans%}',
+                            tooltip: '{%trans%}Reply to list or to sender and all recipients{%endtrans%}',
+                            scale: '{{buttonsize}}',
+                            icon: '/bundles/xxammailclient/icons/{{iconsize}}/outlook_reply_all.png',
+                            handler: function(){
+                                var path=Ext.getCmp('mailclient_maillist').getStore().getProxy().extraParams.path.toString()
+                                var mailid=Ext.getCmp('mailclient_maillist').view.selection.id
+                                window.location.href='#mailclient/write?type=replyall&path='+path+'&mailid='+mailid;
+                            }
                         },
-                        { xtype: 'button', text: '{%trans%}Forward{%endtrans%}', tooltip: '{%trans%}Forward{%endtrans%}', scale: '{{buttonsize}}', icon: '/bundles/xxammailclient/icons/{{iconsize}}/email_forward.png' },
+                        {
+                            xtype: 'button',
+                            text: '{%trans%}Forward{%endtrans%}',
+                            tooltip: '{%trans%}Forward{%endtrans%}',
+                            scale: '{{buttonsize}}',
+                            icon: '/bundles/xxammailclient/icons/{{iconsize}}/email_forward.png',
+                            handler: function(){
+                                var path=Ext.getCmp('mailclient_maillist').getStore().getProxy().extraParams.path.toString()
+                                var mailid=Ext.getCmp('mailclient_maillist').view.selection.id
+                                window.location.href='#mailclient/write?type=forward&path='+path+'&mailid='+mailid;
+                            }
+                        },
                         { 
                             xtype: 'button', text: '{%trans%}Trash{%endtrans%}', 
                             tooltip: '{%trans%}Move message to trash{%endtrans%}', 

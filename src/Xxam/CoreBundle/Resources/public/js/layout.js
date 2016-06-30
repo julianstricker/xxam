@@ -1127,7 +1127,7 @@ function loadtab() {
     });
 }
 
-function showlogentries(entityname,id) {
+function showlogentries(entityname,id,editroute) {
     if (typeof(LogentrieslistModel) == 'undefined') {
         Ext.define('LogentrieslistModel', {
             extend: 'Ext.data.Model',
@@ -1188,7 +1188,7 @@ function showlogentries(entityname,id) {
                         tooltip: 'get version',
                         handler: function (grid, rowIndex, colIndex) {
                             var rec = grid.getStore().getAt(rowIndex);
-                            window.location.href = '#dynmod/edit/' + rec.get('object_id') + '?version=' + rec.get('version');
+                            window.location.href = '#'+editroute+'/' + rec.get('object_id') + '?version=' + rec.get('version');
                         }
                     }]
                 }

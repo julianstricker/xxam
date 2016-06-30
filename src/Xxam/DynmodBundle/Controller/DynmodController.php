@@ -6,7 +6,6 @@ namespace Xxam\DynmodBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Xxam\CoreBundle\Entity\LogEntryRepository;
 use Xxam\DynmodBundle\Entity\Dynmod;

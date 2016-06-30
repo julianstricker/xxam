@@ -15,6 +15,7 @@ use League\Flysystem\Cached\Storage\Memcached as Cache;
 
 
 use Xxam\FilemanagerBundle\Helper\FlysystemPlugins\ThumbnailDropbox;
+use Xxam\FilemanagerBundle\Helper\FlysystemPlugins\ThumbnailLocal;
 use Xxam\UserBundle\Entity\Group;
 use Xxam\FilemanagerBundle\Entity\Filesystem as XxamFilesystem;
 
@@ -163,10 +164,10 @@ class FilemanagerBaseController extends Controller {
         }
         switch ($filesystem->getAdapter()) {
             case 'local':
-                
+                $fs->addPlugin(new ThumbnailLocal($this->get('just_thumbnail')));
                 break;
             case 'dropbox':
-                $fs->addPlugin(new ThumbnailDropbox);
+                $fs->addPlugin(new ThumbnailDropbox());
                 break;
             
         }
@@ -291,11 +292,10 @@ class FilemanagerBaseController extends Controller {
                 $ctime->setTimestamp(intval($thumbnaildata[0]));
                 $imgdata=$thumbnaildata[1];
             } else {
-                $thumbnaildata = $fs->getThumbnail($path, $size);
-                if ($thumbnaildata[1]) {
-                    $thumbnaildata[0] = $ctime->getTimestamp();
-                    $this->memcached->set($cachename, serialize($ctime->getTimestamp() . '|' . $thumbnaildata[1]));
-                    $imgdata=$thumbnaildata[1];
+                $imgdata = $fs->getThumbnail($path, $size);
+                if ($imgdata) {
+
+                    $this->memcached->set($cachename, serialize($ctime->getTimestamp() . '|' . $imgdata));
 
                 } else { //icon ausgeben:
                     $imgdata=$this->getIcon($path, $size);

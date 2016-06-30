@@ -6,6 +6,9 @@ use League\Flysystem\PluginInterface;
 
 class ThumbnailDropbox implements PluginInterface
 {
+
+
+
     /* @var FilesystemInterface $filesystem */
     protected $filesystem;
 
@@ -34,7 +37,9 @@ class ThumbnailDropbox implements PluginInterface
         if (get_class($adapter)=='League\Flysystem\Cached\CachedAdapter') $adapter=$adapter->getAdapter();
         $client=$adapter->getClient();
         $path=$adapter->applyPathPrefix($path);
-        return $client->getThumbnail($path,'png',$size);
+        $thumbnaildata=$client->getThumbnail($path,'png',$size);
+        return is_null($thumbnaildata) ? null : (isset($thumbnaildata[1]) ? $thumbnaildata[1] : 0 );
         
     }
+
 }

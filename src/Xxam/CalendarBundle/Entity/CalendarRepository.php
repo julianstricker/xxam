@@ -39,8 +39,8 @@ class CalendarRepository extends EntityRepository
         $fields[]=Array('name'=> 'birthday','type'=>'date', 'dateFormat'=>'Y-m-d', 'format'=>'Y-m-d');
         $fields[]=Array('name'=> 'photo','type'=>'string');
         $fields[]=Array('name'=> 'organizationfunction','type'=>'string');
-        $fields[]=Array('name'=> 'created','type'=>'date', 'dateFormat'=>'Y-m-d H.i.s');
-        $fields[]=Array('name'=> 'updated','type'=>'date', 'dateFormat'=>'Y-m-d H.i.s');
+        $fields[]=Array('name'=> 'created','type'=>'date', 'dateFormat'=>'Y-m-d H:i:s');
+        $fields[]=Array('name'=> 'updated','type'=>'date', 'dateFormat'=>'Y-m-d H:i:s');
         return $fields;
         
     }

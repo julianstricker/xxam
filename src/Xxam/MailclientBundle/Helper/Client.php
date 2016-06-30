@@ -66,11 +66,11 @@ class Client implements WebSocketClientInterface
      * @param int $tenant_id
      * @param EntityManager $em
      */
-    public function __construct($tenant_id, EntityManager $em,$loop)
+    public function __construct($tenant_id, EntityManager $em,$loop,$memcached)
     {
         $this->tenant_id=$tenant_id;
         $this->em=$em;
-        $this->memcached = $this->get('memcached');
+        $this->memcached = $memcached;
         $this->loop = $loop;
 
     }

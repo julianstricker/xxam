@@ -25,7 +25,7 @@ class ContactRepository extends EntityRepository
     }
     public function getModelFields(){
         $fields=Array();
-        $fields[]=Array('name'=> 'id','type'=>'string','type'=>'int');
+        $fields[]=Array('name'=> 'id','type'=>'int');
         $fields[]=Array('name'=> 'contact_id','type'=>'int');
         $fields[]=Array('name'=> 'contacttype','type'=>'string');
         $fields[]=Array('name'=> 'organizationname','type'=>'string');
@@ -39,8 +39,8 @@ class ContactRepository extends EntityRepository
         $fields[]=Array('name'=> 'birthday','type'=>'date', 'dateFormat'=>'Y-m-d', 'format'=>'Y-m-d');
         $fields[]=Array('name'=> 'photo','type'=>'string');
         $fields[]=Array('name'=> 'organizationfunction','type'=>'string');
-        $fields[]=Array('name'=> 'created','type'=>'date', 'dateFormat'=>'Y-m-d H.i.s');
-        $fields[]=Array('name'=> 'updated','type'=>'date', 'dateFormat'=>'Y-m-d H.i.s');
+        $fields[]=Array('name'=> 'created','type'=>'date', 'dateFormat'=>'Y-m-d H:i:s');
+        $fields[]=Array('name'=> 'updated','type'=>'date', 'dateFormat'=>'Y-m-d H:i:s');
         return $fields;
         
     }

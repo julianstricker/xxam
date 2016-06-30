@@ -250,7 +250,9 @@ class MailclientExtraController extends MailclientBaseController {
      * @return Response
      */
     public function uploadfileAction(Request $request) {
-        $filename=preg_replace("([^\w\s\d\-_~,;:\[\]\(\).])", '', $request->headers->get('X_FILENAME'));
+
+        $filename=preg_replace("([^\w\s\d\-_~,;:\[\]\(\).])", '', $request->headers->get('X-Filename'));
+
         $file=file_get_contents('php://input');
         $user = $this->get('security.token_storage')->getToken()->getUser();
         if (!is_dir($this->get('kernel')->getCacheDir() . '/mailclient_fileuploads')) {
@@ -262,7 +264,7 @@ class MailclientExtraController extends MailclientBaseController {
         $newfilename=md5($user->getId().microtime().rand(0,100000));
         $session  = $this->get("session");
         $fileuploads=$session->get('mailclient_fileuploads',Array());
-        $fileuploads[$newfilename]=$filename;
+        $fileuploads[$newfilename]=['filename'=>$filename,'filepath'=>$this->get('kernel')->getCacheDir() . '/mailclient_fileuploads/'.$user->getId().'/'.$newfilename];
         $session->set('mailclient_fileuploads',$fileuploads);
         
         //if (session_id()) session_write_close();

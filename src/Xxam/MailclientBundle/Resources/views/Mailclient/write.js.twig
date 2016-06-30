@@ -3,8 +3,7 @@
 {% if buttonsize == 'large' %}
     {% set iconsize = '32x32' %}
 {% endif %}
-{% set defaultaccountid = '' %}
-{% set defaultaccountname = '' %}
+
 {
     tabtitle: '{% trans %}Write Mail{% endtrans %}',
     //tabicon: '/bundles/xxammailclient/icons/16x16/email_edit.png',
@@ -46,9 +45,10 @@
                 {name: 'name', type: 'string'}, 
                 {name: 'size', type: 'int'}, 
                 {name: 'status', type: 'int'},
-                {name: 'data', type: 'string'}
+                {name: 'data', type: 'auto'},
+                {name: 'hash', type: 'auto'}
             ],
-            data: {'items':[]},
+            data: {'items':{{ attachmentsgridStoreData|jscode }}},
             proxy: {
                 type: 'memory',
                 reader: {
@@ -124,6 +124,18 @@
                                 padding: '4 2 0 2'
                             },
                             items: [
+                                {
+                                    xtype: 'hiddenfield',
+                                    name: 'fieldinreplyto',
+                                    itemId: 'fieldinreplyto',
+                                    value: '{{ mail.in_reply_to|raw }}'
+                                },
+                                {
+                                    xtype: 'hiddenfield',
+                                    name: 'fieldreferences',
+                                    itemId: 'fieldreferences',
+                                    value: '{{ mail.references|raw }}'
+                                },
                                 {
                                     xtype: 'combobox',
                                     fieldLabel: '{% trans %}From{% endtrans %}',
@@ -285,7 +297,7 @@
                                     xtype: 'hiddenfield',
                                     name: 'fieldattachments',
                                     itemId: 'fieldattachments',
-                                    value: ''
+                                    value: '{{ fieldattachments|jscode }}'
                                 },
                                 {
                                     xtype: 'gridpanel',
@@ -338,7 +350,7 @@
                                                     var xhr = new XMLHttpRequest();
                                                     xhr.upload.grid=grid;
                                                     xhr.open("POST", '{{path('mailclient_uploadfile')}}', true);
-                                                    xhr.setRequestHeader("X_FILENAME", file.name);
+                                                    xhr.setRequestHeader("X-Filename", file.name);
                                                     xhr.upload.addEventListener("progress", function(e){
                                                         var complete = Math.round(e.loaded / e.total * 100);
                                                         var datapos=e.target.grid.store.find('name',file.name);
@@ -349,8 +361,10 @@
                                                     xhr.addEventListener('load', function(){
                                                         console.log('fertig',this);
                                                         var response=Ext.JSON.decode(this.responseText);
+                                                        console.log('response',response);
                                                         if(response.status=='OK'){
                                                             var datapos=this.upload.grid.store.find('name',response.filename);
+                                                            console.log('datapos',datapos);
                                                             this.upload.grid.store.data.items[datapos].data.hash=response.hash;
                                                             var fieldattachments=this.upload.grid.ownerCt.getComponent('fieldattachments');
                                                             var hashes=[];

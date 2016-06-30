@@ -97,7 +97,15 @@ class FilemanagerRESTController extends BaseRestController
     public function postAction(Request $request)
     {
         $entity = new Filesystem();
-        $form = $this->createForm(new FilesystemType($this->container->getParameter('filesystemtypes')), $entity, array("method" => $request->getMethod()));
+        /*$form = $this->createForm(new FilesystemType($this->container->getParameter('filesystemtypes')), $entity, array(
+            "method" => $request->getMethod(),
+
+        ));*/
+
+        $form = $this->createForm(FilesystemType::class, $entity, array(
+            "method" => $request->getMethod(),
+            'filesystemadapters'=>$this->container->getParameter('filesystemadapters')
+        ));
         $this->removeExtraFields($request, $form);
         $form->handleRequest($request);
 
@@ -124,12 +132,16 @@ class FilemanagerRESTController extends BaseRestController
      */
     public function putAction(Request $request, Filesystem $entity)
     {
-        
+
         try {
             $em = $this->getDoctrine()->getManager();
-            
+
             //$request->setMethod('PATCH'); //Treat all PUTs as PATCH
-            $form = $this->createForm(new FilesystemType($this->container->getParameter('filesystemtypes')), $entity, array("method" => $request->getMethod()));
+            //$form = $this->createForm(new FilesystemType($this->container->getParameter('filesystemtypes')), $entity, array("method" => $request->getMethod()));
+            $form = $this->createForm(FilesystemType::class, $entity, array(
+                "method" => $request->getMethod(),
+                'filesystemadapters'=>$this->container->getParameter('filesystemadapters')
+            ));
             $this->removeExtraFields($request, $form);
             $form->handleRequest($request);
             

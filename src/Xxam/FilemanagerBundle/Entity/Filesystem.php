@@ -4,6 +4,7 @@ namespace Xxam\FilemanagerBundle\Entity;
 
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Xxam\CoreBundle\Entity\Base as Base;
 use Xxam\UserBundle\Entity\Group;
 use Xxam\UserBundle\Entity\User;
@@ -39,6 +40,7 @@ class Filesystem implements Base\TenantInterface
      *
      * @ORM\Column(name="filesystemname", type="string", length=50)
      * @Gedmo\Versioned
+     * @Assert\NotBlank()
      */
     protected $filesystemname;
     
@@ -47,6 +49,7 @@ class Filesystem implements Base\TenantInterface
      *
      * @ORM\Column(name="adapter", type="string", length=50)
      * @Gedmo\Versioned
+     * @Assert\NotBlank()
      */
     protected $adapter;
     
@@ -55,6 +58,7 @@ class Filesystem implements Base\TenantInterface
      *
      * @ORM\Column(name="settings", type="string", length=1023)
      * @Gedmo\Versioned
+     * @Assert\NotBlank()
      */
     protected $settings;
     

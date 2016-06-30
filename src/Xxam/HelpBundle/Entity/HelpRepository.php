@@ -29,8 +29,8 @@ class HelpRepository extends EntityRepository
         $fields[]=Array('name'=> 'name','type'=>'string');
         $fields[]=Array('name'=> 'description','type'=>'string');
         $fields[]=Array('name'=> 'help','type'=>'string');
-        $fields[]=Array('name'=> 'created','type'=>'date', 'dateFormat'=>'Y-m-d H.i.s');
-        $fields[]=Array('name'=> 'updated','type'=>'date', 'dateFormat'=>'Y-m-d H.i.s');
+        $fields[]=Array('name'=> 'created','type'=>'date', 'dateFormat'=>'Y-m-d H:i:s');
+        $fields[]=Array('name'=> 'updated','type'=>'date', 'dateFormat'=>'Y-m-d H:i:s');
         return $fields;
 
     }

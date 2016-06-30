@@ -113,8 +113,8 @@ class Group extends BaseGroup implements Base\TenantInterface
             'id' =>                     $this->getId(),
             'name' =>                   $this->getName(),
             'roles' =>                  $this->getRoles(),
-            'created' =>                $this->getCreated() ? $this->getCreated()->format('Y-m-d H.i.s') : false,
-            'updated' =>                $this->getUpdated() ? $this->getUpdated()->format('Y-m-d H.i.s') : false
+            'created' =>                $this->getCreated() ? $this->getCreated()->format('Y-m-d H:i:s') : false,
+            'updated' =>                $this->getUpdated() ? $this->getUpdated()->format('Y-m-d H:i:s') : false
         );
     }
     
