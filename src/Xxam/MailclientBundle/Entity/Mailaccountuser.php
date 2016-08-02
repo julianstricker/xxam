@@ -27,7 +27,6 @@ class Mailaccountuser implements Base\TenantInterface
     protected $id;
     
     /**
-     * @var string
      *
      * @ORM\Column(name="user_id", type="integer")
      * @Gedmo\Versioned

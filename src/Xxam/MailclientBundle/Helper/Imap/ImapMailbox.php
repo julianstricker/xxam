@@ -172,7 +172,7 @@ class ImapMailbox extends Mbox{
      */
 
     public function addMail($msg, $seen = true) {
-        return imap_append($this->getImapStream(), $this->imapPath, $msg . "\r\n", $seen ? "\\Seen" : null);
+        return \imap_append($this->getImapStream(), $this->imapPath, $msg . "\r\n", $seen ? "\\Seen" : null);
     }
     
     /*

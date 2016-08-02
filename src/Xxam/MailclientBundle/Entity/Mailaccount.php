@@ -2,6 +2,7 @@
 
 namespace Xxam\MailclientBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping as ORM;
 use Xxam\CoreBundle\Entity\Base as Base;
@@ -192,14 +193,18 @@ class Mailaccount implements Base\TenantInterface
     private $updated;
 
     /**
-     * @ORM\OneToMany(targetEntity="Xxam\MailclientBundle\Entity\Mailaccountuser", mappedBy="mailaccount", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity="Mailaccountuser", mappedBy="mailaccount", cascade={"persist", "remove"})
      */
     private $mailaccountusers;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Mailspool", mappedBy="mailaccount", cascade={"persist", "remove"})
+     */
+    private $mailspools;
+
     public function __construct()
     {
-        parent::__construct();
-        // your own logic
+        $this->mailaccountusers = new ArrayCollection();
     }
 
 
@@ -679,7 +684,7 @@ class Mailaccount implements Base\TenantInterface
      * @param \Xxam\MailclientBundle\Entity\Mailaccountuser $mailaccountusers
      * @return Mailaccount
      */
-    public function addMailaccountuser(\Xxam\MailclientBundle\Entity\Mailaccountuser $mailaccountusers)
+    public function addMailaccountuser(Mailaccountuser $mailaccountusers)
     {
         $this->mailaccountusers[] = $mailaccountusers;
 
@@ -691,7 +696,7 @@ class Mailaccount implements Base\TenantInterface
      *
      * @param \Xxam\MailclientBundle\Entity\Mailaccountuser $mailaccountusers
      */
-    public function removeMailaccountuser(\Xxam\MailclientBundle\Entity\Mailaccountuser $mailaccountusers)
+    public function removeMailaccountuser(Mailaccountuser $mailaccountusers)
     {
         $this->mailaccountusers->removeElement($mailaccountusers);
     }

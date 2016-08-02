@@ -4,11 +4,14 @@
 
 namespace Xxam\UserBundle\Entity;
 
+use Doctrine\Common\Collections\Collection;
 use Gedmo\Mapping\Annotation as Gedmo;
 use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ORM\Mapping as ORM;
 use Xxam\CoreBundle\Entity\Base as Base;
+use Xxam\CoreBundle\Entity\Extjsstate;
 use Xxam\CoreBundle\Entity\Widget;
+use Xxam\FilemanagerBundle\Entity\Filesystem;
 
 /**
  * @ORM\Entity
@@ -56,7 +59,7 @@ class User extends BaseUser implements Base\TenantInterface
 
 
     /**
-     * @var Widget[] $widgets
+     * @var Collection|Widget[] $widgets
      * @ORM\OneToMany(targetEntity="Xxam\CoreBundle\Entity\Widget", mappedBy="user", cascade={"persist", "remove"})
      * @ORM\OrderBy({"sortfield" = "ASC"})
      */
@@ -65,14 +68,22 @@ class User extends BaseUser implements Base\TenantInterface
     
     
     /**
+     * @var Filesystem[] | Collection $filesystems
      * @ORM\OneToMany(targetEntity="Xxam\FilemanagerBundle\Entity\Filesystem", mappedBy="user", cascade={"persist", "remove"})
      */
     private $filesystems;
 
     /**
+     * @var Extjsstate[] | Collection $extjsstates
      * @ORM\OneToMany(targetEntity="Xxam\CoreBundle\Entity\Extjsstate", mappedBy="user", cascade={"persist", "remove"})
      */
     private $extjsstates;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Xxam\MailclientBundle\Entity\Mailspool", mappedBy="user", cascade={"persist", "remove"})
+     */
+    private /** @noinspection PhpUnusedPrivateFieldInspection */
+        $mailspools;
 
     public function __construct() {
         parent::__construct();
@@ -133,16 +144,16 @@ class User extends BaseUser implements Base\TenantInterface
     /**
      * Add widgets
      *
-     * @param \Xxam\CoreBundle\Entity\Widget $widgets
+     * @param Widget $widgets
      */
-    public function addWidget(\Xxam\CoreBundle\Entity\Widget $widgets) {
+    public function addWidget(Widget $widgets) {
         $this->widgets[] = $widgets;
     }
 
     /**
      * Get widgets
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection|Widget[]
      */
     public function getWidgets() {
         return $this->widgets;
@@ -151,9 +162,9 @@ class User extends BaseUser implements Base\TenantInterface
     /**
      * Add extjsstates
      *
-     * @param \Xxam\CoreBundle\Entity\Extjsstate $extjsstates
+     * @param Extjsstate $extjsstates
      */
-    public function addExtjsstate(\Xxam\CoreBundle\Entity\Extjsstate $extjsstates) {
+    public function addExtjsstate(Extjsstate $extjsstates) {
         $this->extjsstates[] = $extjsstates;
     }
 
@@ -199,9 +210,9 @@ class User extends BaseUser implements Base\TenantInterface
     /**
      * Remove widgets
      *
-     * @param \Xxam\CoreBundle\Entity\Widget $widgets
+     * @param Widget $widgets
      */
-    public function removeWidget(\Xxam\CoreBundle\Entity\Widget $widgets)
+    public function removeWidget(Widget $widgets)
     {
         $this->widgets->removeElement($widgets);
     }
@@ -209,10 +220,10 @@ class User extends BaseUser implements Base\TenantInterface
     /**
      * Add filesystems
      *
-     * @param \Xxam\FilemanagerBundle\Entity\Filesystem $filesystems
+     * @param Filesystem $filesystems
      * @return User
      */
-    public function addFilesystem(\Xxam\FilemanagerBundle\Entity\Filesystem $filesystems)
+    public function addFilesystem(Filesystem $filesystems)
     {
         $this->filesystems[] = $filesystems;
 
@@ -222,9 +233,9 @@ class User extends BaseUser implements Base\TenantInterface
     /**
      * Remove filesystems
      *
-     * @param \Xxam\FilemanagerBundle\Entity\Filesystem $filesystems
+     * @param Filesystem $filesystems
      */
-    public function removeFilesystem(\Xxam\FilemanagerBundle\Entity\Filesystem $filesystems)
+    public function removeFilesystem(Filesystem $filesystems)
     {
         $this->filesystems->removeElement($filesystems);
     }

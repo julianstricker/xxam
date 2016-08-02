@@ -327,7 +327,9 @@ class MailclientController extends MailclientBaseController {
             'type'=>$type,
             'mailid'=>$mailid,
             'path'=>$path,
-            'mail'=>new IncomingMail()
+            'mail'=>new IncomingMail(),
+            'attachmentsgridStoreData'=>[],
+            'fieldattachments'=>[]
             
         );
         $mailaccountid=false;

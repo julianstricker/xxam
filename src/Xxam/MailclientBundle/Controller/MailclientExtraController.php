@@ -6,6 +6,7 @@ namespace Xxam\MailclientBundle\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
+use Xxam\MailclientBundle\Entity\Mailspool;
 
 class MailclientExtraController extends MailclientBaseController {
     
@@ -221,18 +222,35 @@ class MailclientExtraController extends MailclientBaseController {
         if (!$mailaccount){
             return $this->throwJsonError('Mailaccount not found');
         }
-        $mailer = $this->getMailerForMailaccount($mailaccount);
+        //$mailer = $this->getMailerForMailaccount($mailaccount);
         $message=$this->generateMailForRequest($request);
-        if (get_class($message)=='Response'){ //on Error:
+        if (get_class($message)=='Symfony\Component\HttpFoundation\Response'){ //on Error:
             return $message;
         }
 
-        $resp=$this->sendmail($mailer,$message);
-        if ($resp!==true && get_class($resp)=='Response'){ //on Error:
+        /*$resp=$this->sendmail($mailer,$message);
+        if ($resp!==true && get_class($resp)=='Symfony\Component\HttpFoundation\Response'){ //on Error:
             return $resp;
+        }*/
+
+        $spool=new Mailspool();
+        $spool->mapMessage($message,$this->get('security.token_storage')->getToken()->getUser(),$mailaccount);
+        $sendafter=$request->get('fieldsendafter');
+        if (is_numeric($sendafter)){
+            $sendafter = new \DateTime();
+            $sendafter->add(new \DateInterval('PT'.$request->get('fieldsendafter').'M'));
+        }else{
+            $sendafter= new \DateTime($sendafter);
         }
+        $spool->setSendafter($sendafter);
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($spool);
+        $em->flush();
+
+
+
         //move into sent folder:
-        $msg = $message->toString(); 
+        $msg = $message->toString();
         //  (this creates the full MIME message required for imap_append()!!
         //  After this you can call imap_append like this:
         $folder=ltrim($mailaccount->getSentfolder(),'.');
@@ -240,6 +258,9 @@ class MailclientExtraController extends MailclientBaseController {
         $mailbox->addMail($msg,true);
         return $this->getJsonResponse(Array('status'=>'OK'));
     }
+
+
+
     
     /**
      * Mailclient

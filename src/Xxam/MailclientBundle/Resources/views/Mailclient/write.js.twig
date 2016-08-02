@@ -8,7 +8,7 @@
     tabtitle: '{% trans %}Write Mail{% endtrans %}',
     //tabicon: '/bundles/xxammailclient/icons/16x16/email_edit.png',
     iconCls: 'x-fa fa-envelope',
-    getitems: function (){
+    getitems: function(){
         if (typeof(Xxam.form) == 'undefined' || typeof(Xxam.form.field) == 'undefined' || typeof(Xxam.form.field.tag) == 'undefined'){
             Ext.define('Xxam.form.field.tag', {
                 extend: 'Ext.form.field.Tag',
@@ -57,8 +57,28 @@
                 }
             }
         });
-    
-        
+
+        var dateMenu = Ext.create('Ext.menu.DatePicker', {
+            format: 'Y-m-d H:i',
+            handler: function(dp, date){
+                Ext.Msg.alert('Date Selected', 'You selected ' + Ext.Date.format(date, 'M j, Y'));
+            }
+        });
+        var nowtime=new Date();
+        var thetime=new Date();
+        thetime.setMinutes(thetime.getMinutes()+15-thetime.getMinutes()%15);
+        thetime.setSeconds(0);
+        var dateMenuitems = [];
+        for(var i=0; i<96; i++){
+            var datestring=thetime.getDate()-nowtime.getDate()==0 ? '{% trans %}Today{% endtrans %}' : '{% trans %}Tomorrow{% endtrans %}';
+            datestring+=', '+Ext.String.leftPad(thetime.getHours(),2,'0')+':'+Ext.String.leftPad(thetime.getMinutes(),2,'0');
+            dateMenuitems.push({text: datestring, thetime: Ext.Date.format(thetime, 'Y-m-d H:i:s'), handler: function(){
+                ttt=this;
+                this.up('button').setText('{% trans %}Send{% endtrans %} '+this.config.text);
+                this.up('form').form.findField('fieldsendafter').setValue(this.config.thetime);
+            }});
+            thetime.setMinutes(thetime.getMinutes()+15);
+        }
 
         return {
             layout: 'fit',
@@ -75,43 +95,57 @@
                     jsonSubmit: true,
                     paramsAsHash: true,
                     url: '{{path('mailclient_sendmail')}}?type={{type}}&path={{path}}&mailid={{mailid}}',
-                    buttons: [{ text: 'Cancel'},
-                    {
-                        text: '{% trans %}Send{% endtrans %}',
-                        formBind: true, //only enabled once the form is valid
-                        disabled: true,
-                        handler: function(evt){
-                            var form = this.up('form').getForm();
-                            fff=form;
-                            if (form.isValid()) {
-                                var formvalues=form.getValues();
-                                if(formvalues.fieldto=='' && formvalues.fieldcc=='' && formvalues.fieldbcc==''){
-                                    Ext.Msg.alert('{% trans %}Send{% endtrans %}', '{% trans %}Please enter at least one recipient.{% endtrans %}');
-                                    return false;
-                                }else{
-                                    Ext.Ajax.request({
-                                        url: form.url,
-                                        method: 'POST',
-                                        waitTitle: 'Connecting',
-                                        waitMsg: '{% trans %}Sending data...{% endtrans %}',
-                                        jsonData: form.getValues(),
-                                        timeout: 600000,
-                                        success: function(response) {
-                                            var resp=Ext.JSON.decode(response.responseText);
-                                            console.log('success',resp);
-                                            Xxam.msg('{% trans %}Send{% endtrans %}','{% trans %}Email was send{% endtrans %}', '/bundles/xxammailclient/icons/32x32/email.png');
-                                            Ext.getCmp('contenttabpanel').getActiveTab().destroy();
-                                        },
-                                        failure: function(response) {
-                                            var resp=Ext.JSON.decode(response.responseText);
-                                            console.log('failure',response.responseText);
-                                            Ext.Msg.alert('{% trans %}Failed{% endtrans %}', resp.error);
-                                        }
-                                    });
+                    buttons: [
+                        {
+                            text: '{% trans %}Send now{% endtrans %}',
+                            xtype: 'splitbutton',
+                            iconCls: 'x-fa fa-clock-o',
+                            menu      : [
+                                {text: '{% trans %}now{% endtrans %}', handler: function(){ ttt=this; this.up('button').setText('{% trans %}Send{% endtrans %} '+this.config.text); this.up('form').form.findField('fieldsendafter').setValue(''); }},
+                                {text: '{% trans %}in 5 minutes{% endtrans %}', handler: function(){ this.up('button').setText('{% trans %}Send{% endtrans %} '+this.config.text); this.up('form').form.findField('fieldsendafter').setValue('5'); }},
+                                {text: '{% trans %}in 15 minutes{% endtrans %}', handler: function(){ this.up('button').setText('{% trans %}Send{% endtrans %} '+this.config.text); this.up('form').form.findField('fieldsendafter').setValue('15'); }},
+                                {text: '{% trans %}in 30 minutes{% endtrans %}', handler: function(){ this.up('button').setText('{% trans %}Send{% endtrans %} '+this.config.text); this.up('form').form.findField('fieldsendafter').setValue('30'); }},
+                                {text: '{% trans %}in 1 hour{% endtrans %}', handler: function(){ this.up('button').setText('{% trans %}Send{% endtrans %} '+this.config.text); this.up('form').form.findField('fieldsendafter').setValue('60'); }},
+                                {
+                                    text: '{% trans %}after...{% endtrans %}',
+                                    menu: dateMenuitems
+                                },
+
+                            ],
+                            formBind: true, //only enabled once the form is valid
+                            disabled: true,
+                            handler: function(evt){
+                                var form = this.up('form').getForm();
+                                fff=form;
+                                if (form.isValid()) {
+                                    var formvalues=form.getValues();
+                                    if(formvalues.fieldto=='' && formvalues.fieldcc=='' && formvalues.fieldbcc==''){
+                                        Ext.Msg.alert('{% trans %}Send{% endtrans %}', '{% trans %}Please enter at least one recipient.{% endtrans %}');
+                                        return false;
+                                    }else{
+                                        Ext.Ajax.request({
+                                            url: form.url,
+                                            method: 'POST',
+                                            waitTitle: 'Connecting',
+                                            waitMsg: '{% trans %}Sending data...{% endtrans %}',
+                                            jsonData: form.getValues(),
+                                            timeout: 600000,
+                                            success: function(response) {
+                                                var resp=Ext.JSON.decode(response.responseText);
+                                                console.log('success',resp);
+                                                Xxam.msg('{% trans %}Send{% endtrans %}','{% trans %}Email was send{% endtrans %}', '/bundles/xxammailclient/icons/32x32/email.png');
+                                                Ext.getCmp('contenttabpanel').getActiveTab().destroy();
+                                            },
+                                            failure: function(response) {
+                                                var resp=Ext.JSON.decode(response.responseText);
+                                                console.log('failure',response.responseText);
+                                                Ext.Msg.alert('{% trans %}Failed{% endtrans %}', resp.error);
+                                            }
+                                        });
+                                    }
                                 }
                             }
-                        }
-                    }],
+                        }],
                     items: [
                         {
                             xtype: 'fieldcontainer',
@@ -129,6 +163,12 @@
                                     name: 'fieldinreplyto',
                                     itemId: 'fieldinreplyto',
                                     value: '{{ mail.in_reply_to|raw }}'
+                                },
+                                {
+                                    xtype: 'hiddenfield',
+                                    name: 'fieldsendafter',
+                                    itemId: 'fieldsendafter',
+                                    value: ''
                                 },
                                 {
                                     xtype: 'hiddenfield',

@@ -11,6 +11,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Xxam\ContactBundle\Entity\Contact;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use LinkedIn\LinkedIn;
 
 /**
  * Contact controller.
@@ -104,6 +105,78 @@ class ContactController extends Controller
         }
         return $this->render('XxamContactBundle:Contact:edit.js.twig', array('entity'=>$entity,'contacttypes'=>$this->contacttypesAsKeyValue(),'modelfields'=>$repository->getModelFields()));
     }
+
+    /**
+     * Get Linkedin Contact infos
+     *
+     * @Route("/getlinkedincontact/{email}", name="contact_getlinkedincontact")
+     * @Method("GET")
+     * @Security("has_role('ROLE_CONTACT_EDIT')")
+     */
+    /*public function getlinkedincontactAction($email) {
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+        $li = new LinkedIn(
+            array(
+                'api_key' => '787fjpije7jmt7',
+                'api_secret' => 'sb4ndNUGhGaZYFaG',
+                'callback_url' => 'https://xxam.com/contact/linkedinoauth'
+            )
+        );
+        $url = $li->getLoginUrl(
+            array(
+                LinkedIn::SCOPE_BASIC_PROFILE,
+                LinkedIn::SCOPE_EMAIL_ADDRESS,
+                //LinkedIn::SCOPE_NETWORK
+            )
+        );
+        $memcached=$this->get('memcached');
+        $token= $memcached->get('linkedin_token_'.$user->getTenantId());
+        if (!$token){
+            $url = $li->getLoginUrl(
+                array(
+                    LinkedIn::SCOPE_BASIC_PROFILE,
+                    LinkedIn::SCOPE_EMAIL_ADDRESS,
+                    //LinkedIn::SCOPE_NETWORK
+                )
+            );
+            $info = $li->get('/people/~:(first-name,last-name,positions)');
+            $response = new Response(json_encode(Array('status'=>'auth','url'=>$url)));
+            return $response;
+        }else{
+            $li->setAccessToken($token);
+            $info = $li->get('/people/~:(first-name,last-name,positions)');
+            $response = new Response(json_encode(Array('status'=>'OK','data'=>$info)));
+            return $response;
+        }
+
+
+    }*/
+
+    /**
+     * Get Linkedin Contact infos
+     *
+     * @Route("/linkedinoauth", name="contact_linkedinoauth")
+     * @Method("GET")
+     */
+    /*public function linkedinoauthAction() {
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+
+        $li = new LinkedIn(
+            array(
+                'api_key' => '787fjpije7jmt7',
+                'api_secret' => 'sb4ndNUGhGaZYFaG',
+                'callback_url' => 'https://xxam.com/contact/linkedinoauth'
+            )
+        );
+        $token = $li->getAccessToken($_REQUEST['code']);
+        $token_expires = $li->getAccessTokenExpiration();
+        $memcached=$this->get('memcached');
+        $memcached->set('linkedin_token_'.$user->getTenantId(),$token);
+        $response = new Response(json_encode(Array('status'=>'OK','token'=>$token_expires)));
+        return $response;
+    }*/
+
+
     
     private function contacttypesAsKeyValue(){
         $contacttypes=Array();
