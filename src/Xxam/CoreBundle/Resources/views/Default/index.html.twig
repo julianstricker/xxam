@@ -8,8 +8,8 @@
         {% block stylesheets %}
             {% stylesheets
             'bundles/xxamcore/css/*'
-            'assets/vendor/extjs/build/classic/theme-triton/resources/theme-triton-all_1.css'
-            'assets/vendor/extjs/build/classic/theme-triton/resources/theme-triton-all_2.css'
+            'assets/vendor/extjs/build/classic/theme-gray/resources/theme-gray-all.css'
+            'assets/vendor/extjs/build/packages/font-awesome/resources/font-awesome-all.css'
             filter='cssrewrite' %}
             <link rel="stylesheet" type="text/css" href="{{ asset_url }}" />
             {% endstylesheets %}
@@ -31,7 +31,7 @@
             {%if app.environment == 'dev' %}
                 {% javascripts
                     'assets/vendor/extjs/build/ext-all-debug.js'
-                    'assets/vendor/extjs/build/classic/theme-triton/theme-triton-debug.js'
+                    'assets/vendor/extjs/build/classic/theme-gray/theme-gray-debug.js'
                     '@XxamCoreBundle/Resources/public/js/adapter.js'
                     '@XxamCoreBundle/Resources/public/js/layout.js'
                     'assets/vendor/extjs/build/packages/charts/classic/charts-debug.js'
@@ -41,7 +41,7 @@
             {% else %}
                 {% javascripts
                 'assets/vendor/extjs/build/ext-all.js'
-                'assets/vendor/extjs/build/classic/theme-triton/theme-triton.js'
+                'assets/vendor/extjs/build/classic/theme-gray/theme-gray.js'
                 '@XxamCoreBundle/Resources/public/js/adapter.js'
                 '@XxamCoreBundle/Resources/public/js/layout.js'
                 'assets/vendor/extjs/build/packages/charts/classic/charts.js'

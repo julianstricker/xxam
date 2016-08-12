@@ -19,13 +19,12 @@ class DynmodType extends AbstractType
             ->add('name')
             ->add('description')
             ->add('help')
+            ->add('iconcls')
+            ->add('additionalroles')
             ->add('actions')
             ->add('objectactions')
-            ->add('datacontainer_id')
+            ->add('active')
 
-
-            
-                
         ;
     }
 

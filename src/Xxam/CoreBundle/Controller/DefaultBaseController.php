@@ -30,18 +30,26 @@ class DefaultBaseController extends Controller
     /**
      * Returns a Array of Widgets-Service-Ids
      *
-     * @return array
+     * @return array|object
      */
-    protected function getRegisteredWidgets(){
-        $widgets=Array();
+    protected function getRegisteredWidgets()
+    {
         /** @var Container $container */
-        $container=$this->container;
-        foreach($container->getServiceIds() as $serviceid){
-            if (strpos($serviceid,'xxamportalwidget.')===0){
-                $widgets[]=$serviceid;
-            }
-        }
-        return $widgets;
+        $container = $this->container;
+        return $container->get('xxam_portalwidget_holder');
+    }
+    /**
+     * Returns a Array of Menu-Services
+     *
+     * @return array|object
+     */
+    protected function getRegistereMenus()
+    {
+
+        /** @var Container $container */
+        $container = $this->container;
+        return $container->get('xxam_menuservices_holder');
+
     }
 
     /**
@@ -52,22 +60,22 @@ class DefaultBaseController extends Controller
      */
     protected function getMenu($config)
     {
-        $menu=Array();
-	foreach($config as $value){
-            $menuitem=Array();
-            foreach($value as $key=>$val){
-                if ($key=='role'){
+        $menu = Array();
+        foreach ($config as $value) {
+            $menuitem = Array();
+            foreach ($value as $key => $val) {
+                if ($key == 'role') {
                     if (!$this->get('security.authorization_checker')->isGranted($val)) continue 2;
-                }elseif($key=='menu') {
-                    $menuitem[$key]=$this->getMenu($val);
-                }else{
-                    $menuitem[$key]=$val;
+                } elseif ($key == 'menu') {
+                    $menuitem[$key] = $this->getMenu($val);
+                } else {
+                    $menuitem[$key] = $val;
                 }
             }
-	    
-	    $menu[]=$menuitem;
+
+            $menu[] = $menuitem;
         }
-	return $menu;
+        return $menu;
     }
 
     /**
@@ -76,11 +84,12 @@ class DefaultBaseController extends Controller
      * @param User $user
      * @return Response
      */
-    protected function statefulGetResponse(User $user){
-        $states=$user->getExtjsstates();
-        $resp=Array();
-        foreach($states as $state){
-            $resp[$state->getStatekey()]=$state->getStatevalue();
+    protected function statefulGetResponse(User $user)
+    {
+        $states = $user->getExtjsstates();
+        $resp = Array();
+        foreach ($states as $state) {
+            $resp[$state->getStatekey()] = $state->getStatevalue();
         }
         $response = new Response(json_encode($resp));
         $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
@@ -95,18 +104,19 @@ class DefaultBaseController extends Controller
      * @param mixed $value
      * @return Response
      */
-    protected function statefulPostResponse(User $user, $key, $value){
+    protected function statefulPostResponse(User $user, $key, $value)
+    {
         $em = $this->getDoctrine()->getManager();
-        $state=$widget=$this->getDoctrine()->getManager()->getRepository('XxamCoreBundle:Extjsstate')->findOneBy(Array('user_id'=>$user->getId(),'statekey'=>$key));
-        if(!$state){
-            $state=new Extjsstate();
+        $state = $widget = $this->getDoctrine()->getManager()->getRepository('XxamCoreBundle:Extjsstate')->findOneBy(Array('user_id' => $user->getId(), 'statekey' => $key));
+        if (!$state) {
+            $state = new Extjsstate();
             $state->setUser($user);
             $state->setStatekey($key);
         }
         $state->setStatevalue($value);
         $em->persist($state);
         $em->flush();
-        $resp=Array('success'=>'true');
+        $resp = Array('success' => 'true');
 
         $response = new Response(json_encode($resp));
         $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
@@ -120,18 +130,19 @@ class DefaultBaseController extends Controller
      * @param String $key
      * @return Response
      */
-    protected function statefulDeleteResponse(User $user, $key){
+    protected function statefulDeleteResponse(User $user, $key)
+    {
         $em = $this->getDoctrine()->getManager();
-        $filter=Array('user_id'=>$user->getId());
-        if ($key!=false) $filter['statekey']=$key;
-        $states=$widget=$this->getDoctrine()->getManager()->getRepository('XxamCoreBundle:Extjsstate')->findBy($filter);
-        if($states){
-            foreach($states as $state){
+        $filter = Array('user_id' => $user->getId());
+        if ($key != false) $filter['statekey'] = $key;
+        $states = $widget = $this->getDoctrine()->getManager()->getRepository('XxamCoreBundle:Extjsstate')->findBy($filter);
+        if ($states) {
+            foreach ($states as $state) {
                 $em->remove($state);
             }
         }
         $em->flush();
-        $resp=Array('success'=>'true');
+        $resp = Array('success' => 'true');
 
         $response = new Response(json_encode($resp));
         $response->headers->set('Content-Type', 'application/json; charset=UTF-8');

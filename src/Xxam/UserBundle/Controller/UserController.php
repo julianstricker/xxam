@@ -116,7 +116,7 @@ class UserController extends Controller
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find User entity.');
         }
-        $form   = $this->createForm(new UserType($this->getRoles()), $entity)->createView();
+        $form   = $this->createForm(UserType::class,$entity, ['roledefinitions'=>$this->getRoles()])->createView();
 
         /** @var User $entity */
 

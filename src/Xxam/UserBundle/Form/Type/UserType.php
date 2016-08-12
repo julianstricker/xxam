@@ -1,6 +1,8 @@
 <?php
 
 namespace Xxam\UserBundle\Form\Type;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 
@@ -14,21 +16,20 @@ class UserType extends AbstractType
     {
         parent::buildForm($builder ,$options);
 
-        $rds=$this->roledefinitions;
+        $rds=$this->roledefinitions=$options['roledefinitions'];
         $roledefinitions=Array();
         if ($rds){
             foreach($rds as $key => $value){
                $roledefinitions[$value]=$value; 
             }
         }
-        //dump($roledefinitions);
         $builder
             ->add('username')
             ->add('email')
-            ->add('passwordplain','password',array('mapped'=>false))
+            ->add('passwordplain',PasswordType::class,array('mapped'=>false))
             ->add('locked')
             ->add('groups') 
-            ->add('roles' ,'choice' ,array('choices'=>$roledefinitions,'multiple'=>true,'expanded'=>true )) 
+            ->add('roles' ,ChoiceType::class ,array('choices'=>$roledefinitions,'multiple'=>true,'expanded'=>true ))
         ;
         
         //$builder->get('roles')->addModelTransformer(new RolesTransformer());
@@ -41,9 +42,9 @@ class UserType extends AbstractType
     }
     
     protected $roledefinitions;
-    public function __construct ($roledefinitions)
+    public function __construct ()
     {
-        $this->roledefinitions = $roledefinitions;        
+
     }
     public function configureOptions(OptionsResolver $resolver)
     {
@@ -52,6 +53,7 @@ class UserType extends AbstractType
             'data_class' => 'Xxam\UserBundle\Entity\User',
             //'validation_groups' => array('Brandnamic\CoreBundle\Entity\User'),
             'lang' => 'de',
+            'roledefinitions' => []
         )); 
     }
 }

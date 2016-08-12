@@ -13,6 +13,7 @@ namespace Xxam\CoreBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 
@@ -28,10 +29,26 @@ class XxamCoreExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configuration = new Configuration();
+        //$configuration = new Configuration();
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('parameters.yml');
+        if (!$container->hasDefinition('xxam_menuservices_holder')) {
+            $taggedServiceHolder = new Definition();
+            $taggedServiceHolder->setClass('SplDoublyLinkedList');
+            $container->setDefinition('xxam_menuservices_holder', $taggedServiceHolder);
+        }
+        if (!$container->hasDefinition('xxam_portalwidget_holder')) {
+            $taggedServiceHolder = new Definition();
+            $taggedServiceHolder->setClass('SplDoublyLinkedList');
+            $container->setDefinition('xxam_portalwidget_holder', $taggedServiceHolder);
+        }
+        if (!$container->hasDefinition('xxam_roles_holder')) {
+            $taggedServiceHolder = new Definition();
+            $taggedServiceHolder->setClass('SplDoublyLinkedList');
+            $container->setDefinition('xxam_roles_holder', $taggedServiceHolder);
+        }
     }
+
 }

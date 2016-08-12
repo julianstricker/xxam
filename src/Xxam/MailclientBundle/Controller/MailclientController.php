@@ -3,11 +3,13 @@
 namespace Xxam\MailclientBundle\Controller;
 
 
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Xxam\MailclientBundle\Entity\Mailaccountuser;
 use Xxam\MailclientBundle\Entity\MailaccountuserRepository;
+use Xxam\MailclientBundle\Entity\Mailspool;
 use Xxam\MailclientBundle\Helper\Imap\IncomingMail;
 
 class MailclientController extends MailclientBaseController {
@@ -108,6 +110,7 @@ class MailclientController extends MailclientBaseController {
 
             $returndata[] =  $this->removeChildrenkeys($children);
         }
+
         //dump($returndata);
         //setLocale(LC_ALL,'de_DE.UTF8');
         $response = new Response(json_encode($returndata));
@@ -130,6 +133,7 @@ class MailclientController extends MailclientBaseController {
         $limit=$request->get('limit',100);
         $sort=$request->get('sort','arrival');
         $dir=$request->get('dir','DESC');
+        $filter=json_decode($request->get('filter','[]')); //[{"operator":"like","value":"test","property":"subject"},{"operator":"lt","value":"08/03/2016","property":"date"}]
         $path=$request->get('path','');
         $mailaccountid=0;
         if ($path){
@@ -138,6 +142,7 @@ class MailclientController extends MailclientBaseController {
             unset($pathexpl[0]);
             $path=count($pathexpl)>0 ? '.'.implode('.',$pathexpl) : '';
         }
+
         $mailaccount=$this->getUserMailaccountForId($mailaccountid);
         
         if (!$mailaccount){
@@ -146,11 +151,56 @@ class MailclientController extends MailclientBaseController {
         $returndata=Array();
         
         $mailbox = $this->getImapMailbox($mailaccount,$path);
-        $searchcriteria='ALL'; //'ALL';
+        if (count($filter)>0){
+            $filterstrings=[];
+            foreach($filter as $f){
+                switch($f->property){
+                    case 'subject':
+                        $filterstrings[]='SUBJECT "'.$f->value.'"';
+                        break;
+                    case 'from':
+                        $filterstrings[]='FROM "'.$f->value.'"';
+                        break;
+                    case 'to':
+                        $filterstrings[]='TO "'.$f->value.'"';
+                        break;
+                    case 'date':
+                        $valuedateobj=new \DateTime($f->value);
+                        $valuedate=$valuedateobj->format('d-M-Y');
+                        if($f->operator=='lt'){
+                            $filterstrings[]='BEFORE "'.$valuedate.'"';
+                        }else if($f->operator=='gt'){
+                            $filterstrings[]='SINCE "'.$valuedate.'"';
+                        }else if ($f->operator=='eq'){
+                            $filterstrings[]='ON "'.$valuedate.'"';
+                        }
+                        break;
+                    case 'recent':
+                        $filterstrings[]= $f->value ? 'NEW' : 'OLD';
+                        break;
+                    case 'flagged':
+                        $filterstrings[]= $f->value ? 'FLAGGED' : 'UNFLAGGED';
+                        break;
+                    case 'answered':
+                        $filterstrings[]= $f->value ? 'ANSWERED' : 'UNANSWERED';
+                        break;
+                    case 'deleted':
+                        $filterstrings[]= $f->value ? 'DELETED' : 'UNDELETED';
+                        break;
+                    case 'seen':
+                        $filterstrings[]= $f->value ? 'SEEN' : 'UNSEEN';
+                        break;
+                }
+            }
+            $searchcriteria=implode(' ',$filterstrings);
+        }else{
+            $searchcriteria='ALL'; //'ALL';
+        }
+
         $sortarray=Array(
             'date' => SORTDATE,
             'arrival' => SORTARRIVAL,
-	    'from' => SORTFROM,
+	        'from' => SORTFROM,
             'subject'=> SORTSUBJECT,
             'to' => SORTTO,
             'cc' => SORTCC,
@@ -162,6 +212,10 @@ class MailclientController extends MailclientBaseController {
         $mails=$mailbox->getMailsInfo($pagingmails_ids);
         $mailsbyid=Array();
         foreach($mails as $m){
+            if (property_exists($m,'date')){
+                $date = new \DateTime($m->date);
+                if ($date) $m->date = $date->format('Y-m-d H:i:s');
+            }
             $mailsbyid[$m->uid]=$m;
         }
         //dump($mailsbyid);
@@ -173,7 +227,7 @@ class MailclientController extends MailclientBaseController {
         $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
         return $response; 
     }
-    
+
     /**
      * Mailclient
      *

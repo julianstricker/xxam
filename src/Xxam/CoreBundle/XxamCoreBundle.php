@@ -11,23 +11,21 @@
 
 namespace Xxam\CoreBundle;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Xxam\CoreBundle\DependencyInjection\Compiler\AggregatedTaggedServicesPass;
 
 class XxamCoreBundle extends Bundle
 {
-    static function getMenu(){
-        return [
-            'hauptmenu_1'=>[
-                'text'=>       'Portal',
-                'iconCls'=>    'x-fa fa-th-large'  ,
-                #'handler'=>    'function() { window.location.href="#portal"}',
-                'href'=>       '#portal',
-                'hrefTarget'=> '_self',
-                'stateId'=> 'xxam_menu_portal',
-            ]
-        ];
+    /**
+     * @see Symfony\Component\HttpKernel\Bundle.Bundle::registerExtensions()
+     * @param ContainerBuilder $container
+     */
+    public function build(ContainerBuilder $container)
+    {
+        parent::build($container);
+        $container->addCompilerPass(new AggregatedTaggedServicesPass());
     }
-    static Function getRoledefinitions(){
-        return ["ROLE_ADMIN","ROLE_USER"];
-    }
+
+
 }

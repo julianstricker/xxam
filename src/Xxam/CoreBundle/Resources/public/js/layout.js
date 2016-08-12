@@ -8,6 +8,7 @@ Ext.Loader.setConfig({
 Ext.Loader.setPath('Ext.ux', '/assets/vendor/extjs/packages/ux/classic/src'); //'/assets/vendor/extjs/examples/ux');
 Ext.Loader.setPath('Portal.view', '/js/portal');
 Ext.Loader.setPath('widget.xxam', '/bundles');
+
 Ext.require([
     '*',
     'Portal.view.Portlet',

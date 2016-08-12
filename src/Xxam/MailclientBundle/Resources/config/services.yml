@@ -14,4 +14,16 @@ services:
         class: Xxam\MailclientBundle\Controller\NewmailsWidgetController
         arguments: ["@security.token_storage","@doctrine.orm.entity_manager"]
         tags:
-            -  { name: xxamportalwidget }
+            -  { name: xxam.portalwidget }
+
+    xxammailclientbundle.menuservice:
+        class: Xxam\MailclientBundle\Services\MenuService
+        # arguments: ["@templating"]
+        arguments: ["@security.token_storage"]
+        tags:
+            -  { name: xxam.menuservice }
+
+    xxammailclientbundle.rolesservice:
+       class: Xxam\MailclientBundle\Services\RolesService
+       tags:
+           -  { name: xxam.rolesservice }

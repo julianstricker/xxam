@@ -34,12 +34,24 @@ class DefaultController extends DefaultBaseController
         $user = $this->get('security.token_storage')->getToken()->getUser();
         //generate menu:
         $menuitems=Array();
+
+
+        $registeredmenus=$this->getRegistereMenus();
+        //dump($registeredwidgets);
+        foreach($registeredmenus as $registeredmenu){
+            $menuitems=array_replace_recursive($menuitems,$registeredmenu->getMenu());
+
+        }
+
+/*
         foreach ($this->container->getParameter('kernel.bundles') as $name ) {
             if(method_exists($name,'getMenu')){
                 $menuitems=array_replace_recursive($menuitems,call_user_func($name.'::getMenu'));
             }
         }
+        //dump($this->container->get('service_container')->);
 
+*/
 
         $menu=$this->getMenu($menuitems);
         $menu[]=Array('xtype'=>'tbfill','stateId'=>'xxam_menu_tbfill');
@@ -66,7 +78,6 @@ class DefaultController extends DefaultBaseController
         $token=hash('sha256',rand(0,99999999999).$key);
         $memcached = $this->get('memcached');
         $memcached->add('chatid_'.$token,$userdata);
-        $environment= $this->container->get( 'kernel' )->getEnvironment();
         $exttheme=$this->getParameter('exttheme');
         /*$extthemecss='/assets/vendor/extjs/build/packages/ext-theme-'.$exttheme.'/build/resources/ext-theme-'.$exttheme.'-all.css';
         $extthemejs='/assets/vendor/extjs/build/packages/ext-theme-'.$exttheme.'/build/ext-theme-'.$exttheme.'.js';
@@ -164,11 +175,13 @@ class DefaultController extends DefaultBaseController
      *
      * @return Response
      */
-    public function getwidgetsAction(Request $request){
+    public function getwidgetsAction(){
         $returnvalue=Array();
         $registeredwidgets=$this->getRegisteredWidgets();
+        //dump($registeredwidgets);
         foreach($registeredwidgets as $registeredwidget){
-            $definition=$this->get($registeredwidget)->getDefinitionAction();
+            //$definition=$this->get($registeredwidget)->getDefinitionAction();
+            $definition=$registeredwidget->getDefinitionAction();
             $definition['service']=$registeredwidget;
             $returnvalue[]=$definition;
 
@@ -198,7 +211,7 @@ class DefaultController extends DefaultBaseController
         }else if($request->getMethod()=='DELETE'){
             return $this->statefulDeleteResponse($user,$request->get('key',false));
         }
-        return true;
+        return new Response('');
     }
 
     /**
@@ -210,7 +223,6 @@ class DefaultController extends DefaultBaseController
      */
     public function getlogentriesAction(Request $request) {
 
-        $user = $this->get('security.token_storage')->getToken()->getUser();
         $entityname=$request->get('entityname','');
         $id=$request->get('id',null);
         /** @var EntityManager $em */

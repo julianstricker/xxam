@@ -66,7 +66,14 @@ class DynmodRESTController extends BaseRestController
                 //total:
 
                 $total = $em->getRepository('XxamDynmodBundle:Dynmod')->getTotalcount($filters);
-                return array('dynmods'=>$entities, 'limit'=>$limit,'offset'=>$offset, 'totalCount'=>$total);
+
+                $results=[];
+                /** @var Dynmod $entity */
+                foreach($entities as $entity){
+                    $results[]=$entity->toGridObject();
+                }
+                return array('dynmods'=>$results, 'limit'=>$limit,'offset'=>$offset, 'totalCount'=>$total);
+
             }
 
             return FOSView::create('Not Found', Codes::HTTP_NO_CONTENT);

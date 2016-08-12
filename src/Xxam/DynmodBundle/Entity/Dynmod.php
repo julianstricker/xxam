@@ -32,12 +32,6 @@ class Dynmod implements Base\TenantInterface
      */
     private $id;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="datacontainer_id", type="integer", nullable=true)
-     */
-    private $datacontainer_id;
 
     /**
      * @var string
@@ -73,12 +67,20 @@ class Dynmod implements Base\TenantInterface
     private $help;
 
     /**
-     * @var array
+     * @var string
      *
-     * @ORM\Column(name="roles", type="json_array", nullable=true)
+     * @ORM\Column(name="iconcls", type="string", length=150, nullable=true)
      * @Gedmo\Versioned
      */
-    private $roles;
+    private $iconcls;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="additionalroles", type="json_array", nullable=true)
+     * @Gedmo\Versioned
+     */
+    private $additionalroles;
 
     /**
      * @var array
@@ -95,6 +97,14 @@ class Dynmod implements Base\TenantInterface
      * @Gedmo\Versioned
      */
     private $objectactions;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="active", type="boolean")
+     * @Gedmo\Versioned
+     */
+    private $active=0;
 
     /**
      * @var \DateTime $created
@@ -201,27 +211,27 @@ class Dynmod implements Base\TenantInterface
     }
 
     /**
-     * Set roles
+     * Set additionalroles
      *
-     * @param array $roles
+     * @param array $additionalroles
      *
      * @return Dynmod
      */
-    public function setRoles($roles)
+    public function setAdditionalroles($additionalroles)
     {
-        $this->roles = $roles;
+        $this->additionalroles = $additionalroles;
 
         return $this;
     }
 
     /**
-     * Get roles
+     * Get additionalroles
      *
      * @return array
      */
-    public function getRoles()
+    public function getAdditionalroles()
     {
-        return $this->roles;
+        return $this->additionalroles;
     }
 
     /**
@@ -352,39 +362,6 @@ class Dynmod implements Base\TenantInterface
         $this->datacontainers->removeElement($datacontainer);
     }
 
-    /**
-     * Get datacontainers
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getDatacontainers()
-    {
-        return $this->datacontainers;
-    }
-
-    /**
-     * Set datacontainerId
-     *
-     * @param integer $datacontainerId
-     *
-     * @return Dynmod
-     */
-    public function setDatacontainerId($datacontainerId)
-    {
-        $this->datacontainer_id = $datacontainerId;
-
-        return $this;
-    }
-
-    /**
-     * Get datacontainerId
-     *
-     * @return integer
-     */
-    public function getDatacontainerId()
-    {
-        return $this->datacontainer_id;
-    }
 
     /**
      * Set code
@@ -409,4 +386,73 @@ class Dynmod implements Base\TenantInterface
     {
         return $this->code;
     }
+
+    /**
+     * @return boolean
+     */
+    public function isActive()
+    {
+        return $this->active;
+    }
+
+    /**
+     * @param boolean $active
+     * @return Dynmod
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDatacontainers()
+    {
+        return $this->datacontainers;
+    }
+
+    /**
+     * @param mixed $datacontainers
+     * @return Dynmod
+     */
+    public function setDatacontainers($datacontainers)
+    {
+        $this->datacontainers = $datacontainers;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIconcls()
+    {
+        return $this->iconcls;
+    }
+
+    /**
+     * @param string $iconcls
+     * @return Dynmod
+     */
+    public function setIconcls($iconcls)
+    {
+        $this->iconcls = $iconcls;
+        return $this;
+    }
+
+    public function toGridObject() {
+        return Array(
+            'id' =>                     $this->getId(),
+            'code' =>                   $this->getCode(),
+            'name' =>                   $this->getName(),
+            'description' =>            $this->getDescription(),
+            'help' =>                   $this->getHelp(),
+            'active' =>                 $this->isActive(),
+            'iconcls' =>                $this->getIconcls(),
+            'created' =>                $this->getCreated() ? $this->getCreated()->format('Y-m-d H:i:s') : false,
+            'updated' =>                $this->getUpdated() ? $this->getUpdated()->format('Y-m-d H:i:s') : false
+        );
+    }
+
 }

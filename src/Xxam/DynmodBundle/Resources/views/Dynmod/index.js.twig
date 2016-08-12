@@ -24,8 +24,8 @@
             sortable: false,
             xtype: 'actioncolumn',
             width: 100,
+            margin: '0 5 0 0',
             items: [{
-                //icon: '/bundles/xxamdynmod/icons/16x16/user_edit.png',
                 iconCls: 'x-fa fa-edit',
                 tooltip: '{%trans%}Edit{%endtrans%}',
                 handler: function(grid, rowIndex, colIndex) {
@@ -34,9 +34,7 @@
                     window.location.href='#dynmod/edit/'+rec.get('id');
                 }
             },{
-                //icon: '/bundles/xxamdynmod/icons/16x16/user_delete.png',
                 iconCls: 'x-fa fa-trash-o',
-                //iconCls: 'pictos pictos-delete',
                 tooltip: '{%trans%}Remove{%endtrans%}',
                 handler: function(grid, rowIndex, colIndex) {
                     var rec = grid.getStore().getAt(rowIndex);

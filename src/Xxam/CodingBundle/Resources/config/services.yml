@@ -2,3 +2,13 @@ services:
 #    xxam_core.example:
 #        class: Xxam\CodingBundle\Example
 #        arguments: [@service_id, "plain_value", %parameter%]
+    xxamcodingbundle.menuservice:
+        class: Xxam\CodingBundle\Services\MenuService
+        # arguments: ["@templating"]
+        arguments: ["@security.token_storage"]
+        tags:
+            -  { name: xxam.menuservice }
+    xxamcodingbundle.rolesservice:
+       class: Xxam\CodingBundle\Services\RolesService
+       tags:
+           -  { name: xxam.rolesservice }

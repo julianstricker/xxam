@@ -69,4 +69,9 @@ mailclient_sendmail:
 mailclient_settings:
     path: /mailclient/settings
     defaults: { _controller: XxamMailclientBundle:Mailclient:settings }
+
+xxam_mailclient_mailspool_api:
+    resource: "@XxamMailclientBundle/Controller/MailspoolRESTController.php"
+    type:   rest
+    prefix:   /api
     

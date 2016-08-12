@@ -52,6 +52,7 @@
         var mailclient_maillist_store=Ext.create('Ext.data.Store', {
             model: 'EmaillistModel',
             remoteSort: true,
+            remoteFilter: true,
             //leadingBufferZone: 300,
             pageSize: 100,
             listeners:{
@@ -137,6 +138,16 @@
                     iconCls: 'x-fa fa-pencil',
                     handler: function(){
                         window.location.href='#mailclient/write';
+                    }
+                },
+                {
+                    xtype: 'button',
+                    text: '{%trans%}Outbox{%endtrans%}',
+                    tooltip: '{%trans%}Show Outbox{%endtrans%}',
+                    scale: '{{buttonsize}}',
+                    iconCls: 'x-fa fa-send',
+                    handler: function(){
+                        window.location.href='#mailspool';
                     }
                 },
                 { xtype: 'tbfill'},
@@ -411,7 +422,10 @@
                             dataIndex: 'date', 
                             stateId: 'mailclient_maillist_date',
                             stateful: true, 
-                            filter: {type: 'date'},
+                            filter: {
+                                type: 'date',
+                                dateFormat: 'Y-m-d H:i:s'
+                            },
                             renderer: function(value, metaData, record) {
                                 if(record.data.seen==false){
                                     metaData.tdStyle = 'font-weight: bold;';
@@ -620,8 +634,7 @@
                             dataIndex: 'hasattachment', 
                             stateId: 'mailclient_maillist_hasattachment',
                             stateful: true, 
-                            hidden: false, 
-                            filter: {type: 'boolean'},
+                            hidden: false,
                             renderer: function(value, metaData, record) {
                                 if(value==true){
                                     metaData.tdAttr = 'data-qtip={% trans %}Attachment{% endtrans %}';

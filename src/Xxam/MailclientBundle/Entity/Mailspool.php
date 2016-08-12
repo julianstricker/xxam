@@ -7,8 +7,11 @@ use Doctrine\ORM\Mapping as ORM;
 use Xxam\CoreBundle\Entity\Base as Base;
 use Xxam\UserBundle\Entity\User;
 
+
+
+
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Xxam\MailclientBundle\Entity\MailspoolRepository")
  * @ORM\Table(
  *     name="mailspool",
  *     indexes={
@@ -140,13 +143,32 @@ class Mailspool implements Base\TenantInterface
 
     public function toArray()
     {
-        //'id': 'Id', 'name': 'Name', 'hotelcategory_id': 'Category', 'stars_id': 'Stars', 'zip': 'Zip', 'location_id': 'Location', 'email': 'Email', 'tel': 'Tel', 'www': 'Www'}
         return array(
             'id' => $this->id,
             'mailaccount_id' => $this->getMailaccount()->getId(),
             'user_id' => $this->getUserId(),
             'subject' => $this->getSubject(),
             'emailto' => $this->getEmailto(),
+            'sendafter' => is_null($this->getSendafter()) ? '-' : $this->getSendafter()->format('Y-m-d H:i:s'),
+            'sendtime' => is_null($this->getSendtime()) ? '-' : $this->getSendtime()->format('Y-m-d H:i:s'),
+            'readtimes' => $this->getReadtimes(),
+            'updated' => is_null($this->getUpdated()) ? '-' : $this->getUpdated()->format('Y-m-d H:i:s'),
+            'created' => is_null($this->getCreated()) ? '-' : $this->getCreated()->format('Y-m-d H:i:s'),
+            'sendstatus' => $this->getSendstatus()
+        );
+    }
+
+    public function toGridObject() {
+
+        return Array(
+            'id' => $this->id,
+            'mailaccount_id' => $this->getMailaccount()->getId(),
+            'user_id' => $this->getUserId(),
+            'subject' => $this->getSubject(),
+            'emailfrom' => $this->getEmailfrom(),
+            'emailto' => $this->getEmailto(),
+            'emailcc' => $this->getEmailcc(),
+            'emailbcc' => $this->getEmailbcc(),
             'sendafter' => is_null($this->getSendafter()) ? '-' : $this->getSendafter()->format('Y-m-d H:i:s'),
             'sendtime' => is_null($this->getSendtime()) ? '-' : $this->getSendtime()->format('Y-m-d H:i:s'),
             'readtimes' => $this->getReadtimes(),

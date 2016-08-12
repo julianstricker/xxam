@@ -77,6 +77,10 @@ html {
 
 }
 
+.x-action-col-icon{
+    margin-right: 3px;
+}
+
 .chatbubbleleft
 {
     position: relative;

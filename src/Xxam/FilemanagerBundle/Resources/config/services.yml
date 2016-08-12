@@ -2,3 +2,14 @@ services:
 #    xxam_core.example:
 #        class: Xxam\FilemanagerBundle\Example
 #        arguments: [@service_id, "plain_value", %parameter%]
+    xxamfilemanagerbundle.menuservice:
+        class: Xxam\FilemanagerBundle\Services\MenuService
+        # arguments: ["@templating"]
+        arguments: ["@security.token_storage"]
+        tags:
+            -  { name: xxam.menuservice }
+
+    xxamfilemanagerbundle.rolesservice:
+       class: Xxam\FilemanagerBundle\Services\RolesService
+       tags:
+           -  { name: xxam.rolesservice }

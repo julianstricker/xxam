@@ -10,9 +10,18 @@ services:
         # arguments: ["@templating"]
         arguments: ["@security.token_storage"]
         tags:
-            -  { name: xxamportalwidget }
+            -  { name: xxam.portalwidget }
             
+    xxamcorebundle.menuservice:
+        class: Xxam\CoreBundle\Services\MenuService
+        arguments: ["@security.token_storage"]
+        tags:
+            -  { name: xxam.menuservice }
 
+    xxamcorebundle.rolesservice:
+       class: Xxam\CoreBundle\Services\RolesService
+       tags:
+           -  { name: xxam.rolesservice }
             
     kernel.listener.tenantsetparameter:    
        class: Xxam\CoreBundle\EventListener\TenantSetParameter

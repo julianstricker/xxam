@@ -36,4 +36,13 @@ services:
           - { name: 'monolog.logger', channel: 'security' }
 
 
- 
+    xxamuserbundle.menuservice:
+         class: Xxam\UserBundle\Services\MenuService
+         arguments: ["@security.token_storage"]
+         tags:
+             -  { name: xxam.menuservice }
+
+    xxamuserbundle.rolesservice:
+       class: Xxam\UserBundle\Services\RolesService
+       tags:
+           -  { name: xxam.rolesservice }

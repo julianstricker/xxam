@@ -17,41 +17,159 @@
                 url : '{{path('post_dynmod')}}',
                 writer: {
                     type: "json",
-                    writeAllFields: true
+                    writeAllFields: true /*,
+                    transform: {
+                        fn: function(data, request) {
+                            // do some manipulation of the unserialized data object
+                            console.log(data);
+                            ddd=data;
+                            rrr=request;
+                            data.additionalroles=Ext.JSON.decode(data.additionalroles);
+                            console.log(data);
+                            return data;
+                        },
+                        scope: this
+                    }*/
                 }
             }
         });
     }
 
 
+    var generateAddtionalruleinput=function(value,disabled){
+        return {
+            xtype: 'fieldcontainer',
+            layout:'hbox',
+            shrinkWrap: 1,
+            hideLabel: true,
+            items: [
+                {
+                    xtype: 'textfield',
+                    flex: 1,
+                    fieldLabel: 'ROLE_DYNMOD_[CODE]_',
+                    labelAlign: 'right',
+                    labelSeparator: ' ',
+                    labelWidth: 'auto',
+                    value: value,
+                    regex: new RegExp("^[A-Z0-9_]+$"),
+                    regexText: 'Only A-Z, digits and "_" allowed'
+                },
+                {
+                    xtype: 'button',
+                    flex: 0,
+                    width: 50,
+                    iconCls: 'x-fa fa-minus',
+                    margin: '0 0 0 5',
+                    scale: "small",
+                    tooltip: '{%trans%}Remove{%endtrans%}',
+                    disabled: disabled,
+                    handler: function(){
+                        ttt=this;
+                        var fieldcontainer=this.up('fieldcontainer');
+                        var fieldcontainerparent=fieldcontainer.up();
+                        fieldcontainerparent.remove(fieldcontainer);
+                        if (fieldcontainerparent.items.length==1){
+                            fieldcontainerparent.down('button').setDisabled(true);
+                        }
+                    }
+                }
+            ]
+        }
+    }
+    var additionalrules = {% if entity.additionalroles %}{{entity.additionalroles|jsonwithfunctions}}{% else %}[]{% endif %};
+    var additionalrulesimputs=[];
+    if(additionalrules.length==0) additionalrules.push('');
+    Ext.Array.each(additionalrules,function(additionalrule){
+        console.log(additionalrule);
+        additionalrulesimputs.push(generateAddtionalruleinput(additionalrule,additionalrules.length==1));
+    });
+
+
+
     return {
         xtype: 'form',
-        layout: 'form',
+        //layout: 'form',
         defaultType: 'textfield',
         scrollable: true,
+        bodyPadding: 5,
+        layout: 'anchor',
         defaults: {
-            labelWidth: 120
+            labelWidth: 120,
+            anchor: '100%'
         },
         items: [{
             xtype: 'hiddenfield',
             name: 'id',
             value: '{{entity.id}}'
         },{
-            fieldLabel: 'Code',
+            fieldLabel: '{%trans%}Code{%endtrans%}',
             name: 'code',
-            value: '{{entity.code}}'
+            value: '{{entity.code}}',
+            allowBlank: false,
+            minLength: 4,
+            maxLength: 10,
+            regex: new RegExp("^[a-z0-9_]+$"),
+            regexText: 'Only a-z, digits and "_" allowed'
         },{
-            fieldLabel: 'Name',
+            fieldLabel: '{%trans%}Name{%endtrans%}',
             name: 'name',
             value: '{{entity.name}}'
         },{
-            fieldLabel: 'Description',
+            fieldLabel: '{%trans%}Description{%endtrans%}',
             name: 'description',
             value: '{{entity.description}}'
         },{
-            fieldLabel: 'Help',
+            fieldLabel: '{%trans%}Help{%endtrans%}',
             name: 'help',
             value: '{{entity.help}}'
+        },{
+            fieldLabel: '{%trans%}IconCls{%endtrans%}',
+            name: 'iconcls',
+            value: '{{entity.iconcls}}'
+        },{
+            fieldLabel: '{%trans%}Active{%endtrans%}',
+            name: 'active',
+            xtype: 'checkbox',
+            checked   :  {% if entity.active %}true{% else %}false{% endif %},
+            value: '{{entity.active}}'
+        },{
+            xtype: 'hiddenfield',
+            name: 'additionalroles',
+            value: '{{entity.additionalroles|json_encode}}'
+        },{
+            xtype: 'fieldcontainer',
+            fieldLabel: '{%trans%}Additional Roles{%endtrans%}',
+            layout: 'vbox',
+            anchor: '100%',
+            //flex: 1,
+            items: [
+                {
+                    xtype: 'component',
+                    html: '{%trans%}Help text for additional roles{%endtrans%}'
+                },
+                {
+                    xtype: 'fieldcontainer',
+                    layout: 'vbox',
+                    shrinkWrap: 1,
+                    hideLabel: true,
+                    padding:5,
+                    anchor: '100%',
+                    flex: 1,
+                    items: additionalrulesimputs
+                },
+                {
+                    xtype: 'button',
+                    iconCls: 'x-fa fa-plus',
+                    text: '{%trans%}Add{%endtrans%}',
+                    handler: function(){
+                        ttt=this;
+                        var fieldsetcontainer=this.up('fieldcontainer').down('fieldcontainer');
+                        //var fieldcontainer=fieldsetcontainer.down('fieldcontainer').cloneConfig();
+                        fieldsetcontainer.add(generateAddtionalruleinput('',false));
+                        fieldsetcontainer.down('button').setDisabled(false);
+                    }
+                }
+            ]
         }],
         dockedItems: [{
             xtype: 'toolbar',
@@ -68,10 +186,16 @@
                     handler: function() {
                         // The getForm() method returns the Ext.form.Basic instance:
                         var form = this.up('form').getForm();
+                        fff=this.up('form');
                         if (form.isValid()) {
-                            console.log(typeof(DynmodModel));
                             var newdynmod=Ext.create('DynmodModel',form.getValues());
-                            console.log(newdynmod);
+                            var additionalroles=[];
+                            Ext.Array.each(this.up('form').down('fieldcontainer').down('fieldcontainer').items.items,function(item){
+                                if (item.down('textfield').getValue()!='') additionalroles.push(item.down('textfield').getValue());
+                            });
+                            newdynmod.data.additionalroles=additionalroles;
+                            ndm=newdynmod;
+
 
                             // Submit the Ajax request and handle the response
                             newdynmod.save({
