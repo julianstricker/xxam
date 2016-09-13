@@ -80,11 +80,8 @@
     var additionalrulesimputs=[];
     if(additionalrules.length==0) additionalrules.push('');
     Ext.Array.each(additionalrules,function(additionalrule){
-        console.log(additionalrule);
         additionalrulesimputs.push(generateAddtionalruleinput(additionalrule,additionalrules.length==1));
     });
-
-
 
     return {
         xtype: 'form',

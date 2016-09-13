@@ -315,7 +315,10 @@ Ext.onReady(function() {
                     },
                     {
                         region: 'east',
-                        layout: {
+                        id: 'regioneast',
+                        headerPosition: 'left',
+                        header: false,
+                        /*layout: {
                             type: 'accordion',
                             multi: true
                         },
@@ -323,19 +326,105 @@ Ext.onReady(function() {
                         id: 'commpanel',
                         collapsible: true,
                         //collapsed: true,
-                        split: true,
+                        split: true,*/
                         width: 300,
 
-                        items: []
+                        tabPosition: 'left',
+                        collapsible: true,
+                        collapsed: true,
+                        split: true,
+                        xtype: 'tabpanel',
+                        items: [{
+                            xtype: 'panel',
+                            layout: {
+                                type: 'accordion',
+                                multi: false
+                            },
+                            iconCls: 'x-fa fa-phone',
+                            bodyStyle: 'margin:0; padding:0;',
+
+                            title: 'Comm Panel',
+                            id: 'commpanel',
+                            items:[]
+                        },{
+                            xtype: 'panel',
+                            iconCls: 'x-fa fa-user',
+                            //bodyStyle: 'background:#ffc; padding:10px;',
+                            hidden: true,
+                            title: 'Contact',
+                            id: 'contactpanel',
+                            items:[]
+                        }]
                     }
                 ],
                 renderTo: Ext.getBody()
             });
+
+
+
+
             loadtab();
             Ext.getCmp('xxam_menu').add(menu);
+
         }}));
 
+    loadContactdata=function(email) {
+        Ext.Ajax.request({
+            url: xxam_core_homepage+'contact/getcontactdataforemail/'+email,
 
+            success: function(response, opts) {
+                var obj = Ext.decode(response.responseText);
+                console.dir(obj);
+                var contactpanel=Ext.getCmp('contactpanel');
+
+                var t = new Ext.XTemplate([
+                    '<div style="width: 100%;">',
+                    '<tpl for="images">',
+                    '  <div style="margin: auto; padding-top:20px; width: 120px"><img src="{origin}" style="width: 120px; height:120px; border: 5px solid white; border-radius: 100px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);" /></div>',
+                    '</tpl>',
+                    '  <div style="text-align: center;">{firstname} {lastname}</div>',
+                    '  <div style="text-align: center;">{email}</div>',
+                    '  <div style="text-align: center;">{organizationfunction} at {organizationname}</div>',
+                    '  <div style="text-align: center;">{notes}</div>',
+                    '<tpl for="communicationdatas">',
+                    '  <div style="text-align: center;">{value}</div>',
+                    '</tpl>',
+                    '</div>'
+                ]);
+                contactpanel.update(t.apply(obj));
+                contactpanel.setHidden(false);
+                contactpanel.tab.setHidden(false);
+                Ext.getCmp('regioneast').setCollapsed(false);
+            },
+
+            failure: function(response, opts) {
+                console.log('server-side failure with status code ' + response.status);
+                var contactpanel=Ext.getCmp('contactpanel');
+                contactpanel.setHidden(true);
+                contactpanel.tab.setHidden(true);
+                Ext.getCmp('regioneast').setCollapsed(true);
+
+            }
+        });
+        /*var tip = Ext.create('Ext.tip.ToolTip', {
+            target: 'mailclient_maillist',
+            delegate: Ext.getCmp('mailclient_maillist').getView().itemSelector,
+            // Moving within the row should not hide the tip.
+            trackMouse: false,
+            bodyStyle: 'background:#FFF; padding:10px;',
+            bodyBorder: false,
+            // Render immediately so that tip.body can be referenced prior to the first show.
+            renderTo: Ext.getBody(),
+            listeners: {
+                // Change content dynamically depending on which element triggered the show.
+                beforeshow: function updateTipBody(tip) {
+                    ttt = tip;
+                    tip.update('Over company "' + Ext.getCmp('mailclient_maillist').getView().getRecord(tip.triggerElement).get('from') + '"');
+                    tip.update('<div><img src="https://www.xing.com/image/e_6_d_a941a55af_6398154_1/julian-stricker-foto.192x192.jpg" style="border: 5px solid white; border-radius: 100px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);" /></div>');
+                }
+            }
+        });*/
+    }
 
     xxamws={
         subscriptions:[],

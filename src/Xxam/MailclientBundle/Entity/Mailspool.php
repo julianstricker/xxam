@@ -141,24 +141,26 @@ class Mailspool implements Base\TenantInterface
     private $user;
 
 
-    public function toArray()
-    {
+    public function toArray($timezone='') {
+        if($timezone=='') $timezone=date_default_timezone_get();
+
         return array(
             'id' => $this->id,
             'mailaccount_id' => $this->getMailaccount()->getId(),
             'user_id' => $this->getUserId(),
             'subject' => $this->getSubject(),
             'emailto' => $this->getEmailto(),
-            'sendafter' => is_null($this->getSendafter()) ? '-' : $this->getSendafter()->format('Y-m-d H:i:s'),
-            'sendtime' => is_null($this->getSendtime()) ? '-' : $this->getSendtime()->format('Y-m-d H:i:s'),
+            'sendafter' => is_null($this->getSendafter()) ? '-' : $this->getSendafter()->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s'),
+            'sendtime' => is_null($this->getSendtime()) ? '-' : $this->getSendtime()->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s'),
             'readtimes' => $this->getReadtimes(),
-            'updated' => is_null($this->getUpdated()) ? '-' : $this->getUpdated()->format('Y-m-d H:i:s'),
-            'created' => is_null($this->getCreated()) ? '-' : $this->getCreated()->format('Y-m-d H:i:s'),
+            'updated' => is_null($this->getUpdated()) ? '-' : $this->getUpdated()->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s'),
+            'created' => is_null($this->getCreated()) ? '-' : $this->getCreated()->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s'),
             'sendstatus' => $this->getSendstatus()
         );
     }
 
-    public function toGridObject() {
+    public function toGridObject($timezone='') {
+        if($timezone=='') $timezone=date_default_timezone_get();
 
         return Array(
             'id' => $this->id,
@@ -169,11 +171,11 @@ class Mailspool implements Base\TenantInterface
             'emailto' => $this->getEmailto(),
             'emailcc' => $this->getEmailcc(),
             'emailbcc' => $this->getEmailbcc(),
-            'sendafter' => is_null($this->getSendafter()) ? '-' : $this->getSendafter()->format('Y-m-d H:i:s'),
-            'sendtime' => is_null($this->getSendtime()) ? '-' : $this->getSendtime()->format('Y-m-d H:i:s'),
+            'sendafter' => is_null($this->getSendafter()) ? '-' : $this->getSendafter()->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s'),
+            'sendtime' => is_null($this->getSendtime()) ? '-' : $this->getSendtime()->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s'),
             'readtimes' => $this->getReadtimes(),
-            'updated' => is_null($this->getUpdated()) ? '-' : $this->getUpdated()->format('Y-m-d H:i:s'),
-            'created' => is_null($this->getCreated()) ? '-' : $this->getCreated()->format('Y-m-d H:i:s'),
+            'updated' => is_null($this->getUpdated()) ? '-' : $this->getUpdated()->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s'),
+            'created' => is_null($this->getCreated()) ? '-' : $this->getCreated()->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s'),
             'sendstatus' => $this->getSendstatus()
         );
     }

@@ -40,7 +40,7 @@ class Communicationdata implements Base\TenantInterface
     /**
      * @var integer
      *
-     * @ORM\Column(name="communicationdatatype_id", type="integer", nullable=true)
+     * @ORM\Column(name="communicationdatatype_id", type="string", nullable=true)
      * @Gedmo\Versioned
      */
     private $communicationdatatype_id;
@@ -113,7 +113,7 @@ class Communicationdata implements Base\TenantInterface
     /**
      * Set communicationdatatype_id
      *
-     * @param integer $communicationdatatypeId
+     * @param string $communicationdatatypeId
      * @return Communicationdata
      */
     public function setCommunicationdatatypeId($communicationdatatypeId)
@@ -126,7 +126,7 @@ class Communicationdata implements Base\TenantInterface
     /**
      * Get communicationdatatype_id
      *
-     * @return integer 
+     * @return string
      */
     public function getCommunicationdatatypeId()
     {

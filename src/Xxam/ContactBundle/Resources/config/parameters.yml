@@ -8,5 +8,33 @@ parameters:
     2: Billing
     3: International
     4: Parcel
-    5: Home
+    5: Private
     6: Work
+  communicationdatatypes:
+    email:
+      email_private: Private
+      email_business: Business
+      email_other: Other
+    phone:
+      phone_private: Private
+      phone_business: Business
+      phone_other: Other
+      phone_mobileprivate: Mobile (private)
+      phone_mobilebusiness: Mobile (business)
+      phone_faxprivate: Fax (private)
+      phone_faxbusiness: Fax (business)
+      phone_googlevoice: Google Voice
+      phone_pager: Pager
+    web:
+      web_profile: Profile
+      web_homepage: Homepage
+      web_blog: Blog
+      web_business: Business
+      web_twitter: Twitter
+    im:
+      im_icq: ICQ
+      im_msn: MSN
+
+
+
+

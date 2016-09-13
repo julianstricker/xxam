@@ -36,23 +36,23 @@ class MailspoolRESTController extends BaseRestController
     {
         return $entity;
     }
+
     /**
      * Get all Mailspool entities.
      *
      * @View(serializerEnableMaxDepthChecks=true)
      *
+     * @param Request $request
      * @param ParamFetcherInterface $paramFetcher
-     *
-     * @return Response
-     *
+     * @return array|FOSView
      * @QueryParam(name="offset", requirements="\d+", nullable=true, description="Offset from which to start listing notes.")
      * @QueryParam(name="limit", requirements="\d+", default="20", description="How many notes to return.")
      * @QueryParam(name="order_by", nullable=true, array=true, description="Order by fields. Must be an array ie. &order_by[name]=ASC&order_by[description]=DESC")
      * @QueryParam(name="filters", nullable=true, array=true, description="Filter by fields. Must be an array ie. &filters[id]=3")
-     * 
+     *
      * @Security("has_role('ROLE_CONTACT_LIST')")
      */
-    public function cgetAction(ParamFetcherInterface $paramFetcher)
+    public function cgetAction(Request $request, ParamFetcherInterface $paramFetcher)
     {
         try {
             $offset = $paramFetcher->get('offset');
@@ -70,7 +70,7 @@ class MailspoolRESTController extends BaseRestController
                 $results=Array();
                 /** @var Filesystem $entity */
                 foreach($entities as $entity){
-                    $results[]=$entity->toGridObject();
+                    $results[]=$entity->toGridObject($request->getSession()->get('timezone'));
                 }
 
                 return array('mailspools'=>$results, 'limit'=>$limit,'offset'=>$offset, 'totalCount'=>$total);

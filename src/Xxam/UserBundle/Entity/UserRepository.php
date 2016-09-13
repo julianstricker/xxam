@@ -39,7 +39,7 @@ class UserRepository extends EntityRepository
         $fields[]=Array('name'=> 'updated','type'=>'date', 'dateFormat'=>'Y-m-d H:i:s');
         $fields[]=Array('name'=> 'groups','type'=>'auto', 'convert'=>'function(value){ if (value && Ext.isArray(value)){ return value; }else if( value && !Ext.isArray(value) ){ return [value]; }else{ return []; }}');
         $fields[]=Array('name'=> 'roles','type'=>'auto', 'convert'=>'function(value){ if (value && Ext.isArray(value)){ return value; }else if( value && !Ext.isArray(value) ){ return [value]; }else{ return []; }}');
-        
+        $fields[]=Array('name'=> 'timezone','type'=>'string');
         return $fields;
         
     }
@@ -55,6 +55,7 @@ class UserRepository extends EntityRepository
         $columns[]=Array('text'=> 'Credentials expired','dataIndex'=> 'credential_expired', 'filter'=> Array('type'=> 'boolean'),'hidden'=> true);
         $columns[]=Array('text'=> 'Credentials expire','dataIndex'=> 'credential_expires_at', 'xtype'=> 'datecolumn', 'format'=>'Y-m-d H:i:s', 'filter'=> Array('type'=> 'date'),'hidden'=> true);
         $columns[]=Array('text'=> 'Groups','dataIndex'=> 'groups', 'filter'=> Array('type'=> 'string'),'hidden'=> false);
+        $columns[]=Array('text'=> 'Timezone','dataIndex'=> 'timezone', 'filter'=> Array('type'=> 'string'));
         $columns[]=Array('text'=> 'Created','dataIndex'=> 'created', 'xtype'=> 'datecolumn', 'format'=>'Y-m-d H:i:s', 'filter'=> Array('type'=> 'date'),'hidden'=> true);
         $columns[]=Array('text'=> 'Updated','dataIndex'=> 'updated', 'xtype'=> 'datecolumn', 'format'=>'Y-m-d H:i:s', 'filter'=> Array('type'=> 'date'),'hidden'=> true);
         return $columns;

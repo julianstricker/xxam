@@ -1,0 +1,196 @@
+{% set iconsize = '16x16' %}
+{% set buttonsize = 'medium' %}
+{% if buttonsize == 'large' %}
+    {% set iconsize = '32x32' %}
+{% endif %}
+{
+    tabtitle: '{{ dynmod.name }}',
+    iconCls: '{{ dynmod.iconcls }}',
+    getitems: function (){
+       if (typeof(DynmodlistModel)=='undefined'){
+            Ext.define('DynmodlistModel',{
+                 extend: 'Ext.data.Model',
+                 fields: {{modelfields|jscode()}},
+                 idProperty: 'id',
+                 proxy: {
+                     type: 'rest',
+                     url : '{{path('post_dynmod')}}'
+                 }
+             });
+        }
+        var gridcolumns= {{gridcolumns|jscode()}};
+        gridcolumns.push({
+            menuDisabled: true,
+            sortable: false,
+            xtype: 'actioncolumn',
+            width: 100,
+            margin: '0 5 0 0',
+            items: [{
+                iconCls: 'x-fa fa-edit',
+                tooltip: '{%trans%}Edit{%endtrans%}',
+                handler: function(grid, rowIndex, colIndex) {
+                    var rec = grid.getStore().getAt(rowIndex);
+                    rrr=rec;
+                    window.location.href='#dynmod/edit/'+rec.get('id');
+                }
+            },{
+                iconCls: 'x-fa fa-trash-o',
+                tooltip: '{%trans%}Remove{%endtrans%}',
+                handler: function(grid, rowIndex, colIndex) {
+                    var rec = grid.getStore().getAt(rowIndex);
+                    console.log(rec);
+                    
+                    rrr=rec;
+                    ggg=grid;
+                    Ext.Msg.confirm('{%trans%}Remove{%endtrans%}', '{%trans%}Remove{%endtrans%} ' + rec.get('firstname')+' ' + rec.get('lastname')+'?',function(btn){
+                        if (btn=='yes'){
+                            //grid.getStore().remove(rec);//
+                            this.erase({
+                                success: function(module) {
+                                   console.log('success',module,this);
+                                   grid.getStore().load({
+                                        callback: function(records, operation, success) {
+                                            //Ext.getCmp('mailclient_maillist').view.scrollTo(0,scrollpos);
+                                        }
+                                    });
+                                },
+                                failure: function(module) {
+                                    console.log('failed',module);
+                                    Ext.Msg.alert('Failed', 'Deletion failed');
+                                }
+                            });
+                        }
+                    },rec);
+                    
+                    
+                    
+                    
+                }
+            },{
+                //icon: '/bundles/xxamdynmod/icons/16x16/user_edit.png',
+                iconCls: 'x-fa fa-history',
+                tooltip: '{%trans%}Log entries{%endtrans%}',
+                handler: function(grid, rowIndex, colIndex) {
+                    var rec = grid.getStore().getAt(rowIndex);
+                    showlogentries('Xxam\\DynmodBundle\\Entity\\Dynmod',rec.get('id'),'dynmod/edit');
+
+                }
+            }]
+        });
+        
+        return {
+    
+            tbar: [{ 
+                xtype: 'button', 
+                text: '{%trans%}Add new Module{%endtrans%}',
+                //icon: '/bundles/xxamdynmod/icons/{{iconsize}}/user_add.png',
+                iconCls: 'x-fa fa-plus',
+                handler: function(){
+                        window.location.href='#dynmod/edit';
+                    }
+              }],
+            layout: 'border',
+            items: [
+                {
+                    xtype: 'gridpanel',
+                    region: 'center',
+                    layout: 'fit',
+                    id: 'dynmodlist',
+                    stateful: true,
+                    stateId: 'dynmodlist',
+                    //stateEvents: ['columnschanged'],
+                    minHeight: 60,
+                    minSize: 60,
+                    weight: 1,
+                    loadMask: true,
+                    /*selModel: {
+                        pruneRemoved: false
+                    },*/
+                    selType: 'rowmodel',
+                    multiSelect: true,
+                    plugins: [
+                        'gridfilters'
+                    ],
+                    store: Ext.create('Ext.data.BufferedStore', {
+                        model: 'DynmodlistModel',
+                        remoteSort: true,
+                        leadingBufferZone: 300,
+                        pageSize: 100,
+                        
+                        proxy:{
+                            type: 'rest',
+                            url: '{{path('get_dynmods')}}',
+                            reader : {
+                                type: 'json',
+                                rootProperty: 'dynmods',
+                                totalProperty: 'totalCount'
+                            },
+                            // sends single sort as multi parameter
+                            simpleSortMode: true
+                        },
+                        autoLoad: false,
+                        autoSync: true,
+                        listeners: {
+                            
+                        }
+                    }),
+                    columns: gridcolumns,
+                    listeners:{
+                        itemkeydown: function(grid, record, tr, rowindex, event){
+                            eee=event;
+                            if(event.keyCode==event.DELETE || event.keyCode==event.BACKSPACE){
+                                //delete:
+                                ggg=grid;
+                                selected=grid.selectionModel.selected.items;
+                                selectedids=[];
+                                Ext.Array.each(selected,function(item){
+                                    selectedids.push(item.id);
+                                });
+                                console.log('delete',selectedids);
+                                
+                            }
+                        },
+                        rowcontextmenu: function(grid, index, tr, rowindex, event) {
+                            console.log('rowcontextmenu');
+                            event.stopEvent();
+                            var record = grid.getStore().getAt(index);
+                            var menu = new Ext.menu.Menu({
+                                items: [
+                                    { 
+                                        text: '{%trans%}Delete{%endtrans%}', 
+                                        tooltip: '{%trans%}Delete module{%endtrans%}',
+                                        scale: '{{buttonsize}}', 
+                                        //icon: '/bundles/xxamdynmod/icons/16x16/dynmod_delete.png',
+                                        iconCls: 'x-fa fa-trash-o',
+                                        handler: function(){
+                                            console.log(this);
+
+                                            selected=Ext.getCmp('mailclient_maillist').selModel.selected.items;
+                                            selectedids=[];
+                                            Ext.Array.each(selected,function(item){
+                                                selectedids.push(item.id);
+                                            });
+
+                                            var from=Ext.getCmp('mailclient_maillist').getStore().getProxy().extraParams.path.toString();
+                                            
+                                        }
+                                    },
+                                    {
+                                        text: '{%trans%}Edit{%endtrans%}',
+                                        tooltip: '{%trans%}Edit{%endtrans%}',
+                                        scale: '{{buttonsize}}',
+                                        iconCls: 'x-fa fa-edit'
+                                        //icon: '/bundles/xxamdynmod/icons/16x16/dynmod_edit.png'
+                                    }
+
+                                
+                                ]
+                            }).showAt(event.getXY());
+                        }
+                    }
+                }
+
+            ]
+        }
+    }
+}

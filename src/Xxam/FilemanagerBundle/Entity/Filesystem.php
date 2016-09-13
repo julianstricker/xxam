@@ -305,7 +305,8 @@ class Filesystem implements Base\TenantInterface
         return $this->groups;
     }
     
-    public function toGridObject() {
+    public function toGridObject($timezone='') {
+        if($timezone=='') $timezone=date_default_timezone_get();
         $groups=Array();
         if ($this->getGroups()){
             foreach($this->getGroups() as $group){
@@ -318,8 +319,8 @@ class Filesystem implements Base\TenantInterface
             'user' =>                   $this->getUser()? $this->getUser()->getUsername() : null,
             'filesystemname' =>         $this->getFilesystemname(),
             'adapter' =>                $this->getAdapter(),
-            'created' =>                $this->getCreated() ? $this->getCreated()->format('Y-m-d H:i:s') : false,
-            'updated' =>                $this->getUpdated() ? $this->getUpdated()->format('Y-m-d H:i:s') : false,
+            'created' =>                $this->getCreated() ? $this->getCreated()->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s') : false,
+            'updated' =>                $this->getUpdated() ? $this->getUpdated()->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s') : false,
             'groups' =>                 $groups
         );
     }

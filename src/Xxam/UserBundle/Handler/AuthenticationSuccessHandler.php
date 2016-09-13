@@ -15,7 +15,12 @@ class AuthenticationSuccessHandler extends DefaultAuthenticationSuccessHandler {
     private $translator;
     
     public function onAuthenticationSuccess(Request $request, TokenInterface $token) {
-        if($request->isXmlHttpRequest()){
+        $timezone=$request->get('timezone');
+        $token->getUser()->setTimezone($timezone);
+        $session=$request->getSession();
+        $session->set('timezone',$timezone);
+        //date_default_timezone_set($timezone);
+            if($request->isXmlHttpRequest()){
             $url = $this->determineTargetUrl($request);
             if(!preg_match('/http/', $url)){
                 $url = $request->getBaseUrl().$url;

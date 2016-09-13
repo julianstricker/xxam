@@ -32,12 +32,17 @@ class MailspoolCommand extends ContainerAwareCommand
         $em->getFilters()->disable('tenant_filter');
         $repository = $em->getRepository('XxamMailclientBundle:Mailspool');
         $query = $repository->createQueryBuilder('s');
+        $timezone=new \DateTimeZone('UTC');
+        $nowutc=new \DateTime('now');
+        $nowutc->setTimezone($timezone);
+
         if ($mailspool_id){
             $query->where('s.id = :id');
             $query->setParameter('id', $mailspool_id);
         }else {
+
             $query->where('s.sendtime IS NULL AND s.sendafter <= :timenow AND s.sendstatus < 3');
-            $query->setParameter('timenow', new \DateTime('now'));
+            $query->setParameter('timenow', $nowutc);
         }
         /** @var mailspool[] $mailspools */
         $mailspools = $query->getQuery()->execute();

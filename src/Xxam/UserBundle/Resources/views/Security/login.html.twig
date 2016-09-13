@@ -63,6 +63,11 @@
                     value: 'on',
                     fieldLabel: '{{ 'security.login.remember_me'|trans }}',
                     allowBlank: true
+                }, {
+                    xtype: 'hidden',
+                    name: 'timezone',
+                    value: jstz.determine().name(),
+                    allowBlank: true
                 }],
                 buttons: [{
                     text: '{{ 'security.login.submit'|trans }}',

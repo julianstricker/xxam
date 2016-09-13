@@ -101,6 +101,10 @@ class DefaultController extends DefaultBaseController
         return $this->render('XxamCoreBundle:Default:portal.js.twig', array('widgets'=>$widgets));
     }
 
+    public function privacyAction() {
+        return $this->render('XxamCoreBundle:Default:privacy.html.twig', array());
+    }
+
 
     public function uploadfileprogressAction(Request $request) {
         $progressid=$request->get('progressid','');
@@ -232,9 +236,10 @@ class DefaultController extends DefaultBaseController
         $entity= $em->find($entityname,$id);
         $logs = $logrepo->getLogEntries($entity);
         $returnvalues=[];
+        $timezone=new \DateTimeZone($request->getSession()->get('timezone'));
         foreach($logs as $log){
             $returnvalues[]=[
-                'logged_at'=>$log->getLoggedAt()->format('Y-m-d H:i:s'),
+                'logged_at'=>$log->getLoggedAt()->setTimezone($timezone)->format('Y-m-d H:i:s'),
                 'action'=>$log->getAction(),
                 'object_id'=>$log->getObjectId(),
                 'username'=>$log->getUsername(),

@@ -2,6 +2,7 @@
 
 namespace Xxam\UserBundle\Form\Type;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -23,12 +24,14 @@ class UserType extends AbstractType
                $roledefinitions[$value]=$value; 
             }
         }
+
         $builder
             ->add('username')
             ->add('email')
             ->add('passwordplain',PasswordType::class,array('mapped'=>false))
             ->add('locked')
-            ->add('groups') 
+            ->add('groups')
+            ->add('timezone',HiddenType::class)
             ->add('roles' ,ChoiceType::class ,array('choices'=>$roledefinitions,'multiple'=>true,'expanded'=>true ))
         ;
         

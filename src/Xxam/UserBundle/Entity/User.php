@@ -33,6 +33,13 @@ class User extends BaseUser implements Base\TenantInterface
     protected $id;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="timezone", type="string", length=255, nullable=true)
+     */
+    private $timezone;
+
+    /**
      * @var \DateTime $created
      *
      * @Gedmo\Timestampable(on="create")
@@ -82,8 +89,7 @@ class User extends BaseUser implements Base\TenantInterface
     /**
      * @ORM\OneToMany(targetEntity="Xxam\MailclientBundle\Entity\Mailspool", mappedBy="user", cascade={"persist", "remove"})
      */
-    private /** @noinspection PhpUnusedPrivateFieldInspection */
-        $mailspools;
+    private $mailspools;
 
     public function __construct() {
         parent::__construct();
@@ -181,7 +187,8 @@ class User extends BaseUser implements Base\TenantInterface
         return $this->roles;
     }
 
-    public function toGridObject() {
+    public function toGridObject($timezone='') {
+        if($timezone=='') $timezone=date_default_timezone_get();
         $groups=Array();
         if ($this->getGroups()){
             foreach($this->getGroups() as $group){
@@ -192,16 +199,17 @@ class User extends BaseUser implements Base\TenantInterface
             'id' =>                     $this->getId(),
             'username' =>               $this->getUsername(),
             'email' =>                  $this->getEmail(),
-            'last_login' =>             $this->getLastLogin() ? $this->getLastLogin()->format('Y-m-d H:i:s') : false,
+            'last_login' =>             $this->getLastLogin() ? $this->getLastLogin()->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s') : false,
             'locked' =>                 $this->isLocked(),
             'expired' =>                $this->isExpired(),
-            'expires_at' =>             $this->expiresAt ? $this->expiresAt->format('Y-m-d H:i:s') : false,
+            'expires_at' =>             $this->expiresAt ? $this->expiresAt->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s') : false,
             'credentials_expired' =>    $this->isCredentialsExpired(),
-            'credentials_expire_at' =>  $this->credentialsExpireAt ? $this->credentialsExpireAt->format('Y-m-d H:i:s') : false,
-            'created' =>                $this->getCreated() ? $this->getCreated()->format('Y-m-d H:i:s') : false,
-            'updated' =>                $this->getUpdated() ? $this->getUpdated()->format('Y-m-d H:i:s') : false,
+            'credentials_expire_at' =>  $this->credentialsExpireAt ? $this->credentialsExpireAt->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s') : false,
+            'created' =>                $this->getCreated() ? $this->getCreated()->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s') : false,
+            'updated' =>                $this->getUpdated() ? $this->getUpdated()->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s') : false,
             'groups' =>                 $groups,
             'roles' =>                  $this->getDirectroles(),
+            'timezone' =>               $this->getTimezone(),
         );
     }
 
@@ -259,4 +267,24 @@ class User extends BaseUser implements Base\TenantInterface
     {
         $this->extjsstates->removeElement($extjsstates);
     }
+
+    /**
+     * @return string
+     */
+    public function getTimezone()
+    {
+        return $this->timezone;
+    }
+
+    /**
+     * @param string $timezone
+     * @return User
+     */
+    public function setTimezone($timezone)
+    {
+        $this->timezone = $timezone;
+        return $this;
+    }
+
+
 }

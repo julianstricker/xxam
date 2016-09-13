@@ -40,10 +40,10 @@ class Datacontainer implements Base\TenantInterface
     /**
      * @var bool
      *
-     * @ORM\Column(name="isdefault", type="boolean")
+     * @ORM\Column(name="defaultcontainer", type="boolean")
      * @Gedmo\Versioned
      */
-    private $isdefault=0;
+    private $defaultcontainer=false;
 
     /**
      * @var array
@@ -297,27 +297,70 @@ class Datacontainer implements Base\TenantInterface
     }
 
     /**
-     * Set isdefault
+     * Set defaultcontainer
      *
-     * @param boolean $isdefault
+     * @param boolean $defaultcontainer
      *
      * @return Datacontainer
      */
-    public function setIsdefault($isdefault)
+    public function setDefaultcontainer($defaultcontainer)
     {
-        $this->isdefault = $isdefault;
+        $this->defaultcontainer = $defaultcontainer;
 
         return $this;
     }
 
     /**
-     * Get isdefault
+     * Get defaultcontainer
      *
      * @return boolean
      */
-    public function getIsdefault()
+    public function isDefaultcontainer()
     {
-        return $this->isdefault;
+        return $this->defaultcontainer;
+    }
+
+    public function toGridObject($timezone='') {
+        if($timezone=='') $timezone=date_default_timezone_get();
+        return Array(
+            'id' =>                     $this->getId(),
+            'name' =>                   $this->getName(),
+            'defaultcontainer' =>       $this->isDefaultcontainer(),
+            'created' =>                $this->getCreated() ? $this->getCreated()->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s') : false,
+            'updated' =>                $this->getUpdated() ? $this->getUpdated()->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s') : false
+        );
+    }
+
+    public function getModelFields(){
+
+        $fields=Array();
+        if ($this->getFielddefinitions()) {
+            foreach ($this->getFielddefinitions() as $fielddefinition) {
+                $field = [];
+                $field['name'] = $fielddefinition['name'];
+                $field['type'] = $fielddefinition['type'];
+                $field = array_merge($field, $fielddefinition['modelconfig']);
+                $fields[] = $field;
+
+            }
+        }
+        return $fields;
+
+    }
+    public function getGridColumns(){
+        $columns=Array();
+        if ($this->getFielddefinitions()) {
+            foreach ($this->getFielddefinitions() as $fielddefinition) {
+                $column = [];
+                $column['text'] = $fielddefinition['text'];
+                $column['dataIndex'] = $fielddefinition['name'];
+                $column['type'] = $fielddefinition['type'];
+                $column = array_merge($column, $fielddefinition['formfieldconfig']);
+                $columns[] = $column;
+            }
+        }
+        return $columns;
+
     }
 
 }

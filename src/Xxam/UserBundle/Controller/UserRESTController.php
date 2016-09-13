@@ -39,22 +39,23 @@ class UserRESTController extends BaseRestController
     {
         return $entity;
     }
+
     /**
      * Get all User entities.
      *
      * @View(serializerEnableMaxDepthChecks=true)
      *
+     * @param Request $request
      * @param ParamFetcherInterface $paramFetcher
+     * @return array|FOSView
      * @Security("has_role('ROLE_USER_LIST')")
-     *
-     * @return Response
      *
      * @QueryParam(name="offset", requirements="\d+", nullable=true, description="Offset from which to start listing notes.")
      * @QueryParam(name="limit", requirements="\d+", default="20", description="How many notes to return.")
      * @QueryParam(name="order_by", nullable=true, array=true, description="Order by fields. Must be an array ie. &order_by[name]=ASC&order_by[description]=DESC")
      * @QueryParam(name="filters", nullable=true, array=true, description="Filter by fields. Must be an array ie. &filters[id]=3")
      */
-    public function cgetAction(ParamFetcherInterface $paramFetcher)
+    public function cgetAction(Request $request, ParamFetcherInterface $paramFetcher)
     {
         try {
             $offset = $paramFetcher->get('offset');
@@ -72,7 +73,7 @@ class UserRESTController extends BaseRestController
                 $results=Array();
                 /** @var User $entity */
                 foreach($entities as $entity){
-                    $results[]=$entity->toGridObject();
+                    $results[]=$entity->toGridObject($request->getSession()->get('timezone'));
                 }
                 return array('users'=>$results, 'limit'=>$limit,'offset'=>$offset, 'totalCount'=>$total);
             }
@@ -97,7 +98,8 @@ class UserRESTController extends BaseRestController
     public function postAction(Request $request)
     {
         $entity = new User();
-        $form = $this->createForm(new UserType($this->getRoles()), $entity, array("method" => $request->getMethod()));
+        //$form = $this->createForm(new UserType($this->getRoles()), $entity, array("method" => $request->getMethod()));
+        $form = $this->createForm(UserType::class,$entity, ['roledefinitions'=>$this->getRoles(),"method" => $request->getMethod()]);
         $this->removeExtraFields($request, $form);
         $form->handleRequest($request);
         $entity->setPlainPassword($request->get('passwordplain'));
@@ -112,7 +114,7 @@ class UserRESTController extends BaseRestController
                 $user->setPlainPassword($request->get('passwordplain'));
                 $userManager->updateUser($user);
             }
-            return $entity->toGridObject();
+            return $entity->toGridObject($request->getSession()->get('timezone'));
         }
 
         return FOSView::create(array('errors' => $form->getErrors()), Codes::HTTP_INTERNAL_SERVER_ERROR);
@@ -136,7 +138,9 @@ class UserRESTController extends BaseRestController
             $em = $this->getDoctrine()->getManager();
             
             //$request->setMethod('PATCH'); //Treat all PUTs as PATCH
-            $form = $this->createForm(new UserType($this->getRoles()), $entity, array("method" => $request->getMethod()));
+            //$form = $this->createForm(new UserType($this->getRoles()), $entity, array("method" => $request->getMethod()));
+            $form = $this->createForm(UserType::class,$entity, ['roledefinitions'=>$this->getRoles(),"method" => $request->getMethod()]);
+
             $this->removeExtraFields($request, $form);
             $form->handleRequest($request);
             
@@ -150,7 +154,7 @@ class UserRESTController extends BaseRestController
                     $userManager->updateUser($user);
                 }
 
-                return $entity->toGridObject();
+                return $entity->toGridObject($request->getSession()->get('timezone'));
             }
             //dump($form->getData());
             return FOSView::create(array('errors' => $form->getErrors()), Codes::HTTP_INTERNAL_SERVER_ERROR);

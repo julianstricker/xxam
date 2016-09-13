@@ -20,10 +20,16 @@
             }
           });
         }
+
+
+
         var grouproles=[];
         {% for group in groups %}
         grouproles[{{group.id}}]={{group.roles|jscode}};
         {% endfor %}
+
+        var timezone='{{ entity.timezone }}';
+        if (timezone=='') timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         
         return {
             xtype: 'form',
@@ -91,6 +97,14 @@
                 name:'rolesg',
                 vertical: true,
                 items: {{ roles|jscode }}
+            },{
+                fieldLabel: 'Timezone',
+                submitValue: false,
+                xtype: 'combo',
+                name:'timezone',
+                store: {{ timezones|jscode }},
+                value: timezone
+
             }],
             buttons: [{
                 text: '{%trans%}Save{%endtrans%}',

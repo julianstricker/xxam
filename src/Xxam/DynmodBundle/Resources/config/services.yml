@@ -15,3 +15,5 @@ services:
        class: Xxam\DynmodBundle\Services\RolesService
        tags:
            -  { name: xxam.rolesservice }
+       arguments:
+        entityManager: "@doctrine.orm.entity_manager"

@@ -7,3 +7,11 @@ xxam_dynmod_api:
     type:   rest
     prefix:   /api
 
+xxam_dynmod_datacontainer:
+    resource: "@XxamDynmodBundle/Controller/DatacontainerController.php"
+    type: annotation
+
+xxam_dynmod_datacontainer_api:
+    resource: "@XxamDynmodBundle/Controller/DatacontainerRESTController.php"
+    type:   rest
+    prefix:   /api

@@ -12,4 +12,35 @@ use Doctrine\ORM\EntityRepository;
  */
 class DatacontainerRepository extends EntityRepository
 {
+    public function getTotalcount($filters){
+        $query = $this->createQueryBuilder('e');
+        $query->select('COUNT(DISTINCT e.id)');
+        $z=0;
+        foreach($filters as $key => $value){
+            $query->andWhere('(e.'.$key.' = :value'.$z);
+            $query->setParameter('value'.$z, $value);
+        }
+        return $query->getQuery()->getSingleScalarResult();
+    }
+    public function getModelFields(){
+        $fields=Array();
+        $fields[]=Array('name'=> 'id','type'=>'int');
+        $fields[]=Array('name'=> 'name','type'=>'string');
+        $fields[]=Array('name'=> 'defaultcontainer','type'=>'boolean');
+        $fields[]=Array('name'=> 'fielddefinitions');
+        $fields[]=Array('name'=> 'created','type'=>'date', 'dateFormat'=>'Y-m-d H:i:s');
+        $fields[]=Array('name'=> 'updated','type'=>'date', 'dateFormat'=>'Y-m-d H:i:s');
+        return $fields;
+
+    }
+    public function getGridColumns(){
+        $columns=Array();
+        $columns[]=Array('text'=> 'Id','dataIndex'=> 'id', 'filter'=> Array('type'=> 'number'),'hidden'=> true);
+        $columns[]=Array('text'=> 'Name','dataIndex'=> 'name', 'filter'=> Array('type'=> 'string'));
+        $columns[]=Array('text'=> 'Is default','flex'=> 1,'dataIndex'=> 'defaultcontainer', 'xtype'=> 'checkcolumn', 'filter'=> Array('type'=> 'boolean'));
+        $columns[]=Array('text'=> 'Created','dataIndex'=> 'created', 'xtype'=> 'datecolumn', 'format'=>'Y-m-d H:i:s', 'filter'=> Array('type'=> 'date'),'hidden'=> true);
+        $columns[]=Array('text'=> 'Updated','dataIndex'=> 'updated', 'xtype'=> 'datecolumn', 'format'=>'Y-m-d H:i:s', 'filter'=> Array('type'=> 'date'),'hidden'=> true);
+        return $columns;
+
+    }
 }

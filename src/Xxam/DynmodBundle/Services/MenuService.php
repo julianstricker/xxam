@@ -42,6 +42,18 @@ class MenuService
                         'iconCls' => 'x-fa fa-cube',
                         'href' => '#dynmod',
                         'role' => 'ROLE_DYNMOD_CREATE'
+                    ),
+                    'menu_dynmod_datacontainer' => Array(
+                        'text' => 'Datacontainer',
+                        'iconCls' => 'x-fa fa-cubes',
+                        'href' => '#dynmod/datacontainer',
+                        'role' => 'ROLE_DYNMOD_DATACONTAINER_LIST'
+                    ),
+                    'menu_dynmod_datacontainer-create' => Array(
+                        'text' => 'Create new Dynmod',
+                        'iconCls' => 'x-fa fa-cube',
+                        'href' => '#dynmod/datacontainer/create',
+                        'role' => 'ROLE_DYNMOD_DATACONTAINER_CREATE'
                     )
                 )
             )
@@ -55,9 +67,9 @@ class MenuService
                 'role' => 'ROLE_DYNMOD_'.strtoupper($dynmod->getCode()).'_LIST',
                 'menu' => Array(
                     'menu_dynmod' => Array(
-                        'text' => 'Dynmod',
+                        'text' => $dynmod->getName(),
                         'iconCls' => $dynmod->getIconcls(),
-                        'href' => '#dynmod/'.$dynmod->getCode(),
+                        'href' => '#dynmod/index/'.$dynmod->getCode(),
                         'role' => 'ROLE_DYNMOD_'.strtoupper($dynmod->getCode()).'_LIST'
                     )
                 )

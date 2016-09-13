@@ -31,7 +31,10 @@ class ContactType extends AbstractType
             ->add('birthday',DateType::class, array('input'=>'datetime', /*'format' => 'dd.MM.yyyy',*/ 'widget'=>'single_text'))
             ->add('photo')
             ->add('organizationfunction')
-            //->add('addresses')
+            ->add('additionalfields')
+            ->add('notes')
+            ->add('addresses')
+            ->add('communicationdatas')
             
                 
         ;

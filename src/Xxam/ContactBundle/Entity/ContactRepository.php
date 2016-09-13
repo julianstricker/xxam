@@ -64,4 +64,17 @@ class ContactRepository extends EntityRepository
         return $columns;
         
     }
+
+    /**
+     * @param String $email
+     * @return Contact|null
+     */
+    public function findOneByEmail($email){
+        $query = $this->createQueryBuilder('e');
+        $query->join('e.communicationdatas','c');
+        $query->andWhere("c.communicationdatatype_id LIKE 'email_%'");
+        $query->andWhere('c.value LIKE :value');
+        $query->setParameter('value', $email);
+        return $query->getQuery()->getFirstResult();
+    }
 }

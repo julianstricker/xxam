@@ -2,6 +2,7 @@
 
 namespace Xxam\ContactBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping as ORM;
 use Xxam\CoreBundle\Entity\Base as Base;
@@ -118,12 +119,12 @@ class Contact implements Base\TenantInterface
     private $birthday;
 
     /**
-     * @var string
+     * @var Image[]
      *
-     * @ORM\Column(name="photo", type="string", length=255, nullable=true)
+     * @ORM\Column(name="images", type="json_array", nullable=true)
      * @Gedmo\Versioned
      */
-    private $photo;
+    private $images;
 
     /**
      * @var string
@@ -132,6 +133,38 @@ class Contact implements Base\TenantInterface
      * @Gedmo\Versioned
      */
     private $organizationfunction;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="notes", type="text", nullable=true)
+     * @Gedmo\Versioned
+     */
+    private $notes;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="gender", type="string", length=2, nullable=true)
+     * @Gedmo\Versioned
+     */
+    private $gender;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="timezone", type="string", length=255, nullable=true)
+     * @Gedmo\Versioned
+     */
+    private $timezone;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="additionalfields", type="json_array", nullable=true)
+     * @Gedmo\Versioned
+     */
+    private $additionalfields;
     
     /**
      * @var \DateTime $created
@@ -423,26 +456,30 @@ class Contact implements Base\TenantInterface
     }
 
     /**
-     * Set photo
-     *
-     * @param string $photo
+     * @return Image[]
+     */
+    public function getImages()
+    {
+        return $this->images;
+    }
+
+    /**
+     * @param Image[] $images
      * @return Contact
      */
-    public function setPhoto($photo)
+    public function setImages($images)
     {
-        $this->photo = $photo;
-
+        $this->images = $images;
         return $this;
     }
 
     /**
-     * Get photo
-     *
-     * @return string 
+     * @param Image $image
+     * @return Contact
      */
-    public function getPhoto()
-    {
-        return $this->photo;
+    public function addImage(Image $image){
+        $this->images[]= $image;
+        return $this;
     }
 
     /**
@@ -518,16 +555,17 @@ class Contact implements Base\TenantInterface
      */
     public function __construct()
     {
-        $this->addresses = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->addresses = new ArrayCollection();
+        $this->communicationdatas = new ArrayCollection();
     }
 
     /**
      * Add addresses
      *
-     * @param \Xxam\ContactBundle\Entity\Address $addresses
+     * @param Address $addresses
      * @return Contact
      */
-    public function addAddress(\Xxam\ContactBundle\Entity\Address $addresses)
+    public function addAddress(Address $addresses)
     {
         $this->addresses[] = $addresses;
 
@@ -537,9 +575,9 @@ class Contact implements Base\TenantInterface
     /**
      * Remove addresses
      *
-     * @param \Xxam\ContactBundle\Entity\Address $addresses
+     * @param Address $addresses
      */
-    public function removeAddress(\Xxam\ContactBundle\Entity\Address $addresses)
+    public function removeAddress(Address $addresses)
     {
         $this->addresses->removeElement($addresses);
     }
@@ -557,10 +595,10 @@ class Contact implements Base\TenantInterface
     /**
      * Add communicationdatas
      *
-     * @param \Xxam\ContactBundle\Entity\Communicationdata $communicationdatas
+     * @param Communicationdata $communicationdatas
      * @return Contact
      */
-    public function addCommunicationdata(\Xxam\ContactBundle\Entity\Communicationdata $communicationdatas)
+    public function addCommunicationdata(Communicationdata $communicationdatas)
     {
         $this->communicationdatas[] = $communicationdatas;
 
@@ -570,9 +608,9 @@ class Contact implements Base\TenantInterface
     /**
      * Remove communicationdatas
      *
-     * @param \Xxam\ContactBundle\Entity\Communicationdata $communicationdatas
+     * @param Communicationdata $communicationdatas
      */
-    public function removeCommunicationdata(\Xxam\ContactBundle\Entity\Communicationdata $communicationdatas)
+    public function removeCommunicationdata(Communicationdata $communicationdatas)
     {
         $this->communicationdatas->removeElement($communicationdatas);
     }
@@ -586,6 +624,81 @@ class Contact implements Base\TenantInterface
     {
         return $this->communicationdatas;
     }
+
+    /**
+     * @return string
+     */
+    public function getNotes()
+    {
+        return $this->notes;
+    }
+
+    /**
+     * @param string $notes
+     * @return Contact
+     */
+    public function setNotes($notes)
+    {
+        $this->notes = $notes;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAdditionalfields()
+    {
+        return $this->additionalfields;
+    }
+
+    /**
+     * @param array $additionalfields
+     * @return Contact
+     */
+    public function setAdditionalfields($additionalfields)
+    {
+        $this->additionalfields = $additionalfields;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGender()
+    {
+        return $this->gender;
+    }
+
+    /**
+     * @param string $gender
+     * @return Contact
+     */
+    public function setGender($gender)
+    {
+        $this->gender = $gender;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTimezone()
+    {
+        return $this->timezone;
+    }
+
+    /**
+     * @param string $timezone
+     * @return Contact
+     */
+    public function setTimezone($timezone)
+    {
+        $this->timezone = $timezone;
+        return $this;
+    }
+
+
+
     
     
 }

@@ -90,7 +90,7 @@ class UserController extends Controller
         $groups=$this->getDoctrine()->getManager()->getRepository('XxamUserBundle:Group')->findAll();
         $entity=new User();
         
-        return $this->render('XxamUserBundle:User:edit.js.twig', array('entity'=>$entity,'groups'=>$groups,'roles'=>$this->getRolesFormatted($entity),'modelfields'=>$repository->getModelFields()));
+        return $this->render('XxamUserBundle:User:edit.js.twig', array('entity'=>$entity,'groups'=>$groups,'roles'=>$this->getRolesFormatted($entity),'modelfields'=>$repository->getModelFields(),'timezones'=> \DateTimeZone::listIdentifiers()));
     }
     
     
@@ -120,7 +120,7 @@ class UserController extends Controller
 
         /** @var User $entity */
 
-        return $this->render('XxamUserBundle:User:edit.js.twig', array('entity'=>$entity,'groups'=>$groups,'groupsformatted'=>$this->getGroupsFormatted($groups,$entity),'form'=>$form,'roles'=>$this->getRolesFormatted($entity),'modelfields'=>$repository->getModelFields()));
+        return $this->render('XxamUserBundle:User:edit.js.twig', array('entity'=>$entity,'groups'=>$groups,'groupsformatted'=>$this->getGroupsFormatted($groups,$entity),'form'=>$form,'roles'=>$this->getRolesFormatted($entity),'modelfields'=>$repository->getModelFields(),'timezones'=> \DateTimeZone::listIdentifiers()));
     }
 
     /**

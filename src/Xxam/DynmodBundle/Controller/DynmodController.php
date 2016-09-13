@@ -94,7 +94,43 @@ class DynmodController extends Controller
         $data['modelfields']=$repository->getModelFields();
         return $this->render('XxamDynmodBundle:Dynmod:edit.js.twig', $data);
     }
-    
 
-    
+    /**
+     * Lists all entities of a dynmod.
+     *
+     * @Route("/index/{code}", name="dynmod_dynmodindex")
+     * @Method("GET")
+     * @param $code
+     * @return Response
+     */
+    public function dynmodindexAction($code) {
+        /** @var DynmodRepository $repository */
+        $repository=$this->getDoctrine()->getManager()->getRepository('XxamDynmodBundle:Dynmod');
+        /** @var Dynmod $dynmod */
+        $dynmod=$repository->findOneBy(['code'=>$code]);
+        $datacontainer=$dynmod->getDefaultDatacontainer();
+       // $datacontainer->getFielddefinitions();
+
+        return $this->render('XxamDynmodBundle:Dynmod:dynmodindex.js.twig', array('dynmod'=>$dynmod,'modelfields'=>$datacontainer ? $datacontainer->getModelFields() : null,'gridcolumns'=>$datacontainer ? $datacontainer->getGridColumns() : null));
+    }
+
+    /**
+     * Lists all entities of a dynmod.
+     *
+     * @Route("/loaddatacontainers/{id}", name="dynmod_loaddatacontainers")
+     * @Method("GET")
+     * @param $id
+     * @return Response
+     */
+    public function loaddatacontainersAction($id) {
+        /** @var DynmodRepository $repository */
+        $repository=$this->getDoctrine()->getManager()->getRepository('XxamDynmodBundle:Dynmod');
+        /** @var Dynmod $dynmod */
+        $dynmod=$repository->findOneBy(['id'=>$id]);
+        $datacontainers=[];
+        foreach($dynmod->getDatacontainers() as $datacontainer){
+            $datacontainers[]=$datacontainer->toGridArray();
+        }
+        return new Response(json_encode(['datacontainers'=>$datacontainers]));
+    }
 }

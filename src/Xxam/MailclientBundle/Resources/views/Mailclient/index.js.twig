@@ -2,18 +2,22 @@
 {% set iconsize = '16x16' %}
 {% set buttonsize = 'medium' %}
 {% if buttonsize == 'large' %}
-    {% set iconsize = '32x32' %}
+{% set iconsize = '32x32' %}
 {% endif %}
 {
     tabtitle: 'Mails',
-    //tabicon: '/bundles/xxammailclient/icons/16x16/email.png',
-    iconCls: 'x-fa fa-envelope',
-    getitems: function (){
+            //tabicon: '/bundles/xxammailclient/icons/16x16/email.png',
+            iconCls
+:
+    'x-fa fa-envelope',
+            getitems
+:
+    function () {
         Xxam.appendHead({
             css: ['/bundles/xxammailclient/css/layout.css']
         });
-        if (typeof(EmaillistModel)=='undefined'){
-            Ext.define('EmaillistModel',{
+        if (typeof(EmaillistModel) == 'undefined') {
+            Ext.define('EmaillistModel', {
                 extend: 'Ext.data.Model',
                 fields: [
                     {name: 'subject', type: 'string'},
@@ -37,8 +41,8 @@
             });
         }
 
-        if (typeof(EmailtreeModel)=='undefined'){
-            Ext.define('EmailtreeModel',{
+        if (typeof(EmailtreeModel) == 'undefined') {
+            Ext.define('EmailtreeModel', {
                 extend: 'Ext.data.TreeModel',
                 fields: [
                     {name: 'text', type: 'string'},
@@ -47,33 +51,33 @@
                 ]
             });
         }
-        lastmailboxinfo=false;
-        
-        var mailclient_maillist_store=Ext.create('Ext.data.Store', {
+        lastmailboxinfo = false;
+
+        var mailclient_maillist_store = Ext.create('Ext.data.Store', {
             model: 'EmaillistModel',
             remoteSort: true,
             remoteFilter: true,
             //leadingBufferZone: 300,
             pageSize: 100,
-            listeners:{
-                load: function(store, records, successful, operation, node, eOpts ){
+            listeners: {
+                load: function (store, records, successful, operation, node, eOpts) {
                     console.log('check');
-                    Ext.Array.each(records,function(record,index){
-                        if(record.data.recent==1){
-                            if (!windowhasfocus){
-                                notify('{% trans %}New mail from{% endtrans %} '+record.data.from, Ext.String.htmlEncode(record.data.subject), '/bundles/xxammailclient/icons/32x32/email.png')
+                    Ext.Array.each(records, function (record, index) {
+                        if (record.data.recent == 1) {
+                            if (!windowhasfocus) {
+                                notify('{% trans %}New mail from{% endtrans %} ' + record.data.from, Ext.String.htmlEncode(record.data.subject), '/bundles/xxammailclient/icons/32x32/email.png')
                             }
-                            Xxam.msg('{% trans %}New mail from{% endtrans %} '+record.data.from, Ext.String.htmlEncode(record.data.subject), '/bundles/xxammailclient/icons/32x32/email.png');
+                            Xxam.msg('{% trans %}New mail from{% endtrans %} ' + record.data.from, Ext.String.htmlEncode(record.data.subject), '/bundles/xxammailclient/icons/32x32/email.png');
                         }
                     });
                 }
             },
 
 
-            proxy:{
+            proxy: {
                 type: 'ajax',
-                url: '{{path('mailclient_listmails')}}',
-                reader : {
+                url: '{{ path('mailclient_listmails') }}',
+                reader: {
                     type: 'json',
                     rootProperty: 'mails',
                     totalProperty: 'totalCount'
@@ -91,100 +95,106 @@
             },
             autoLoad: false
         });
-        
-        var mailclient_maillist_pagingtoolbar=Ext.create('Ext.PagingToolbar', {
+
+        var mailclient_maillist_pagingtoolbar = Ext.create('Ext.PagingToolbar', {
             store: mailclient_maillist_store,
             displayInfo: true,
             displayMsg: 'Displaying Mails {0} - {1} of {2}',
             emptyMsg: "No mails to display"
 
         });
-        
-        getthumbnailurl=function(filename,filepath){
-            var fileextensiontomimetype={{fileextensiontomimetype|jscode}};
-            var fileextensionswiththumbnails={{fileextensionswiththumbnails|jscode}}
-            var filenamesplit=filename.split('.');
-            
-            var filetype=filenamesplit[filenamesplit.length-1].toLowerCase();
-            if (Ext.Array.indexOf(fileextensionswiththumbnails,filetype)>-1){
-                return "{{path('xxam_core_homepage')}}thumbnails/crop/64x64"+filepath;
+
+        getthumbnailurl = function (filename, filepath) {
+            var fileextensiontomimetype ={{ fileextensiontomimetype|jscode }};
+            var fileextensionswiththumbnails ={{ fileextensionswiththumbnails|jscode }}
+            var filenamesplit = filename.split('.');
+
+            var filetype = filenamesplit[filenamesplit.length - 1].toLowerCase();
+            if (Ext.Array.indexOf(fileextensionswiththumbnails, filetype) > -1) {
+                return "{{ path('xxam_core_homepage') }}thumbnails/crop/64x64" + filepath;
             }
-            if (typeof fileextensiontomimetype[filetype] != 'undefined'){
-                return "/bundles/xxamcore/icons/64x64/mimetypes/"+fileextensiontomimetype[filetype];
+            if (typeof fileextensiontomimetype[filetype] != 'undefined') {
+                return "/bundles/xxamcore/icons/64x64/mimetypes/" + fileextensiontomimetype[filetype];
             }
             return "/bundles/xxamcore/icons/64x64/mimetypes/unknown.png";
 
         };
-        
+
+
+
+
+
+
+
         return {
             tbar: [
-                { 
-                    xtype: 'button', 
-                    text: '{%trans%}Refresh{%endtrans%}', 
-                    tooltip: '{%trans%}Check for new messages{%endtrans%}', 
-                    scale: '{{buttonsize}}', 
-                    //icon: '/bundles/xxammailclient/icons/{{iconsize}}/arrow_refresh.png',
+                {
+                    xtype: 'button',
+                    text: '{% trans %}Refresh{% endtrans %}',
+                    tooltip: '{% trans %}Check for new messages{% endtrans %}',
+                    scale: '{{ buttonsize }}',
+                    //icon: '/bundles/xxammailclient/icons/{{ iconsize }}/arrow_refresh.png',
                     iconCls: 'x-fa fa-refresh',
-                    handler: function(){
+                    handler: function () {
                         Ext.getCmp('mailclient_maillist').store.load();
                     }
                 },
-                { 
-                    xtype: 'button', 
-                    text: '{%trans%}New{%endtrans%}', 
-                    tooltip: '{%trans%}Create new message{%endtrans%}', 
-                    scale: '{{buttonsize}}', 
-                    //icon: '/bundles/xxammailclient/icons/{{iconsize}}/email_edit.png',
+                {
+                    xtype: 'button',
+                    text: '{% trans %}New{% endtrans %}',
+                    tooltip: '{% trans %}Create new message{% endtrans %}',
+                    scale: '{{ buttonsize }}',
+                    //icon: '/bundles/xxammailclient/icons/{{ iconsize }}/email_edit.png',
                     iconCls: 'x-fa fa-pencil',
-                    handler: function(){
-                        window.location.href='#mailclient/write';
+                    handler: function () {
+                        window.location.href = '#mailclient/write';
                     }
                 },
                 {
                     xtype: 'button',
-                    text: '{%trans%}Outbox{%endtrans%}',
-                    tooltip: '{%trans%}Show Outbox{%endtrans%}',
-                    scale: '{{buttonsize}}',
+                    text: '{% trans %}Outbox{% endtrans %}',
+                    tooltip: '{% trans %}Show Outbox{% endtrans %}',
+                    scale: '{{ buttonsize }}',
                     iconCls: 'x-fa fa-send',
-                    handler: function(){
-                        window.location.href='#mailspool';
+                    handler: function () {
+                        window.location.href = '#mailspool';
                     }
                 },
-                { xtype: 'tbfill'},
+                {xtype: 'tbfill'},
                 {
                     xtype: 'button',
-                    text: '{%trans%}Settings{%endtrans%}',
-                    tooltip: '{%trans%}Settings{%endtrans%}',
-                    scale: '{{buttonsize}}',
-                    //icon: '/bundles/xxammailclient/icons/{{iconsize}}/email_setting.png',
+                    text: '{% trans %}Settings{% endtrans %}',
+                    tooltip: '{% trans %}Settings{% endtrans %}',
+                    scale: '{{ buttonsize }}',
+                    //icon: '/bundles/xxammailclient/icons/{{ iconsize }}/email_setting.png',
                     iconCls: 'x-fa fa-gears',
-                    handler: function(){
-                        window.location.href='#mailclient/settings';
+                    handler: function () {
+                        window.location.href = '#mailclient/settings';
                     }
                 }
 
             ],
-            listeners:{
-                 added: function(tab, container, pos ){
-                    if (typeof mailclient_maillisttimeout == 'undefined'){
-                        mailclient_maillisttimeoutfunction=function(){ 
+            listeners: {
+                added: function (tab, container, pos) {
+                    if (typeof mailclient_maillisttimeout == 'undefined') {
+                        mailclient_maillisttimeoutfunction = function () {
                             //if (!windowhasfocus){ //Ext.getCmp('mailclient_maillist').store.load();
-                            if ('Deaktiviert'==true){
-                            
-                                Ext.Ajax.request({
-                                    url: 'mailclient/getmailboxinfo?path='+Ext.getCmp('mailclient_folderlist').getSelection()[0].data.path,
+                            if ('Deaktiviert' == true) {
 
-                                    success: function(response){
-                                        var responsejson=Ext.JSON.decode(response.responseText);
-                                        rrr=responsejson;
-                                        if (lastmailboxinfo == false || Ext.JSON.encode(lastmailboxinfo)!=Ext.JSON.encode(responsejson.mailboxinfo)){
+                                Ext.Ajax.request({
+                                    url: 'mailclient/getmailboxinfo?path=' + Ext.getCmp('mailclient_folderlist').getSelection()[0].data.path,
+
+                                    success: function (response) {
+                                        var responsejson = Ext.JSON.decode(response.responseText);
+                                        rrr = responsejson;
+                                        if (lastmailboxinfo == false || Ext.JSON.encode(lastmailboxinfo) != Ext.JSON.encode(responsejson.mailboxinfo)) {
                                             //something has changed, reload...
-                                            console.log(Ext.JSON.encode(lastmailboxinfo)==Ext.JSON.encode(responsejson.mailboxinfo));
-                                            lastmailboxinfo=responsejson.mailboxinfo;
-                                            scrollpos=Ext.getCmp('mailclient_maillist').view.getScrollY();
+                                            console.log(Ext.JSON.encode(lastmailboxinfo) == Ext.JSON.encode(responsejson.mailboxinfo));
+                                            lastmailboxinfo = responsejson.mailboxinfo;
+                                            scrollpos = Ext.getCmp('mailclient_maillist').view.getScrollY();
                                             Ext.getCmp('mailclient_maillist').getStore().load({
-                                                callback: function(records, operation, success) {
-                                                    Ext.getCmp('mailclient_maillist').view.scrollTo(0,scrollpos);
+                                                callback: function (records, operation, success) {
+                                                    Ext.getCmp('mailclient_maillist').view.scrollTo(0, scrollpos);
                                                 }
                                             });
                                         }
@@ -194,19 +204,20 @@
                                 });
 
                             }
-                            
-                            
-                            mailclient_maillisttimeout=setTimeout(mailclient_maillisttimeoutfunction, 10000);
+
+
+                            mailclient_maillisttimeout = setTimeout(mailclient_maillisttimeoutfunction, 10000);
                         }
-                        mailclient_maillisttimeout=setTimeout(mailclient_maillisttimeoutfunction, 10000);
+                        mailclient_maillisttimeout = setTimeout(mailclient_maillisttimeoutfunction, 10000);
                     }
-                 },
-                 removed: function(tab, container, pos ){
-                    if (typeof mailclient_maillisttimeout != 'undefined'){
+
+                },
+                removed: function (tab, container, pos) {
+                    if (typeof mailclient_maillisttimeout != 'undefined') {
                         clearTimeout(mailclient_maillisttimeout);
                         delete mailclient_maillisttimeout;
                     }
-                 }
+                }
 
             },
             layout: 'border',
@@ -232,7 +243,7 @@
                         margins: '4 4 5 5',
 
                         viewConfig: {
-                            renderer: function(value,metaData,record){
+                            renderer: function (value, metaData, record) {
                                 return value;
                             },
                             copy: false,
@@ -248,26 +259,26 @@
                             ],
                             listeners: {
 
-                                beforedrop: function(node, data, overModel, dropPosition, dropHandlers){
-                                    if (data.view.xtype=='tableview'){ //move mail into folder:
+                                beforedrop: function (node, data, overModel, dropPosition, dropHandlers) {
+                                    if (data.view.xtype == 'tableview') { //move mail into folder:
                                         dropHandlers.wait = true;
                                         console.log('move mail into folder');
-                                        var ids=[];
-                                        Ext.Array.each(data.records, function(record){
+                                        var ids = [];
+                                        Ext.Array.each(data.records, function (record) {
                                             ids.push(record.id);
                                         });
-                                        var from=data.view.getStore().getProxy().extraParams.path.toString();
-                                        var to=overModel.raw.path;
+                                        var from = data.view.getStore().getProxy().extraParams.path.toString();
+                                        var to = overModel.raw.path;
                                         Ext.Ajax.request({
-                                            url: 'mailclient/movemails?from='+from+'&to='+to+'&ids='+ids,
+                                            url: 'mailclient/movemails?from=' + from + '&to=' + to + '&ids=' + ids,
 
-                                            success: function(response){
-                                                var responsejson=Ext.JSON.decode(response.responseText);
-                                                scrollpos=Ext.getCmp('mailclient_maillist').view.getScrollY();
+                                            success: function (response) {
+                                                var responsejson = Ext.JSON.decode(response.responseText);
+                                                scrollpos = Ext.getCmp('mailclient_maillist').view.getScrollY();
                                                 Ext.getCmp('mailclient_maillist').getStore().load({
-                                                    callback: function(records, operation, success) {
-                                                        console.log('lalala',scrollpos);
-                                                        Ext.getCmp('mailclient_maillist').view.scrollTo(0,scrollpos);
+                                                    callback: function (records, operation, success) {
+                                                        console.log('lalala', scrollpos);
+                                                        Ext.getCmp('mailclient_maillist').view.scrollTo(0, scrollpos);
                                                     }
                                                 });
 
@@ -276,11 +287,11 @@
                                         });
                                         dropHandlers.cancelDrop();
                                         return false;
-                                    }else{
+                                    } else {
                                         dropHandlers.wait = true;
 
-                                        console.log('tree beforedrop',node, data, overModel, dropPosition, dropHandlers);
-                                        Ext.MessageBox.confirm('Drop', 'Are you sure', function(btn){
+                                        console.log('tree beforedrop', node, data, overModel, dropPosition, dropHandlers);
+                                        Ext.MessageBox.confirm('Drop', 'Are you sure', function (btn) {
                                             if (btn === 'yes') {
                                                 dropHandlers.processDrop();
                                             } else {
@@ -291,10 +302,10 @@
 
                                     //return true;
                                 },
-                                drop: function(node, data, overModel, dropPosition) {
+                                drop: function (node, data, overModel, dropPosition) {
                                     console.log('tree drop');
                                     return false;
-                                    console.log('tree drop',node, data, overModel, dropPosition);
+                                    console.log('tree drop', node, data, overModel, dropPosition);
                                 }
                             }
                         },
@@ -302,10 +313,10 @@
                             extend: 'Ext.data.TreeStore',
                             model: EmailtreeModel,
 
-                            proxy:{
+                            proxy: {
                                 type: 'ajax',
-                                url: '{{path('mailclient_listfolders')}}',
-                                reader : {
+                                url: '{{ path('mailclient_listfolders') }}',
+                                reader: {
                                     type: 'json'
                                 }
                             },
@@ -313,23 +324,23 @@
                         },
                         listeners: {
 
-                            load: function(store, records, successful, operation, node, eOpts ){
-                                if (store.ownerTree.getSelection().length==0){
+                            load: function (store, records, successful, operation, node, eOpts) {
+                                if (store.ownerTree.getSelection().length == 0) {
                                     store.ownerTree.getSelectionModel().select(0);
                                 }
                             },
-                            selectionchange: function(model, selected, eOpts){
-                                var grid=model.view.findParentByType('panel').findParentByType('panel').findParentByType('panel').layout.centerRegion.items.items[0];
-                                grid.store.getProxy().setExtraParam('path',selected[0].data.path);
+                            selectionchange: function (model, selected, eOpts) {
+                                var grid = model.view.findParentByType('panel').findParentByType('panel').findParentByType('panel').layout.centerRegion.items.items[0];
+                                grid.store.getProxy().setExtraParam('path', selected[0].data.path);
                                 mailclient_maillist_pagingtoolbar.moveFirst();
                                 //grid.store.load();
-                                Ext.getCmp('mailclient_mailpanel{{id}}').collapse();
-                                Ext.getCmp('mailclient_mailpanel{{id}}').setTitle('');
+                                Ext.getCmp('mailclient_mailpanel{{ id }}').collapse();
+                                Ext.getCmp('mailclient_mailpanel{{ id }}').setTitle('');
 
                             },
-                            beforeiteminsert : function(obj, node) {
-                                console.log('beforeinteminsert',obj,node);   
-                           }
+                            beforeiteminsert: function (obj, node) {
+                                console.log('beforeinteminsert', obj, node);
+                            }
 
 
                         }
@@ -373,314 +384,314 @@
                     // paging bar on the bottom
                     bbar: mailclient_maillist_pagingtoolbar,
                     columns: [
-                        { 
+                        {
                             text: '{% trans %}Subject{% endtrans %}',
-                            dataIndex: 'subject', 
+                            dataIndex: 'subject',
                             stateId: 'mailclient_maillist_subject',
                             stateful: true,
-                            flex: 1, 
-                            cellWrap: true, 
+                            flex: 1,
+                            cellWrap: true,
                             filter: {type: 'string'},
-                            renderer: function(value, metaData, record) {
-                                if(record.data.seen==false){
+                            renderer: function (value, metaData, record) {
+                                if (record.data.seen == false) {
                                     metaData.tdStyle = 'font-weight: bold;';
                                 }
                                 return Ext.String.htmlEncode(value);
-                            } 
+                            }
                         },
-                        { 
+                        {
                             text: '{% trans %}From{% endtrans %}',
-                            dataIndex: 'from', 
+                            dataIndex: 'from',
                             stateId: 'mailclient_maillist_from',
-                            stateful: true, 
+                            stateful: true,
                             filter: {type: 'string'},
-                            renderer: function(value, metaData, record) {
-                                var from=Ext.String.trim(value.split('<')[0]).replace(/"/g,'');
-                                if(from=='') from = value;
-                                if(record.data.seen==false){
+                            renderer: function (value, metaData, record) {
+                                var from = Ext.String.trim(value.split('<')[0]).replace(/"/g, '');
+                                if (from == '') from = value;
+                                if (record.data.seen == false) {
                                     metaData.tdStyle = 'font-weight: bold;';
                                 }
                                 return Ext.String.htmlEncode(from);
-                            } 
+                            }
                         },
-                        { 
+                        {
                             text: '{% trans %}To{% endtrans %}',
-                            dataIndex: 'to', 
+                            dataIndex: 'to',
                             stateId: 'mailclient_maillist_to',
-                            stateful: true, 
-                            hidden: true, 
+                            stateful: true,
+                            hidden: true,
                             filter: {type: 'string'},
-                            renderer: function(value, metaData, record) {
-                                if(record.data.seen==false){
+                            renderer: function (value, metaData, record) {
+                                if (record.data.seen == false) {
                                     metaData.tdStyle = 'font-weight: bold;';
                                 }
                                 return Ext.String.htmlEncode(value);
-                            } 
+                            }
                         },
-                        { 
+                        {
                             text: '{% trans %}Date{% endtrans %}',
-                            dataIndex: 'date', 
+                            dataIndex: 'date',
                             stateId: 'mailclient_maillist_date',
-                            stateful: true, 
+                            stateful: true,
                             filter: {
                                 type: 'date',
                                 dateFormat: 'Y-m-d H:i:s'
                             },
-                            renderer: function(value, metaData, record) {
-                                if(record.data.seen==false){
+                            renderer: function (value, metaData, record) {
+                                if (record.data.seen == false) {
                                     metaData.tdStyle = 'font-weight: bold;';
                                 }
                                 return Ext.String.htmlEncode(value);
-                            } 
+                            }
                         },
-                        { 
+                        {
                             text: '{% trans %}Message Id{% endtrans %}',
-                            dataIndex: 'message_id', 
+                            dataIndex: 'message_id',
                             stateId: 'mailclient_maillist_message_id',
-                            stateful: true, 
+                            stateful: true,
                             hidden: true,
-                            renderer: function(value, metaData, record) {
-                                if(record.data.seen==false){
+                            renderer: function (value, metaData, record) {
+                                if (record.data.seen == false) {
                                     metaData.tdStyle = 'font-weight: bold;';
                                 }
                                 return Ext.String.htmlEncode(value);
-                            }  
+                            }
                         },
-                        { 
+                        {
                             text: '{% trans %}References{% endtrans %}',
-                            dataIndex: 'references', 
+                            dataIndex: 'references',
                             stateId: 'mailclient_maillist_references',
-                            stateful: true, 
+                            stateful: true,
                             hidden: true,
-                            renderer: function(value, metaData, record) {
-                                if(record.data.seen==false){
+                            renderer: function (value, metaData, record) {
+                                if (record.data.seen == false) {
                                     metaData.tdStyle = 'font-weight: bold;';
                                 }
                                 return Ext.String.htmlEncode(value);
-                            }  
+                            }
                         },
-                        { 
+                        {
                             text: '{% trans %}In reply to{% endtrans %}',
-                            dataIndex: 'in_reply_to', 
+                            dataIndex: 'in_reply_to',
                             stateId: 'mailclient_maillist_in_reply_to',
-                            stateful: true, 
+                            stateful: true,
                             hidden: true,
-                            renderer: function(value, metaData, record) {
-                                if(record.data.seen==false){
+                            renderer: function (value, metaData, record) {
+                                if (record.data.seen == false) {
                                     metaData.tdStyle = 'font-weight: bold;';
                                 }
                                 return Ext.String.htmlEncode(value);
-                            }  
+                            }
                         },
-                        { 
+                        {
                             text: '{% trans %}Size{% endtrans %}',
-                            dataIndex: 'size', 
+                            dataIndex: 'size',
                             stateId: 'mailclient_maillist_size',
                             stateful: true,
                             align: 'right',
-                            renderer: function(value, metaData, record) {
+                            renderer: function (value, metaData, record) {
                                 var valuestring;
-                                if(value > 0){
+                                if (value > 0) {
                                     var s = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
-                                    var e = Math.floor(Math.log(value)/Math.log(1024));
-                                    valuestring= (value/Math.pow(1024, Math.floor(e))).toFixed(2)+" "+s[e];
+                                    var e = Math.floor(Math.log(value) / Math.log(1024));
+                                    valuestring = (value / Math.pow(1024, Math.floor(e))).toFixed(2) + " " + s[e];
                                 }
-                                else{
-                                    valuestring= '0 ' + 'bytes';
+                                else {
+                                    valuestring = '0 ' + 'bytes';
                                 }
-                                if(record.data.seen==false){
+                                if (record.data.seen == false) {
                                     metaData.tdStyle = 'font-weight: bold;';
                                 }
                                 return Ext.String.htmlEncode(valuestring);
-                            }  
+                            }
                         },
-                        { 
+                        {
                             text: '{% trans %}Uid{% endtrans %}',
-                            dataIndex: 'uid', 
+                            dataIndex: 'uid',
                             stateId: 'mailclient_maillist_uid',
-                            stateful: true, 
+                            stateful: true,
                             hidden: true,
-                            renderer: function(value, metaData, record) {
-                                if(record.data.seen==false){
+                            renderer: function (value, metaData, record) {
+                                if (record.data.seen == false) {
                                     metaData.tdStyle = 'font-weight: bold;';
                                 }
                                 return Ext.String.htmlEncode(value);
-                            }  
+                            }
                         },
-                        { 
+                        {
                             text: '{% trans %}Msgno{% endtrans %}',
-                            dataIndex: 'msgno', 
+                            dataIndex: 'msgno',
                             stateId: 'mailclient_maillist_msgno',
-                            stateful: true, 
+                            stateful: true,
                             hidden: true,
-                            renderer: function(value, metaData, record) {
-                                if(record.data.seen==false){
+                            renderer: function (value, metaData, record) {
+                                if (record.data.seen == false) {
                                     metaData.tdStyle = 'font-weight: bold;';
                                 }
                                 return Ext.String.htmlEncode(value);
-                            }  
+                            }
                         },
                         {
                             xtype: 'booleancolumn',
                             text: '{% trans %}Recent{% endtrans %}',
-                            dataIndex: 'recent', 
+                            dataIndex: 'recent',
                             stateId: 'mailclient_maillist_recent',
-                            stateful: true, 
-                            hidden: true, 
+                            stateful: true,
+                            hidden: true,
                             filter: {type: 'boolean'},
-                            renderer: function(value, metaData, record) {
-                                if(record.data.seen==true){
+                            renderer: function (value, metaData, record) {
+                                if (record.data.seen == true) {
                                     //return Ext.String.htmlEncode(value);
                                     return
-                                }else{
+                                } else {
                                     //return Ext.String.format('<strong>{0}</strong>', Ext.String.htmlEncode(value));
                                     metaData.tdAttr = 'data-qtip={% trans %}Recent{% endtrans %}';
                                     metaData.tdStyle = 'font-weight: bold;';
                                     return '<div class="fa fa-star"></div>';
                                 }
-                            }  
+                            }
                         },
                         {
                             xtype: 'booleancolumn',
                             text: '{% trans %}Flagged{% endtrans %}',
-                            dataIndex: 'flagged', 
+                            dataIndex: 'flagged',
                             stateId: 'mailclient_maillist_flagged',
-                            stateful: true, 
-                            hidden: true, 
+                            stateful: true,
+                            hidden: true,
                             filter: {type: 'boolean'},
-                            renderer: function(value, metaData, record) {
-                                if(value==true){
+                            renderer: function (value, metaData, record) {
+                                if (value == true) {
                                     //return '<img title="{% trans %}Flagged{% endtrans %}" alt="{% trans %}Flagged{% endtrans %}" src="/bundles/xxammailclient/icons/16x16/star.png" />';
                                     //metaData.tdCls='fa fa-edit ' + Ext.baseCSSPrefix + 'action-col-cell';
                                     metaData.tdAttr = 'data-qtip={% trans %}Flagged{% endtrans %}';
                                     return '<div class="fa fa-bookmark"></div>';
 
-                                }else{
+                                } else {
                                     return ' ';
                                 }
-                            }  
+                            }
                         },
                         {
                             xtype: 'booleancolumn',
                             text: '{% trans %}Answered{% endtrans %}',
-                            dataIndex: 'answered', 
+                            dataIndex: 'answered',
                             stateId: 'mailclient_maillist_answered',
-                            stateful: true, 
-                            hidden: true, 
+                            stateful: true,
+                            hidden: true,
                             filter: {type: 'boolean'},
-                            renderer: function(value, metaData, record) {
-                                if(value==true){
+                            renderer: function (value, metaData, record) {
+                                if (value == true) {
                                     metaData.tdAttr = 'data-qtip={% trans %}Answered{% endtrans %}';
                                     return '<div class="fa fa-check"></div>';
-                                }else{
+                                } else {
                                     return ' ';
                                 }
-                            } 
+                            }
                         },
                         {
                             xtype: 'booleancolumn',
                             text: '{% trans %}Deleted{% endtrans %}',
-                            dataIndex: 'deleted', 
+                            dataIndex: 'deleted',
                             stateId: 'mailclient_maillist_deleted',
-                            stateful: true, 
-                            hidden: true, 
+                            stateful: true,
+                            hidden: true,
                             filter: {type: 'boolean'},
-                            renderer: function(value, metaData, record) {
-                                if(value==true){
+                            renderer: function (value, metaData, record) {
+                                if (value == true) {
                                     metaData.tdAttr = 'data-qtip={% trans %}Deleted{% endtrans %}';
                                     return '<div class="fa fa-check"></div>';
-                                }else{
+                                } else {
                                     return ' ';
                                 }
-                            }  
+                            }
                         },
                         {
                             xtype: 'booleancolumn',
                             text: '{% trans %}Seen{% endtrans %}',
-                            dataIndex: 'seen', 
+                            dataIndex: 'seen',
                             stateId: 'mailclient_maillist_seen',
-                            stateful: true, 
-                            hidden: true, 
+                            stateful: true,
+                            hidden: true,
                             filter: {type: 'boolean'},
-                            renderer: function(value, metaData, record) {
-                                if(value==true){
+                            renderer: function (value, metaData, record) {
+                                if (value == true) {
                                     metaData.tdAttr = 'data-qtip={% trans %}Seen{% endtrans %}';
                                     return '<div class="fa fa-check"></div>';
-                                }else{
+                                } else {
                                     return ' ';
                                 }
-                            }  
+                            }
                         },
                         {
                             xtype: 'booleancolumn',
                             text: '{% trans %}Draft{% endtrans %}',
-                            dataIndex: 'draft', 
+                            dataIndex: 'draft',
                             stateId: 'mailclient_maillist_draft',
-                            stateful: true, 
+                            stateful: true,
                             hidden: true,
-                            renderer: function(value, metaData, record) {
-                                if(value==true){
+                            renderer: function (value, metaData, record) {
+                                if (value == true) {
                                     metaData.tdAttr = 'data-qtip={% trans %}Draft{% endtrans %}';
                                     return '<div class="fa fa-check"></div>';
-                                }else{
+                                } else {
                                     return ' ';
                                 }
-                            }  
+                            }
                         },
                         {
                             xtype: 'booleancolumn',
                             //header: '<img class="header-icon" src="/bundles/xxammailclient/icons/16x16/attach.png" />',
                             header: '<div class="fa fa-paperclip"></div>',
-                            dataIndex: 'hasattachment', 
+                            dataIndex: 'hasattachment',
                             stateId: 'mailclient_maillist_hasattachment',
-                            stateful: true, 
+                            stateful: true,
                             hidden: false,
-                            renderer: function(value, metaData, record) {
-                                if(value==true){
+                            renderer: function (value, metaData, record) {
+                                if (value == true) {
                                     metaData.tdAttr = 'data-qtip={% trans %}Attachment{% endtrans %}';
                                     return '<div class="fa fa-paperclip"></div>';
-                                }else{
+                                } else {
                                     return ' ';
                                 }
-                            }  
+                            }
                         },
-                        { 
+                        {
                             text: '{% trans %}Udate{% endtrans %}',
-                            dataIndex: 'udate', 
+                            dataIndex: 'udate',
                             stateId: 'mailclient_maillist_udate',
-                            stateful: true, 
+                            stateful: true,
                             hidden: true,
-                            renderer: function(value, metaData, record) {
-                                if(record.data.seen==false){
+                            renderer: function (value, metaData, record) {
+                                if (record.data.seen == false) {
                                     metaData.tdStyle = 'font-weight: bold;';
                                 }
                                 return Ext.String.htmlEncode(value);
-                            }  
+                            }
                         }
                     ],
-                    
-                    listeners:{
-                        itemkeydown: function(grid, record, tr, rowindex, event){
-                            eee=event;
-                            if(event.keyCode==event.DELETE || event.keyCode==event.BACKSPACE){
+
+                    listeners: {
+                        itemkeydown: function (grid, record, tr, rowindex, event) {
+                            eee = event;
+                            if (event.keyCode == event.DELETE || event.keyCode == event.BACKSPACE) {
                                 //delete:
-                                ggg=grid;
-                                selected=grid.selectionModel.selected.items;
-                                selectedids=[];
-                                Ext.Array.each(selected,function(item){
+                                ggg = grid;
+                                selected = grid.selectionModel.selected.items;
+                                selectedids = [];
+                                Ext.Array.each(selected, function (item) {
                                     selectedids.push(item.id);
                                 });
-                                console.log('delete',selectedids);
-                                var from=grid.getStore().getProxy().extraParams.path.toString();
+                                console.log('delete', selectedids);
+                                var from = grid.getStore().getProxy().extraParams.path.toString();
                                 Ext.Ajax.request({
-                                    url: 'mailclient/trashmails?from='+from+'&ids='+selectedids.join(','),
-                                    success: function(response){
-                                        var responsejson=Ext.JSON.decode(response.responseText);
-                                        scrollpos=Ext.getCmp('mailclient_maillist').view.getScrollY();
+                                    url: 'mailclient/trashmails?from=' + from + '&ids=' + selectedids.join(','),
+                                    success: function (response) {
+                                        var responsejson = Ext.JSON.decode(response.responseText);
+                                        scrollpos = Ext.getCmp('mailclient_maillist').view.getScrollY();
                                         Ext.getCmp('mailclient_maillist').getStore().load({
-                                            callback: function(records, operation, success) {
-                                                console.log('lalala',scrollpos);
-                                                Ext.getCmp('mailclient_maillist').view.scrollTo(0,scrollpos);
+                                            callback: function (records, operation, success) {
+                                                console.log('lalala', scrollpos);
+                                                Ext.getCmp('mailclient_maillist').view.scrollTo(0, scrollpos);
                                             }
                                         });
 
@@ -689,298 +700,319 @@
                                 });
                             }
                         },
-                        rowcontextmenu: function(grid, index, tr, rowindex, event) {
+                        rowcontextmenu: function (grid, index, tr, rowindex, event) {
                             event.stopEvent();
                             var record = grid.getStore().getAt(index);
                             var menu = new Ext.menu.Menu({
                                 items: [
-                                { text: '{%trans%}Reply{%endtrans%}', tooltip: '{%trans%}Reply to sender{%endtrans%}', scale: '{{buttonsize}}', icon: '/bundles/xxammailclient/icons/16x16/outlook_reply.png' },
-                                { text: '{%trans%}Reply all{%endtrans%}', tooltip: '{%trans%}Reply to list or to sender and all recipients{%endtrans%}', scale: '{{buttonsize}}', icon: '/bundles/xxammailclient/icons/16x16/outlook_reply_all.png',
-                                    menu: [
-                                        { text: '{%trans%}Reply all{%endtrans%}' },
-                                        { text: '{%trans%}Reply list{%endtrans%}' }
-                                    ]
-                                },
-                                { text: '{%trans%}Forward{%endtrans%}', tooltip: '{%trans%}Forward{%endtrans%}', scale: '{{buttonsize}}', icon: '/bundles/xxammailclient/icons/16x16/email_forward.png' },
-                                { 
-                                    text: '{%trans%}Trash{%endtrans%}', 
-                                    tooltip: '{%trans%}Move message to trash{%endtrans%}', 
-                                    scale: '{{buttonsize}}', 
-                                    icon: '/bundles/xxammailclient/icons/16x16/outlook_delete_all.png',
-                                    handler: function(){
+                                    {
+                                        text: '{% trans %}Reply{% endtrans %}',
+                                        tooltip: '{% trans %}Reply to sender{% endtrans %}',
+                                        scale: '{{ buttonsize }}',
+                                        icon: '/bundles/xxammailclient/icons/16x16/outlook_reply.png'
+                                    },
+                                    {
+                                        text: '{% trans %}Reply all{% endtrans %}',
+                                        tooltip: '{% trans %}Reply to list or to sender and all recipients{% endtrans %}',
+                                        scale: '{{ buttonsize }}',
+                                        icon: '/bundles/xxammailclient/icons/16x16/outlook_reply_all.png',
+                                        menu: [
+                                            {text: '{% trans %}Reply all{% endtrans %}'},
+                                            {text: '{% trans %}Reply list{% endtrans %}'}
+                                        ]
+                                    },
+                                    {
+                                        text: '{% trans %}Forward{% endtrans %}',
+                                        tooltip: '{% trans %}Forward{% endtrans %}',
+                                        scale: '{{ buttonsize }}',
+                                        icon: '/bundles/xxammailclient/icons/16x16/email_forward.png'
+                                    },
+                                    {
+                                        text: '{% trans %}Trash{% endtrans %}',
+                                        tooltip: '{% trans %}Move message to trash{% endtrans %}',
+                                        scale: '{{ buttonsize }}',
+                                        icon: '/bundles/xxammailclient/icons/16x16/outlook_delete_all.png',
+                                        handler: function () {
 
-                                        selected=Ext.getCmp('mailclient_maillist').selModel.selected.items;
-                                        selectedids=[];
-                                        Ext.Array.each(selected,function(item){
-                                            selectedids.push(item.id);
-                                        });
+                                            selected = Ext.getCmp('mailclient_maillist').selModel.selected.items;
+                                            selectedids = [];
+                                            Ext.Array.each(selected, function (item) {
+                                                selectedids.push(item.id);
+                                            });
 
-                                        var from=Ext.getCmp('mailclient_maillist').getStore().getProxy().extraParams.path.toString();
-                                        Ext.Ajax.request({
-                                            url: 'mailclient/trashmails?from='+from+'&ids='+selectedids.join(','),
-                                            success: function(response){
-                                                var responsejson=Ext.JSON.decode(response.responseText);
-                                                scrollpos=Ext.getCmp('mailclient_maillist').view.getScrollY();
-                                                Ext.getCmp('mailclient_maillist').getStore().load({
-                                                    callback: function(records, operation, success) {
-                                                        Ext.getCmp('mailclient_maillist').view.scrollTo(0,scrollpos);
-                                                    }
-                                                });
+                                            var from = Ext.getCmp('mailclient_maillist').getStore().getProxy().extraParams.path.toString();
+                                            Ext.Ajax.request({
+                                                url: 'mailclient/trashmails?from=' + from + '&ids=' + selectedids.join(','),
+                                                success: function (response) {
+                                                    var responsejson = Ext.JSON.decode(response.responseText);
+                                                    scrollpos = Ext.getCmp('mailclient_maillist').view.getScrollY();
+                                                    Ext.getCmp('mailclient_maillist').getStore().load({
+                                                        callback: function (records, operation, success) {
+                                                            Ext.getCmp('mailclient_maillist').view.scrollTo(0, scrollpos);
+                                                        }
+                                                    });
 
-                                            }
+                                                }
 
-                                        });
-                                    }
-                                },
-                                { 
-                                    text: '{%trans%}Junk{%endtrans%}', 
-                                    tooltip: '{%trans%}Mark as junk{%endtrans%}', 
-                                    scale: '{{buttonsize}}', 
-                                    icon: '/bundles/xxammailclient/icons/16x16/spam_assassin.png',
-                                    handler: function(){
-
-                                        selected=Ext.getCmp('mailclient_maillist').selModel.selected.items;
-                                        selectedids=[];
-                                        Ext.Array.each(selected,function(item){
-                                            selectedids.push(item.id);
-                                        });
-
-                                        var from=Ext.getCmp('mailclient_maillist').getStore().getProxy().extraParams.path.toString();
-                                        Ext.Ajax.request({
-                                            url: 'mailclient/junkmails?from='+from+'&ids='+selectedids.join(','),
-                                            success: function(response){
-                                                var responsejson=Ext.JSON.decode(response.responseText);
-                                                scrollpos=Ext.getCmp('mailclient_maillist').view.getScrollY();
-                                                Ext.getCmp('mailclient_maillist').getStore().load({
-                                                    callback: function(records, operation, success) {
-                                                        Ext.getCmp('mailclient_maillist').view.scrollTo(0,scrollpos);
-                                                    }
-                                                });
-
-                                            }
-
-                                        });
-                                    } 
-                                },
-                                { text: '{%trans%}Mark{%endtrans%}', tooltip: '{%trans%}Mark message{%endtrans%}', scale: '{{buttonsize}}', icon: '/bundles/xxammailclient/icons/16x16/publisher_bookmark.png',
-                                    menu: [
-                                        { 
-                                            text: '{%trans%}As read{%endtrans%}',
-                                            handler: function(){
-
-                                                selected=Ext.getCmp('mailclient_maillist').selModel.selected.items;
-                                                selectedids=[];
-                                                Ext.Array.each(selected,function(item){
-                                                    selectedids.push(item.id);
-                                                });
-
-                                                var from=Ext.getCmp('mailclient_maillist').getStore().getProxy().extraParams.path.toString();
-                                                Ext.Ajax.request({
-                                                    url: 'mailclient/markmailsasread?from='+from+'&ids='+selectedids.join(','),
-                                                    success: function(response){
-                                                        var responsejson=Ext.JSON.decode(response.responseText);
-                                                        scrollpos=Ext.getCmp('mailclient_maillist').view.getScrollY();
-                                                        Ext.getCmp('mailclient_maillist').getStore().load({
-                                                            callback: function(records, operation, success) {
-                                                                Ext.getCmp('mailclient_maillist').view.scrollTo(0,scrollpos);
-                                                            }
-                                                        });
-
-                                                    }
-
-                                                });
-                                            } 
-                                        },
-                                        { 
-                                            text: '{%trans%}As unread{%endtrans%}',
-                                            handler: function(){
-
-                                                selected=Ext.getCmp('mailclient_maillist').selModel.selected.items;
-                                                selectedids=[];
-                                                Ext.Array.each(selected,function(item){
-                                                    selectedids.push(item.id);
-                                                });
-
-                                                var from=Ext.getCmp('mailclient_maillist').getStore().getProxy().extraParams.path.toString();
-                                                Ext.Ajax.request({
-                                                    url: 'mailclient/markmailsasunread?from='+from+'&ids='+selectedids.join(','),
-                                                    success: function(response){
-                                                        var responsejson=Ext.JSON.decode(response.responseText);
-                                                        scrollpos=Ext.getCmp('mailclient_maillist').view.getScrollY();
-                                                        Ext.getCmp('mailclient_maillist').getStore().load({
-                                                            callback: function(records, operation, success) {
-                                                                Ext.getCmp('mailclient_maillist').view.scrollTo(0,scrollpos);
-                                                            }
-                                                        });
-
-                                                    }
-
-                                                });
-                                            } 
-                                        },
-                                        { 
-                                            text: '{%trans%}As flagged{%endtrans%}',
-                                            handler: function(){
-
-                                                selected=Ext.getCmp('mailclient_maillist').selModel.selected.items;
-                                                selectedids=[];
-                                                Ext.Array.each(selected,function(item){
-                                                    selectedids.push(item.id);
-                                                });
-
-                                                var from=Ext.getCmp('mailclient_maillist').getStore().getProxy().extraParams.path.toString();
-                                                Ext.Ajax.request({
-                                                    url: 'mailclient/markmailsasflagged?from='+from+'&ids='+selectedids.join(','),
-                                                    success: function(response){
-                                                        var responsejson=Ext.JSON.decode(response.responseText);
-                                                        scrollpos=Ext.getCmp('mailclient_maillist').view.getScrollY();
-                                                        Ext.getCmp('mailclient_maillist').getStore().load({
-                                                            callback: function(records, operation, success) {
-                                                                Ext.getCmp('mailclient_maillist').view.scrollTo(0,scrollpos);
-                                                            }
-                                                        });
-
-                                                    }
-
-                                                });
-                                            } 
-                                        },
-                                        { 
-                                            text: '{%trans%}As unflagged{%endtrans%}',
-                                            handler: function(){
-
-                                                selected=Ext.getCmp('mailclient_maillist').selModel.selected.items;
-                                                selectedids=[];
-                                                Ext.Array.each(selected,function(item){
-                                                    selectedids.push(item.id);
-                                                });
-
-                                                var from=Ext.getCmp('mailclient_maillist').getStore().getProxy().extraParams.path.toString();
-                                                Ext.Ajax.request({
-                                                    url: 'mailclient/markmailsasunflagged?from='+from+'&ids='+selectedids.join(','),
-                                                    success: function(response){
-                                                        var responsejson=Ext.JSON.decode(response.responseText);
-                                                        scrollpos=Ext.getCmp('mailclient_maillist').view.getScrollY();
-                                                        Ext.getCmp('mailclient_maillist').getStore().load({
-                                                            callback: function(records, operation, success) {
-                                                                Ext.getCmp('mailclient_maillist').view.scrollTo(0,scrollpos);
-                                                            }
-                                                        });
-
-                                                    }
-
-                                                });
-                                            } 
-                                        }
-                                    ] 
-                                }]
-                            }).showAt(event.getXY());
-                        },
-                        selectionchange: function(model, selected, eOpts){
-                            if (selected.length==1){
-                                var path=model.getStore().getProxy().extraParams.path.toString();
-                                var mailaccountid=path.split('.')[0];
-                                console.log(mailaccountid);
-                                var mailid=selected[0].id;
-                                Ext.Ajax.request({
-                                    url: 'mailclient/getmail?path='+path+'&mailid='+mailid,
-                                    success: function(response){
-                                        var responsejson=Ext.JSON.decode(response.responseText);
-                                        var headerhtml=[];
-                                        //var headerhtmlsmall=[];
-                                        var mailtitle='';
-                                        //subject
-                                        if(typeof responsejson.subject != 'undefined'){
-                                            mailtitle=Ext.String.htmlEncode(responsejson.subject)+' ';
-                                        }
-                                        //from
-                                        var fromtext='';
-                                        if(typeof responsejson.fromName != 'undefined'){
-                                            fromtext=responsejson.fromName;
-                                            mailtitle+='<span class="mailtitlefrom">('+Ext.String.htmlEncode(responsejson.fromName);
-                                        }else{
-                                            mailtitle+='<span class="mailtitlefrom">('+Ext.String.htmlEncode(responsejson.fromAddress);
-                                        }
-                                        if(typeof responsejson.fromAddress != 'undefined') fromtext+='<'+responsejson.fromAddress+'>';
-                                        if(fromtext != '') {
-                                            headerhtml.push('<tr><th>{% trans %}From{% endtrans %}</th><td>'+Ext.String.htmlEncode(fromtext)+'</td></tr>');
-                                        }
-                                        //to
-                                        if(typeof responsejson.toString != 'undefined'){
-                                            headerhtml.push('<tr><th>{% trans %}To{% endtrans %}</th><td>'+Ext.String.htmlEncode(responsejson.toString)+'</td></tr>');
-                                        }
-                                        //replyto
-                                        var replytotext='';
-                                        if(typeof responsejson.replyTo != 'undefined'){
-                                            Ext.Object.each(responsejson.replyTo, function(key,value){
-                                                if (value!=null) replytotext+=value+ ' ';
-                                                replytotext+='<'+key+'>';
                                             });
                                         }
-                                        if (replytotext!='')headerhtml.push('<tr><th>{% trans %}Reply to{% endtrans %}</th><td>'+Ext.String.htmlEncode(replytotext)+'</td></tr>');
+                                    },
+                                    {
+                                        text: '{% trans %}Junk{% endtrans %}',
+                                        tooltip: '{% trans %}Mark as junk{% endtrans %}',
+                                        scale: '{{ buttonsize }}',
+                                        icon: '/bundles/xxammailclient/icons/16x16/spam_assassin.png',
+                                        handler: function () {
+
+                                            selected = Ext.getCmp('mailclient_maillist').selModel.selected.items;
+                                            selectedids = [];
+                                            Ext.Array.each(selected, function (item) {
+                                                selectedids.push(item.id);
+                                            });
+
+                                            var from = Ext.getCmp('mailclient_maillist').getStore().getProxy().extraParams.path.toString();
+                                            Ext.Ajax.request({
+                                                url: 'mailclient/junkmails?from=' + from + '&ids=' + selectedids.join(','),
+                                                success: function (response) {
+                                                    var responsejson = Ext.JSON.decode(response.responseText);
+                                                    scrollpos = Ext.getCmp('mailclient_maillist').view.getScrollY();
+                                                    Ext.getCmp('mailclient_maillist').getStore().load({
+                                                        callback: function (records, operation, success) {
+                                                            Ext.getCmp('mailclient_maillist').view.scrollTo(0, scrollpos);
+                                                        }
+                                                    });
+
+                                                }
+
+                                            });
+                                        }
+                                    },
+                                    {
+                                        text: '{% trans %}Mark{% endtrans %}',
+                                        tooltip: '{% trans %}Mark message{% endtrans %}',
+                                        scale: '{{ buttonsize }}',
+                                        icon: '/bundles/xxammailclient/icons/16x16/publisher_bookmark.png',
+                                        menu: [
+                                            {
+                                                text: '{% trans %}As read{% endtrans %}',
+                                                handler: function () {
+
+                                                    selected = Ext.getCmp('mailclient_maillist').selModel.selected.items;
+                                                    selectedids = [];
+                                                    Ext.Array.each(selected, function (item) {
+                                                        selectedids.push(item.id);
+                                                    });
+
+                                                    var from = Ext.getCmp('mailclient_maillist').getStore().getProxy().extraParams.path.toString();
+                                                    Ext.Ajax.request({
+                                                        url: 'mailclient/markmailsasread?from=' + from + '&ids=' + selectedids.join(','),
+                                                        success: function (response) {
+                                                            var responsejson = Ext.JSON.decode(response.responseText);
+                                                            scrollpos = Ext.getCmp('mailclient_maillist').view.getScrollY();
+                                                            Ext.getCmp('mailclient_maillist').getStore().load({
+                                                                callback: function (records, operation, success) {
+                                                                    Ext.getCmp('mailclient_maillist').view.scrollTo(0, scrollpos);
+                                                                }
+                                                            });
+
+                                                        }
+
+                                                    });
+                                                }
+                                            },
+                                            {
+                                                text: '{% trans %}As unread{% endtrans %}',
+                                                handler: function () {
+
+                                                    selected = Ext.getCmp('mailclient_maillist').selModel.selected.items;
+                                                    selectedids = [];
+                                                    Ext.Array.each(selected, function (item) {
+                                                        selectedids.push(item.id);
+                                                    });
+
+                                                    var from = Ext.getCmp('mailclient_maillist').getStore().getProxy().extraParams.path.toString();
+                                                    Ext.Ajax.request({
+                                                        url: 'mailclient/markmailsasunread?from=' + from + '&ids=' + selectedids.join(','),
+                                                        success: function (response) {
+                                                            var responsejson = Ext.JSON.decode(response.responseText);
+                                                            scrollpos = Ext.getCmp('mailclient_maillist').view.getScrollY();
+                                                            Ext.getCmp('mailclient_maillist').getStore().load({
+                                                                callback: function (records, operation, success) {
+                                                                    Ext.getCmp('mailclient_maillist').view.scrollTo(0, scrollpos);
+                                                                }
+                                                            });
+
+                                                        }
+
+                                                    });
+                                                }
+                                            },
+                                            {
+                                                text: '{% trans %}As flagged{% endtrans %}',
+                                                handler: function () {
+
+                                                    selected = Ext.getCmp('mailclient_maillist').selModel.selected.items;
+                                                    selectedids = [];
+                                                    Ext.Array.each(selected, function (item) {
+                                                        selectedids.push(item.id);
+                                                    });
+
+                                                    var from = Ext.getCmp('mailclient_maillist').getStore().getProxy().extraParams.path.toString();
+                                                    Ext.Ajax.request({
+                                                        url: 'mailclient/markmailsasflagged?from=' + from + '&ids=' + selectedids.join(','),
+                                                        success: function (response) {
+                                                            var responsejson = Ext.JSON.decode(response.responseText);
+                                                            scrollpos = Ext.getCmp('mailclient_maillist').view.getScrollY();
+                                                            Ext.getCmp('mailclient_maillist').getStore().load({
+                                                                callback: function (records, operation, success) {
+                                                                    Ext.getCmp('mailclient_maillist').view.scrollTo(0, scrollpos);
+                                                                }
+                                                            });
+
+                                                        }
+
+                                                    });
+                                                }
+                                            },
+                                            {
+                                                text: '{% trans %}As unflagged{% endtrans %}',
+                                                handler: function () {
+
+                                                    selected = Ext.getCmp('mailclient_maillist').selModel.selected.items;
+                                                    selectedids = [];
+                                                    Ext.Array.each(selected, function (item) {
+                                                        selectedids.push(item.id);
+                                                    });
+
+                                                    var from = Ext.getCmp('mailclient_maillist').getStore().getProxy().extraParams.path.toString();
+                                                    Ext.Ajax.request({
+                                                        url: 'mailclient/markmailsasunflagged?from=' + from + '&ids=' + selectedids.join(','),
+                                                        success: function (response) {
+                                                            var responsejson = Ext.JSON.decode(response.responseText);
+                                                            scrollpos = Ext.getCmp('mailclient_maillist').view.getScrollY();
+                                                            Ext.getCmp('mailclient_maillist').getStore().load({
+                                                                callback: function (records, operation, success) {
+                                                                    Ext.getCmp('mailclient_maillist').view.scrollTo(0, scrollpos);
+                                                                }
+                                                            });
+
+                                                        }
+
+                                                    });
+                                                }
+                                            }
+                                        ]
+                                    }]
+                            }).showAt(event.getXY());
+                        },
+                        selectionchange: function (model, selected, eOpts) {
+                            if (selected.length == 1) {
+                                var path = model.getStore().getProxy().extraParams.path.toString();
+                                var mailaccountid = path.split('.')[0];
+                                console.log(mailaccountid);
+                                var mailid = selected[0].id;
+                                Ext.Ajax.request({
+                                    url: 'mailclient/getmail?path=' + path + '&mailid=' + mailid,
+                                    success: function (response) {
+                                        var responsejson = Ext.JSON.decode(response.responseText);
+                                        var headerhtml = [];
+                                        //var headerhtmlsmall=[];
+                                        var mailtitle = '';
+                                        //subject
+                                        if (typeof responsejson.subject != 'undefined') {
+                                            mailtitle = Ext.String.htmlEncode(responsejson.subject) + ' ';
+                                        }
+                                        //from
+                                        var fromtext = '';
+                                        if (typeof responsejson.fromName != 'undefined') {
+                                            fromtext = responsejson.fromName;
+                                            mailtitle += '<span class="mailtitlefrom">(' + Ext.String.htmlEncode(responsejson.fromName);
+                                        } else {
+                                            mailtitle += '<span class="mailtitlefrom">(' + Ext.String.htmlEncode(responsejson.fromAddress);
+                                        }
+                                        if (typeof responsejson.fromAddress != 'undefined') fromtext += '<' + responsejson.fromAddress + '>';
+                                        if (fromtext != '') {
+                                            headerhtml.push('<tr><th>{% trans %}From{% endtrans %}</th><td>' + Ext.String.htmlEncode(fromtext) + '</td></tr>');
+                                        }
+                                        //to
+                                        if (typeof responsejson.toString != 'undefined') {
+                                            headerhtml.push('<tr><th>{% trans %}To{% endtrans %}</th><td>' + Ext.String.htmlEncode(responsejson.toString) + '</td></tr>');
+                                        }
+                                        //replyto
+                                        var replytotext = '';
+                                        if (typeof responsejson.replyTo != 'undefined') {
+                                            Ext.Object.each(responsejson.replyTo, function (key, value) {
+                                                if (value != null) replytotext += value + ' ';
+                                                replytotext += '<' + key + '>';
+                                            });
+                                        }
+                                        if (replytotext != '')headerhtml.push('<tr><th>{% trans %}Reply to{% endtrans %}</th><td>' + Ext.String.htmlEncode(replytotext) + '</td></tr>');
                                         //date
-                                        if(typeof responsejson.date != 'date'){
-                                            headerhtml.push('<tr><th>{% trans %}Date{% endtrans %}</th><td>'+Ext.String.htmlEncode(responsejson.date)+'</td></tr>');
-                                            mailtitle+=' '+Ext.String.htmlEncode(responsejson.date)+')</span>';
+                                        if (typeof responsejson.date != 'date') {
+                                            headerhtml.push('<tr><th>{% trans %}Date{% endtrans %}</th><td>' + Ext.String.htmlEncode(responsejson.date) + '</td></tr>');
+                                            mailtitle += ' ' + Ext.String.htmlEncode(responsejson.date) + ')</span>';
                                         }
                                         //prio
                                         //if(typeof responsejson.subject != 'undefined') headerhtml.push('<tr><th>{% trans %}Priority{% endtrans %}</th><td>'+Ext.String.htmlEncode(responsejson.subject)+'</td></tr>');
-                                        Ext.getCmp('mailclient_mailpanel{{id}}').setTitle(mailtitle);
-                                        Ext.getCmp('mailclient_mailpanel{{id}}').getComponent('mailpanelheader').setHtml('<table class="mailpanelheader">'+headerhtml.join('')+'</table>'); 
+                                        Ext.getCmp('mailclient_mailpanel{{ id }}').setTitle(mailtitle);
+                                        Ext.getCmp('mailclient_mailpanel{{ id }}').getComponent('mailpanelheader').setHtml('<table class="mailpanelheader">' + headerhtml.join('') + '</table>');
 
-                                        if(responsejson.hasexternallinks) Ext.getCmp('mailclient_mailpanel{{id}}').getComponent('mailpanelheader').setHtml(Ext.getCmp('mailclient_mailpanel{{id}}').getComponent('mailpanelheader').html+'<div class="mailpanelheadernotice"><div>{% trans %}To protect your privacy, remote images are blocked in this message.{% endtrans %} <a href="#" onclick="return displayimages('+mailid+',this);">{% trans %}Display images{% endtrans %}</a></div></div>');
-                                        displayimages=function(mailid,ele){
-                                            Ext.get(Ext.getCmp('mailclient_mailpanel{{id}}').body.dom.querySelector('.mailpanelheadernotice')).destroy();
-                                            Ext.getCmp('mailclient_mailpanelbody{{id}}').load('mailclient/getmailcontent?path='+Ext.getCmp('mailclient_folderlist').getSelection()[0].data.path+'&externalsources=1&mailid='+mailid);
-                                            Ext.getCmp('mailclient_mailpanel{{id}}').updateLayout();
+                                        if (responsejson.hasexternallinks) Ext.getCmp('mailclient_mailpanel{{ id }}').getComponent('mailpanelheader').setHtml(Ext.getCmp('mailclient_mailpanel{{ id }}').getComponent('mailpanelheader').html + '<div class="mailpanelheadernotice"><div>{% trans %}To protect your privacy, remote images are blocked in this message.{% endtrans %} <a href="#" onclick="return displayimages(' + mailid + ',this);">{% trans %}Display images{% endtrans %}</a></div></div>');
+                                        displayimages = function (mailid, ele) {
+                                            Ext.get(Ext.getCmp('mailclient_mailpanel{{ id }}').body.dom.querySelector('.mailpanelheadernotice')).destroy();
+                                            Ext.getCmp('mailclient_mailpanelbody{{ id }}').load('mailclient/getmailcontent?path=' + Ext.getCmp('mailclient_folderlist').getSelection()[0].data.path + '&externalsources=1&mailid=' + mailid);
+                                            Ext.getCmp('mailclient_mailpanel{{ id }}').updateLayout();
                                             return false;
                                         }
-                                        if(Ext.getCmp('mailclient_minimizeheaderbutton{{id}}').pressed){
-                                            Ext.get(Ext.getCmp('mailclient_mailpanel{{id}}').body.dom.querySelector('.mailpanelheader')).setVisibilityMode(Ext.Element.DISPLAY).hide();
-                                        }else{
-                                            Ext.get(Ext.getCmp('mailclient_mailpanel{{id}}').body.dom.querySelector('.mailpanelheader')).show();
+                                        if (Ext.getCmp('mailclient_minimizeheaderbutton{{ id }}').pressed) {
+                                            Ext.get(Ext.getCmp('mailclient_mailpanel{{ id }}').body.dom.querySelector('.mailpanelheader')).setVisibilityMode(Ext.Element.DISPLAY).hide();
+                                        } else {
+                                            Ext.get(Ext.getCmp('mailclient_mailpanel{{ id }}').body.dom.querySelector('.mailpanelheader')).show();
                                         }
                                         //attachments:
-                                        if(typeof responsejson.files != 'undefined'){
-                                            var storedata=[];
-                                            Ext.Array.each(responsejson.files, function(file){
-                                                file.thumbnail=getthumbnailurl(file.name,file.filepath);
+                                        if (typeof responsejson.files != 'undefined') {
+                                            var storedata = [];
+                                            Ext.Array.each(responsejson.files, function (file) {
+                                                file.thumbnail = getthumbnailurl(file.name, file.filepath);
                                                 storedata.push(file);
 
 
                                             });
-                                            Ext.getCmp('mailclient_mailpanelattachments{{id}}').store.setData(storedata);
-                                            if (storedata.length>0) {
+                                            Ext.getCmp('mailclient_mailpanelattachments{{ id }}').store.setData(storedata);
+                                            if (storedata.length > 0) {
                                                 Ext.getCmp('mailclient_mailpanelattachments{{ id }}').up('panel').expand();
-                                            }else{
+                                            } else {
                                                 Ext.getCmp('mailclient_mailpanelattachments{{ id }}').up('panel').collapse();
                                             }
                                         }
-                                        
-                                        
-                                        Ext.getCmp('mailclient_mailpanel{{id}}').setCollapsed(false);
-                                        Ext.getCmp('mailclient_mailpanel{{id}}').getComponent('mailpanelheader').updateLayout();
-                                        Ext.getCmp('mailclient_mailpanelbody{{id}}').load('mailclient/getmailcontent?path='+Ext.getCmp('mailclient_folderlist').getSelection()[0].data.path+'&mailid='+mailid);
-                                            
+
+
+
+
+                                        Ext.getCmp('mailclient_mailpanel{{ id }}').setCollapsed(false);
+                                        Ext.getCmp('mailclient_mailpanel{{ id }}').getComponent('mailpanelheader').updateLayout();
+                                        Ext.getCmp('mailclient_mailpanelbody{{ id }}').load('mailclient/getmailcontent?path=' + Ext.getCmp('mailclient_folderlist').getSelection()[0].data.path + '&mailid=' + mailid);
+
                                         //refresh row:
-                                        Ext.getCmp('mailclient_maillist').selection.data.seen=true;
+                                        Ext.getCmp('mailclient_maillist').selection.data.seen = true;
                                         Ext.getCmp('mailclient_maillist').getView().refresh();
+                                        loadContactdata(responsejson.fromAddress);
                                     }
                                 });
                             }
                         }
                     }
-                },{
+                }, {
                     region: 'south',
-                    id: 'mailclient_mailpanel{{id}}',
+                    id: 'mailclient_mailpanel{{ id }}',
                     collapsible: true,
                     collapsed: true,
                     stateful: true,
                     stateEvents: ["resize"],
-                    getState: function() {
-                        return { height: this.height };
+                    getState: function () {
+                        return {height: this.height};
                     },
-                    
+
                     split: true,
                     //minSize: 200,
                     //maxSize: 450,
@@ -989,7 +1021,7 @@
                     weight: 1,
                     layout: 'border',
                     //layout: 'fit',
-                    items:[
+                    items: [
                         {{ include('Xxam\MailclientBundle:Mailclient:mailpanelitems.js.twig', { 'id': id }) }}
                     ]
                 }]

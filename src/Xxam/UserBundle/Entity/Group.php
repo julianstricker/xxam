@@ -107,14 +107,15 @@ class Group extends BaseGroup implements Base\TenantInterface
       return $this->getName();   
     }
     
-    public function toGridObject() {
+    public function toGridObject($timezone='') {
+        if($timezone=='') $timezone=date_default_timezone_get();
         
         return Array(
             'id' =>                     $this->getId(),
             'name' =>                   $this->getName(),
             'roles' =>                  $this->getRoles(),
-            'created' =>                $this->getCreated() ? $this->getCreated()->format('Y-m-d H:i:s') : false,
-            'updated' =>                $this->getUpdated() ? $this->getUpdated()->format('Y-m-d H:i:s') : false
+            'created' =>                $this->getCreated() ? $this->getCreated()->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s') : false,
+            'updated' =>                $this->getUpdated() ? $this->getUpdated()->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s') : false
         );
     }
     

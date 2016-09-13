@@ -211,10 +211,12 @@ class MailclientController extends MailclientBaseController {
         $pagingmails_ids=array_slice($mails_ids,$start,$limit);
         $mails=$mailbox->getMailsInfo($pagingmails_ids);
         $mailsbyid=Array();
+        $timezone=new \DateTimeZone($request->getSession()->get('timezone'));
+
         foreach($mails as $m){
             if (property_exists($m,'date')){
                 $date = new \DateTime($m->date);
-                if ($date) $m->date = $date->format('Y-m-d H:i:s');
+                if ($date) $m->date = $date->setTimezone($timezone)->format('Y-m-d H:i:s');
             }
             $mailsbyid[$m->uid]=$m;
         }
@@ -272,7 +274,7 @@ class MailclientController extends MailclientBaseController {
         unset($mail->textPlain);
         $attachments=Array();
         foreach($mail->getAttachments() as $attachment){
-            if ($attachment->disposition=='attachment') {
+            if (property_exists($attachment,'disposition') && $attachment->disposition=='attachment') {
                 $attachments[] = Array(
                     'id' => $attachment->id,
                     'name' => $attachment->name,

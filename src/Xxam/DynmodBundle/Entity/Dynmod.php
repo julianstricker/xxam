@@ -3,6 +3,7 @@
 namespace Xxam\DynmodBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -104,7 +105,7 @@ class Dynmod implements Base\TenantInterface
      * @ORM\Column(name="active", type="boolean")
      * @Gedmo\Versioned
      */
-    private $active=0;
+    private $active=false;
 
     /**
      * @var \DateTime $created
@@ -303,6 +304,7 @@ class Dynmod implements Base\TenantInterface
      */
     public function getCreated()
     {
+        //$this->created->setTimeZone(new \DateTimeZone($this->timezone));
         return $this->created;
     }
 
@@ -406,7 +408,7 @@ class Dynmod implements Base\TenantInterface
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection|Datacontainer[]
      */
     public function getDatacontainers()
     {
@@ -421,6 +423,19 @@ class Dynmod implements Base\TenantInterface
     {
         $this->datacontainers = $datacontainers;
         return $this;
+    }
+
+    /**
+     * @return null|Datacontainer
+     */
+    public function getDefaultDatacontainer()
+    {
+        $criteria = Criteria::create()
+            ->where(Criteria::expr()->eq('defaultcontainer', true));
+
+        $filteredDatacontainers = $this->datacontainers->matching($criteria);
+
+        return count($filteredDatacontainers) ? $filteredDatacontainers[0] : null;
     }
 
     /**
@@ -441,7 +456,8 @@ class Dynmod implements Base\TenantInterface
         return $this;
     }
 
-    public function toGridObject() {
+    public function toGridObject($timezone='') {
+        if($timezone=='') $timezone=date_default_timezone_get();
         return Array(
             'id' =>                     $this->getId(),
             'code' =>                   $this->getCode(),
@@ -450,8 +466,8 @@ class Dynmod implements Base\TenantInterface
             'help' =>                   $this->getHelp(),
             'active' =>                 $this->isActive(),
             'iconcls' =>                $this->getIconcls(),
-            'created' =>                $this->getCreated() ? $this->getCreated()->format('Y-m-d H:i:s') : false,
-            'updated' =>                $this->getUpdated() ? $this->getUpdated()->format('Y-m-d H:i:s') : false
+            'created' =>                $this->getCreated() ? $this->getCreated()->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s') : false,
+            'updated' =>                $this->getUpdated() ? $this->getUpdated()->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s') : false
         );
     }
 

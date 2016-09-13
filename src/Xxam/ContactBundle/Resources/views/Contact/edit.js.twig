@@ -29,133 +29,203 @@
         
         return {
             xtype: 'form',
-            layout: 'form',
+            layout: 'hbox',
             defaultType: 'textfield',
             scrollable: true,
             defaults: {
-                labelWidth: 120
+               // labelWidth: 120
+            },
+            fieldDefaults: {
+              //  anchor: '100%'
             },
             items: [{
-                xtype: 'hiddenfield',
-                name: 'id',
-                value: '{{entity.id}}'
-            },{
-                xtype: 'combo',
-                fieldLabel: 'Type',
-                name: 'contacttype_id',
-                store: contacttypesStore,
-                queryMode: 'local',
-                displayField: 'value',
-                valueField: 'id',
-                value: '{{entity.getContacttypeId}}'
-            },{
-                fieldLabel: 'Organisation',
-                name: 'organizationname',
-                value: '{{entity.organizationname}}'
-            },{
-                fieldLabel: 'Name',
                 xtype: 'fieldcontainer',
                 layout: {
                     type: 'hbox'
                 },
-                shrinkWrap: 2,
-                defaultType: 'textfield',
+                margin: '0 0 0 10',
+                flex: 5,
+                //shrinkWrap: 3,
+                //defaultType: 'textfield',
                 defaults: {
-                    labelAlign: 'top'
+                    //labelAlign: 'top'
                 },
                 items: [{
-                     fieldLabel: 'Prefix',
-                     name: 'nameprefix',
-                     allowBlank:true,
-                     flex: 1,
-                     value: '{{entity.nameprefix}}'
-                 },{
+                    xtype: 'fieldcontainer',
+                    layout: {
+                        type: 'vbox',
+                        align: 'stretch'  // Child items are stretched to full width
+                    },
+                    //shrinkWrap: 2,
+                    defaultType: 'textfield',
+                    defaults: {
+                        labelAlign: 'top'
+                    },
+                    //flex:1,
+                    items: [{
+                        xtype: 'hiddenfield',
+                        name: 'id',
+                        value: '{{ entity.id }}'
+                    }, {
+                        xtype: 'combo',
+                        fieldLabel: 'Type',
+                        name: 'contacttype_id',
+                        store: contacttypesStore,
+                        queryMode: 'local',
+                        displayField: 'value',
+                        valueField: 'id',
+                        value: '{{ entity.getContacttypeId }}',
+                        flex: 2
+                    }, {
+                        fieldLabel: '{%trans%}Organisation name{%endtrans%}',
+                        name: 'organizationname',
+                        value: '{{ entity.organizationname }}'
+                    }, {
+                        hideLabel: true,
+                        xtype: 'fieldcontainer',
+                        layout: {
+                            type: 'hbox'
+                        },
+                        shrinkWrap: 2,
+                        defaultType: 'textfield',
+                        defaults: {
+                            labelAlign: 'top'
+                        },
+                        items: [{
+                            fieldLabel: '{%trans%}Prefix{%endtrans%}',
+                            name: 'nameprefix',
+                            allowBlank: true,
+                            flex: 1,
+                            value: '{{ entity.nameprefix }}'
+                        }, {
+                            xtype: 'splitter'
+                        }, {
+                            fieldLabel: '{%trans%}First name{%endtrans%}',
+                            name: 'firstname',
+                            allowBlank: false,
+                            flex: 4,
+                            value: '{{ entity.firstname }}'
+                        }, {
+                            xtype: 'splitter'
+                        }, {
+                            fieldLabel: '{%trans%}Last name{%endtrans%}',
+                            name: 'lastname',
+                            flex: 5,
+                            value: '{{ entity.lastname }}'
+                        }]
+                    }, {
+                        xtype: 'fieldcontainer',
+                        hideLabel: true,
+                        layout: {
+                            type: 'hbox'
+                        },
+                        defaultType: 'textfield',
+                        defaults: {
+                            labelAlign: 'top'
+                        },
+                        items: [{
+                            fieldLabel: '{%trans%}Nickname{%endtrans%}',
+                            name: 'nickname',
+                            allowBlank: true,
+                            flex: 2,
+                            value: '{{ entity.nickname }}',
+
+
+                        }, {
+                            xtype: 'splitter'
+                        },{
+                            fieldLabel: '{%trans%}Initials{%endtrans%}',
+                            name: 'initials',
+                            allowBlank: true,
+                            flex: 1,
+                            value: '{{ entity.initials }}'
+                        }]
+
+                    }, {
+                        xtype: 'fieldcontainer',
+                        fieldLabel: 'Email',
+                        layout: {
+                            type: 'vbox',
+                            align: 'stretch'
+                        },
+                        items:[
+                            {
+                                xtype: 'fieldcontainer',
+                                hideLabel: true,
+                                layout: {
+                                    type: 'hbox'
+                                },
+                                defaultType: 'textfield',
+                                defaults: {
+                                    //labelAlign: 'top'
+                                },
+                                items: [
+                                    {
+                                        hideLabel: true,
+                                        name: 'nickname',
+                                        value: '',
+                                        flex: 1
+                                    }, {
+                                        xtype: 'splitter'
+                                    },{
+                                        hideLabel: true,
+                                        //name: 'initials',
+                                        allowBlank: true,
+                                        flex: 2,
+                                        value: '{{ entity.initials }}'
+                                    }
+                                ]
+                            }
+                        ]
+                    }, {
+                        xtype: 'fieldcontainer',
+                        hideLabel: true,
+                        layout: {
+                            type: 'hbox'
+                            //align: 'middle'
+                        },
+                        shrinkWrap: 2,
+                        defaultType: 'textfield',
+                        defaults: {
+                            labelAlign: 'top'
+                        },
+                        items: [{
+                            fieldLabel: 'VAT',
+                            name: 'vat',
+                            allowBlank: true,
+                            flex: 1,
+                            value: '{{ entity.vat }}'
+                        }, {
+                            xtype: 'splitter'
+                        }, {
+                            fieldLabel: 'Tax',
+                            name: 'tax',
+                            allowBlank: true,
+                            flex: 1,
+                            value: '{{ entity.tax }}'
+                        }]
+                    }, {
+                        fieldLabel: 'Organisation function',
+                        name: 'organizationfunction',
+                        allowBlank: true,
+                        value: '{{ entity.organizationfunction }}'
+                    }, {
+                        fieldLabel: 'Birthday',
+                        name: 'birthday',
+                        xtype: 'datefield',
+                        maxValue: new Date(),
+                        format: 'Y-m-d',
+                        value: '{{ entity.birthday|date('Y-m-d') }}'
+                    }]
+                },{
                     xtype: 'splitter'
-                 },{
-                     fieldLabel: 'First',
-                     name: 'firstname',
-                     allowBlank:false,
-                     flex: 4,
-                     value: '{{entity.firstname}}'
-                 },{
-                    xtype: 'splitter'
-                 },{
-                     fieldLabel: 'Last',
-                     name: 'lastname',
-                     flex: 5,
-                     value: '{{entity.lastname}}'
-                 }]
-            },{
-                fieldLabel: 'Nickname/Initials',
-                xtype: 'fieldcontainer',
-                layout: {
-                    type: 'hbox'
-                },
-                shrinkWrap: 2,
-                defaultType: 'textfield',
-                defaults: {
-                    labelAlign: 'top'
-                },
-                items: [{
-                     fieldLabel: 'Nickname',
-                     name: 'nickname',
-                     allowBlank:true,
-                     flex: 1,
-                     value: '{{entity.nickname}}'
-                 },{
-                     xtype: 'splitter'
-                 },{
-                     fieldLabel: 'Initials',
-                     name: 'initials',
-                     allowBlank:true,
-                     flex: 1,
-                     value: '{{entity.initials}}'
-                 }]
-                
-            },{
-                fieldLabel: 'VAT/Tax Number',
-                xtype: 'fieldcontainer',
-                layout: {
-                    type: 'hbox'
-                    //align: 'middle'
-                },
-                shrinkWrap: 2,
-                defaultType: 'textfield',
-                defaults: {
-                    labelAlign: 'top'
-                },
-                items: [{
-                    fieldLabel: 'VAT',
-                    name: 'vat',
-                    allowBlank:true,
-                    flex: 1,
-                    value: '{{entity.vat}}'
-                 },{
-                    xtype: 'splitter'
-                 },{
-                    fieldLabel: 'Tax',
-                    name: 'tax',
-                    allowBlank:true,
-                    flex: 1,
-                    value: '{{entity.tax}}'
+                },{
+                    xtype: 'panel',
+                    layout: 'fit',
+                    html: 'Image...',
+                    flex: 1
+                    //shrinkWrap: 3 //,
                 }]
-            },{
-                fieldLabel: 'Organisation function',
-                name: 'organizationfunction',
-                allowBlank:true,
-                value: '{{entity.organizationfunction}}'
-            }, {
-                fieldLabel: 'Birthday',
-                name: 'birthday',
-                xtype: 'datefield',
-                maxValue: new Date(),
-                format: 'Y-m-d',
-                value: '{{entity.birthday|date('Y-m-d')}}'
-            }, {
-                fieldLabel: 'Email',
-                name: 'email',
-                vtype:'email',
-                value: ''
             }],
             buttons: [{
                 text: '{%trans%}Save{%endtrans%}',
