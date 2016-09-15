@@ -29,7 +29,7 @@ class SecurityController extends SecurityControllerOrig
             $error = $request->attributes->get($authErrorKey);
         } elseif (null !== $session && $session->has($authErrorKey)) {
             $error = $session->get($authErrorKey);
-            $session->remove($authErrorKey);
+            $request->getSession()->remove($authErrorKey);
         } else {
             $error = null;
         }
