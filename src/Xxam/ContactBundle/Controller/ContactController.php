@@ -219,20 +219,27 @@ class ContactController extends Controller
 
     private function mapXingDataToContact($email,Contact $contact){
         $config = $this->getXingConfig();
+        if ($config==[]) return;
 
         require_once $this->get('kernel')->getRootDir().'/../vendor/hybridauth/hybridauth/hybridauth/Hybrid/Auth.php';
+        $oXING=false;
         try {
             $oHybridAuth = new \Hybrid_Auth($config);
             $oXING       = $oHybridAuth->authenticate('XING');
-            $xingdata=$oXING->api()->get('users/find_by_emails', array(
-                'user_fields' => 'id,first_name,last_name,display_name,permalink,gender,birth_date,active_email,time_zone,interests,organisation_member,languages,private_address,business_address,web_profiles,instant_messaging_accounts,professional_experience,photo_urls',
-                'emails' => $email
-            ));
+
 
         }
         catch(\Exception $e) {
-
+            dump($e);
         }
+
+        if(!$oXING) return;
+
+        $xingdata=$oXING->api()->get('users/find_by_emails', array(
+            'user_fields' => 'id,first_name,last_name,display_name,permalink,gender,birth_date,active_email,time_zone,interests,organisation_member,languages,private_address,business_address,web_profiles,instant_messaging_accounts,professional_experience,photo_urls',
+            'emails' => $email
+        ));
+
         //dump($xingdata);
         $xc=false;
         if (
@@ -380,24 +387,28 @@ class ContactController extends Controller
 
 
     private function getXingConfig(){
-        $config=$this->getParameter('xxam_contact.xing');
+        $config=$this->getParameter('xxam_contact');
 
-        return array(
-            // "base_url" the url that point to HybridAuth Endpoint (where the index.php and config.php are found)
-            "base_url" => $this->container->get('router')->generate('contact_hauth'),
+        if (isset($config['xing']) && isset($config['xing']['key']) && isset($config['xing']['secret'])) {
+            return array(
+                // "base_url" the url that point to HybridAuth Endpoint (where the index.php and config.php are found)
+                "base_url" => $this->container->get('router')->generate('contact_hauth'),
 
-            "providers" => array (
-                "XING" => array (
-                    "enabled" => true,
-                    "wrapper" => array(
-                        "path" => $this->get('kernel')->getRootDir().'/../vendor/hybridauth/hybridauth/additional-providers/hybridauth-xing/Providers/XING.php',
-                        "class" => "Hybrid_Providers_XING"
-                    ),
-                    "keys" => array ( "key" =>$config['key'], "secret" =>$config['secret'] )
+                "providers" => array(
+                    "XING" => array(
+                        "enabled" => true,
+                        "wrapper" => array(
+                            "path" => $this->get('kernel')->getRootDir() . '/../vendor/hybridauth/hybridauth/additional-providers/hybridauth-xing/Providers/XING.php',
+                            "class" => "Hybrid_Providers_XING"
+                        ),
+                        "keys" => array("key" => $config['xing']['key'], "secret" => $config['xing']['secret'])
 
+                    )
                 )
-            )
-        );
+            );
+        }else{
+            return array();
+        }
     }
 
     /**
