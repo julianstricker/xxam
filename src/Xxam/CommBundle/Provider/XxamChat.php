@@ -20,6 +20,8 @@ class XxamChat implements \Ratchet\MessageComponentInterface  {
     protected $subscriptionusers=[];
     protected $usersubscriptions=[];
 
+    protected $memcached;
+
     /*
      * Message code
      * @const int
@@ -269,84 +271,49 @@ class XxamChat implements \Ratchet\MessageComponentInterface  {
         }
 
     }
+
+    /**
+     * @param ConnectionInterface $conn
+     * @param \stdClass $messagedata
+     * @param integer $msgtype
+     */
+    protected function broadcastSignal(ConnectionInterface $conn, \stdClass $messagedata, $msgtype){
+        $user=$this->getUser($conn->resourceId);
+        $receivers=$messagedata->receivers;
+        $data=property_exists($messagedata,'data') ? $messagedata->data : null;
+        foreach ($this->clients as $client) {
+            if ($conn !== $client &&  (count($receivers>0) && in_array($client->resourceId,$receivers))) {
+                // The sender is not the receiver, send to each client connected
+                $userdata=$this->memcached->get('chatsessionid_'.$client->resourceId);
+                if($user['tenant_id']==null || $userdata['tenant_id']==null || $user['tenant_id']==$userdata['tenant_id'])
+                    $client->send(json_encode([$msgtype,$data? ["data"=>$data] : [],$conn->resourceId]));
+            }
+        }
+    }
+
+
     private function onXxamSignal(ConnectionInterface $conn, \stdClass $messagedata){
-        $user=$this->getUser($conn->resourceId);
-        $receivers=$messagedata->receivers;
-        $data=$messagedata->data;
-
-        dump($data);
-
-        foreach ($this->clients as $client) {
-            if ($conn !== $client &&  (count($receivers>0) && in_array($client->resourceId,$receivers))) {
-                // The sender is not the receiver, send to each client connected
-                $userdata=$this->memcached->get('chatsessionid_'.$client->resourceId);
-                if($user['tenant_id']==null || $userdata['tenant_id']==null || $user['tenant_id']==$userdata['tenant_id'])
-                    $client->send(json_encode([XxamChat::MSG_SIGNAL,["data"=>$data],$conn->resourceId]));
-            }
-        }
+        dump($messagedata->data);
+        $this->broadcastSignal($conn, $messagedata, XxamChat::MSG_SIGNAL);
     }
+
     private function onXxamVideophonecall(ConnectionInterface $conn, \stdClass $messagedata){
-        $user=$this->getUser($conn->resourceId);
-        $receivers=$messagedata->receivers;
-        foreach ($this->clients as $client) {
-            if ($conn !== $client &&  (count($receivers>0) && in_array($client->resourceId,$receivers))) {
-                // The sender is not the receiver, send to each client connected
-                $userdata=$this->memcached->get('chatsessionid_'.$client->resourceId);
-                if($user['tenant_id']==null || $userdata['tenant_id']==null || $user['tenant_id']==$userdata['tenant_id'])
-                    $client->send(json_encode([XxamChat::MSG_VIDEOPHONECALL,[],$conn->resourceId]));
-            }
-        }
+        $this->broadcastSignal($conn, $messagedata, XxamChat::MSG_VIDEOPHONECALL);
     }
+
     private function onXxamVideophonecallaccept(ConnectionInterface $conn, \stdClass $messagedata){
-        $user=$this->getUser($conn->resourceId);
-        $receivers=$messagedata->receivers;
-        foreach ($this->clients as $client) {
-            if ($conn !== $client &&  (count($receivers>0) && in_array($client->resourceId,$receivers))) {
-                // The sender is not the receiver, send to each client connected
-                $userdata=$this->memcached->get('chatsessionid_'.$client->resourceId);
-                if($user['tenant_id']==null || $userdata['tenant_id']==null || $user['tenant_id']==$userdata['tenant_id'])
-                    $client->send(json_encode([XxamChat::MSG_VIDEOPHONECALLACCEPT,[],$conn->resourceId]));
-            }
-        }
+        $this->broadcastSignal($conn, $messagedata, XxamChat::MSG_VIDEOPHONECALLACCEPT);
     }
+
     private function onXxamVideophonecallcancel(ConnectionInterface $conn, \stdClass $messagedata){
-        $user=$this->getUser($conn->resourceId);
-        $receivers=$messagedata->receivers;
-        foreach ($this->clients as $client) {
-            if ($conn !== $client &&  (count($receivers>0) && in_array($client->resourceId,$receivers))) {
-                // The sender is not the receiver, send to each client connected
-                $userdata=$this->memcached->get('chatsessionid_'.$client->resourceId);
-                if($user['tenant_id']==null || $userdata['tenant_id']==null || $user['tenant_id']==$userdata['tenant_id'])
-                    $client->send(json_encode([XxamChat::MSG_VIDEOPHONECALLCANCEL,[],$conn->resourceId]));
-            }
-        }
+        $this->broadcastSignal($conn, $messagedata, XxamChat::MSG_VIDEOPHONECALLCANCEL);
     }
 
     private function onXxamData(ConnectionInterface $conn, \stdClass $messagedata){
-        $user=$this->getUser($conn->resourceId);
-        $receivers=$messagedata->receivers;
-        $data=$messagedata->data;
-        foreach ($this->clients as $client) {
-            if ($conn !== $client &&  (count($receivers>0) && in_array($client->resourceId,$receivers))) {
-                // The sender is not the receiver, send to each client connected
-                $userdata=$this->memcached->get('chatsessionid_'.$client->resourceId);
-                if($user['tenant_id']==null || $userdata['tenant_id']==null || $user['tenant_id']==$userdata['tenant_id'])
-                    $client->send(json_encode([XxamChat::MSG_DATA,["data"=>$data],$conn->resourceId]));
-            }
-        }
+        $this->broadcastSignal($conn, $messagedata, XxamChat::MSG_DATA);
     }
 
     private function onXxamDataAck(ConnectionInterface $conn, \stdClass $messagedata){
-        $user=$this->getUser($conn->resourceId);
-        $receivers=$messagedata->receivers;
-        $data=$messagedata->data;
-        foreach ($this->clients as $client) {
-            if ($conn !== $client &&  (count($receivers>0) && in_array($client->resourceId,$receivers))) {
-                // The sender is not the receiver, send to each client connected
-                $userdata=$this->memcached->get('chatsessionid_'.$client->resourceId);
-                if($user['tenant_id']==null || $userdata['tenant_id']==null || $user['tenant_id']==$userdata['tenant_id'])
-                    $client->send(json_encode([XxamChat::MSG_DATA_ACK,["data"=>$data],$conn->resourceId]));
-            }
-        }
+        $this->broadcastSignal($conn, $messagedata, XxamChat::MSG_DATA_ACK);
     }
 }
