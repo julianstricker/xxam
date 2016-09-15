@@ -131,22 +131,7 @@ class ContactController extends Controller
         }
         if(isset($image))$images[]='http://www.gravatar.com/avatar/'.md5($email).'.jpg?s=200&d=404';
 
-        $config = array(
-            // "base_url" the url that point to HybridAuth Endpoint (where the index.php and config.php are found)
-            "base_url" => $this->container->get('router')->generate('contact_hauth'),
-
-            "providers" => array (
-                "XING" => array (
-                    "enabled" => true,
-                    "wrapper" => array(
-                        "path" => $this->get('kernel')->getRootDir().'/../vendor/hybridauth/hybridauth/additional-providers/hybridauth-xing/Providers/XING.php',
-                        "class" => "Hybrid_Providers_XING"
-                    ),
-                    "keys" => array ( "key" => "6da903c01124e7de94d8", "secret" => "fc0f9239c6d283db39314cc597828cad8f4615b0" )
-
-                )
-            )
-        );
+        $config = $this->getXingConfig();
 
         require_once $this->get('kernel')->getRootDir().'/../vendor/hybridauth/hybridauth/hybridauth/Hybrid/Auth.php';
         try {
@@ -230,23 +215,10 @@ class ContactController extends Controller
     }
 
 
+
+
     private function mapXingDataToContact($email,Contact $contact){
-        $config = array(
-            // "base_url" the url that point to HybridAuth Endpoint (where the index.php and config.php are found)
-            "base_url" => $this->container->get('router')->generate('contact_hauth'),
-
-            "providers" => array (
-                "XING" => array (
-                    "enabled" => true,
-                    "wrapper" => array(
-                        "path" => $this->get('kernel')->getRootDir().'/../vendor/hybridauth/hybridauth/additional-providers/hybridauth-xing/Providers/XING.php',
-                        "class" => "Hybrid_Providers_XING"
-                    ),
-                    "keys" => array ( "key" => "6da903c01124e7de94d8", "secret" => "fc0f9239c6d283db39314cc597828cad8f4615b0" )
-
-                )
-            )
-        );
+        $config = $this->getXingConfig();
 
         require_once $this->get('kernel')->getRootDir().'/../vendor/hybridauth/hybridauth/hybridauth/Hybrid/Auth.php';
         try {
@@ -404,6 +376,26 @@ class ContactController extends Controller
 
             }
         }
+    }
+
+
+    private function getXingConfig(){
+        return array(
+            // "base_url" the url that point to HybridAuth Endpoint (where the index.php and config.php are found)
+            "base_url" => $this->container->get('router')->generate('contact_hauth'),
+
+            "providers" => array (
+                "XING" => array (
+                    "enabled" => true,
+                    "wrapper" => array(
+                        "path" => $this->get('kernel')->getRootDir().'/../vendor/hybridauth/hybridauth/additional-providers/hybridauth-xing/Providers/XING.php',
+                        "class" => "Hybrid_Providers_XING"
+                    ),
+                    "keys" => array ( "key" => $this->getParameter(('xing_key')), "secret" => $this->getParameter(('xing_secret')) )
+
+                )
+            )
+        );
     }
 
     /**
