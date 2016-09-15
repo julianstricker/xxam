@@ -358,8 +358,7 @@ class MailclientController extends MailclientBaseController {
                 if (!$content) $content='';
                 return $this->render('XxamMailclientBundle:Mailclient:mailbody.html.twig', array('mailcontent' => '<pre>'.$content.'</pre>'));
             }
-            var_dump($mail);
-            $response = new Response('jojo');
+            $response = new Response('');
             $response->headers->set('Content-Type', 'text/html; charset=UTF-8');
             return $response;
         }

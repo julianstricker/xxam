@@ -19,7 +19,7 @@ class BaseRestController extends Controller
      *
      * @return Form|FormInterface
      */
-    public function createForm($type = null, $data = null, array $options = array())
+    protected function createForm($type = null, $data = null, array $options = array())
     {
         $formfactory = $this->container->get('form.factory');
         $form=$formfactory->createNamed(

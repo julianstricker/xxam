@@ -73,7 +73,7 @@ class AppKernel extends Kernel
     public function __construct($environment, $debug)
     {
         // Two is better than one...
-        ini_set("date.timezone", "UTC");
+        //ini_set("date.timezone", "UTC");
         date_default_timezone_set('UTC');
 
         parent::__construct($environment, $debug);

@@ -148,7 +148,7 @@ class MailclientBaseController extends Controller {
      * @param string $textHtml
      * @return array attachmentId => link placeholder
      */
-    public function getInternalLinksPlaceholders($textHtml) {
+    protected function getInternalLinksPlaceholders($textHtml) {
         return preg_match_all('/=["\'](ci?d:([\w\.%*@-]+))["\']/i', $textHtml, $matches) ? array_combine($matches[2], $matches[1]) : array();
 
     }
@@ -159,7 +159,7 @@ class MailclientBaseController extends Controller {
      * @param array $attachments
      * @return mixed
      */
-    public function replaceInternalLinks($textHtml, $baseUri, $attachments) {
+    protected function replaceInternalLinks($textHtml, $baseUri, $attachments) {
         $baseUri = rtrim($baseUri, '\\/') . '/';
         $fetchedHtml = $textHtml;
         foreach($this->getInternalLinksPlaceholders($textHtml) as $attachmentId => $placeholder) {
