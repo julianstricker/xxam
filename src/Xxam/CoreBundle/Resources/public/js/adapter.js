@@ -66,7 +66,7 @@ if (typeof window === 'object') {
                 } else {
                     // Use _srcObject as a private property for this shim
                     this._srcObject = stream;
-                    // TODO: revokeObjectUrl(this.src) when !stream to release resources?
+
                     this.src = URL.createObjectURL(stream);
                 }
             }
