@@ -35,8 +35,6 @@ parameters:
       im_icq: ICQ
       im_msn: MSN
 
-  xing_key: "%xing_key%"
-  xing_secret: "%xing_secret%"
 
 
 

@@ -380,6 +380,8 @@ class ContactController extends Controller
 
 
     private function getXingConfig(){
+        $config=$this->getParameter('xxam_contact.xing');
+
         return array(
             // "base_url" the url that point to HybridAuth Endpoint (where the index.php and config.php are found)
             "base_url" => $this->container->get('router')->generate('contact_hauth'),
@@ -391,7 +393,7 @@ class ContactController extends Controller
                         "path" => $this->get('kernel')->getRootDir().'/../vendor/hybridauth/hybridauth/additional-providers/hybridauth-xing/Providers/XING.php',
                         "class" => "Hybrid_Providers_XING"
                     ),
-                    "keys" => array ( "key" => $this->getParameter(('xing_key')), "secret" => $this->getParameter(('xing_secret')) )
+                    "keys" => array ( "key" =>$config['key'], "secret" =>$config['secret'] )
 
                 )
             )

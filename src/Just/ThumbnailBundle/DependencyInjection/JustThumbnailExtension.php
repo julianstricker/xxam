@@ -22,8 +22,7 @@ class JustThumbnailExtension extends Extension {
         $config = $this->processConfiguration($configuration, $configs);
         foreach($config as $key => $value){
             $container->setParameter( 'just_thumbnail.'.$key, $value);
-}
-
+        }
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
     }

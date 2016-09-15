@@ -263,3 +263,7 @@ knp_markdown:
     parser:
         service: markdown.parser.max
 
+xxam_contact:
+  xing:
+    key: "%xing_key%"
+    secret: "%xing_secret%"
