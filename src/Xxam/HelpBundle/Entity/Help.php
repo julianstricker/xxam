@@ -2,7 +2,6 @@
 
 namespace Xxam\HelpBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -66,30 +65,6 @@ class Help implements Base\TenantInterface
      * @Gedmo\Versioned
      */
     private $help;
-
-    /**
-     * @var array
-     *
-     * @ORM\Column(name="roles", type="json_array", nullable=true)
-     * @Gedmo\Versioned
-     */
-    private $roles;
-
-    /**
-     * @var array
-     *
-     * @ORM\Column(name="actions", type="json_array", nullable=true)
-     * @Gedmo\Versioned
-     */
-    private $actions;
-
-    /**
-     * @var array
-     *
-     * @ORM\Column(name="objectactions", type="json_array", nullable=true)
-     * @Gedmo\Versioned
-     */
-    private $objectactions;
 
     /**
      * @var \DateTime $created
@@ -191,77 +166,7 @@ class Help implements Base\TenantInterface
         return $this->help;
     }
 
-    /**
-     * Set roles
-     *
-     * @param array $roles
-     *
-     * @return Help
-     */
-    public function setRoles($roles)
-    {
-        $this->roles = $roles;
 
-        return $this;
-    }
-
-    /**
-     * Get roles
-     *
-     * @return array
-     */
-    public function getRoles()
-    {
-        return $this->roles;
-    }
-
-    /**
-     * Set actions
-     *
-     * @param array $actions
-     *
-     * @return Help
-     */
-    public function setActions($actions)
-    {
-        $this->actions = $actions;
-
-        return $this;
-    }
-
-    /**
-     * Get actions
-     *
-     * @return array
-     */
-    public function getActions()
-    {
-        return $this->actions;
-    }
-
-    /**
-     * Set objectactions
-     *
-     * @param array $objectactions
-     *
-     * @return Help
-     */
-    public function setObjectactions($objectactions)
-    {
-        $this->objectactions = $objectactions;
-
-        return $this;
-    }
-
-    /**
-     * Get objectactions
-     *
-     * @return array
-     */
-    public function getObjectactions()
-    {
-        return $this->objectactions;
-    }
 
     /**
      * Set created

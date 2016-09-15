@@ -142,21 +142,7 @@ class Mailspool implements Base\TenantInterface
 
 
     public function toArray($timezone='') {
-        if($timezone=='') $timezone=date_default_timezone_get();
-
-        return array(
-            'id' => $this->id,
-            'mailaccount_id' => $this->getMailaccount()->getId(),
-            'user_id' => $this->getUserId(),
-            'subject' => $this->getSubject(),
-            'emailto' => $this->getEmailto(),
-            'sendafter' => is_null($this->getSendafter()) ? '-' : $this->getSendafter()->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s'),
-            'sendtime' => is_null($this->getSendtime()) ? '-' : $this->getSendtime()->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s'),
-            'readtimes' => $this->getReadtimes(),
-            'updated' => is_null($this->getUpdated()) ? '-' : $this->getUpdated()->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s'),
-            'created' => is_null($this->getCreated()) ? '-' : $this->getCreated()->setTimezone(new \DateTimeZone($timezone))->format('Y-m-d H:i:s'),
-            'sendstatus' => $this->getSendstatus()
-        );
+        return $this->toGridObject($timezone);
     }
 
     public function toGridObject($timezone='') {

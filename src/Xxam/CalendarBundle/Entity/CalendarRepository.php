@@ -25,20 +25,9 @@ class CalendarRepository extends EntityRepository
     }
     public function getModelFields(){
         $fields=Array();
-        $fields[]=Array('name'=> 'id','type'=>'string','type'=>'int');
+        $fields[]=Array('name'=> 'id','type'=>'int');
         $fields[]=Array('name'=> 'calendar_id','type'=>'int');
         $fields[]=Array('name'=> 'calendartype','type'=>'string');
-        $fields[]=Array('name'=> 'organizationname','type'=>'string');
-        $fields[]=Array('name'=> 'lastname','type'=>'string');
-        $fields[]=Array('name'=> 'firstname','type'=>'string');
-        $fields[]=Array('name'=> 'nameprefix','type'=>'string');
-        $fields[]=Array('name'=> 'initials','type'=>'string');
-        $fields[]=Array('name'=> 'nickname','type'=>'string');
-        $fields[]=Array('name'=> 'vat','type'=>'string');
-        $fields[]=Array('name'=> 'tax','type'=>'string');
-        $fields[]=Array('name'=> 'birthday','type'=>'date', 'dateFormat'=>'Y-m-d', 'format'=>'Y-m-d');
-        $fields[]=Array('name'=> 'photo','type'=>'string');
-        $fields[]=Array('name'=> 'organizationfunction','type'=>'string');
         $fields[]=Array('name'=> 'created','type'=>'date', 'dateFormat'=>'Y-m-d H:i:s');
         $fields[]=Array('name'=> 'updated','type'=>'date', 'dateFormat'=>'Y-m-d H:i:s');
         return $fields;
@@ -48,17 +37,6 @@ class CalendarRepository extends EntityRepository
         $columns=Array();
         $columns[]=Array('text'=> 'Id','dataIndex'=> 'id', 'filter'=> Array('type'=> 'number'),'hidden'=> true);
         $columns[]=Array('text'=> 'Calendartype','dataIndex'=> 'calendartype', 'filter'=> Array('type'=> 'string'));
-        $columns[]=Array('text'=> 'Organization','flex'=> 1,'dataIndex'=> 'organizationname', 'filter'=> Array('type'=> 'string'));
-        $columns[]=Array('text'=> 'Lastname','flex'=> 1,'dataIndex'=> 'lastname', 'filter'=> Array('type'=> 'string'));
-        $columns[]=Array('text'=> 'Firstname','flex'=> 1,'dataIndex'=> 'firstname', 'filter'=> Array('type'=> 'string'));
-        $columns[]=Array('text'=> 'Nameprefix','dataIndex'=> 'nameprefix', 'filter'=> Array('type'=> 'string'),'hidden'=> true);
-        $columns[]=Array('text'=> 'Initials','dataIndex'=> 'initials', 'filter'=> Array('type'=> 'string'),'hidden'=> true);
-        $columns[]=Array('text'=> 'Nickname','dataIndex'=> 'nickname', 'filter'=> Array('type'=> 'string'));
-        $columns[]=Array('text'=> 'Vat','dataIndex'=> 'vat', 'filter'=> Array('type'=> 'string'),'hidden'=> true);
-        $columns[]=Array('text'=> 'Tax','dataIndex'=> 'tax', 'filter'=> Array('type'=> 'string'),'hidden'=> true);
-        $columns[]=Array('text'=> 'Birthday','dataIndex'=> 'birthday', 'xtype'=> 'datecolumn', 'format'=>'Y-m-d','filter'=> Array('type'=> 'date'),'hidden'=> true);
-        $columns[]=Array('text'=> 'Photo','dataIndex'=> 'photo','hidden'=> true);
-        $columns[]=Array('text'=> 'Function','dataIndex'=> 'organizationfunction', 'filter'=> Array('type'=> 'string'),'hidden'=> true);
         $columns[]=Array('text'=> 'Created','dataIndex'=> 'created', 'xtype'=> 'datecolumn', 'format'=>'Y-m-d H:i:s', 'filter'=> Array('type'=> 'date'),'hidden'=> true);
         $columns[]=Array('text'=> 'Updated','dataIndex'=> 'updated', 'xtype'=> 'datecolumn', 'format'=>'Y-m-d H:i:s', 'filter'=> Array('type'=> 'date'),'hidden'=> true);
         return $columns;
