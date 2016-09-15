@@ -3,13 +3,11 @@
 namespace Xxam\MailclientBundle\Controller;
 
 
-use Doctrine\ORM\EntityRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Xxam\MailclientBundle\Entity\Mailaccountuser;
 use Xxam\MailclientBundle\Entity\MailaccountuserRepository;
-use Xxam\MailclientBundle\Entity\Mailspool;
 use Xxam\MailclientBundle\Helper\Imap\IncomingMail;
 
 class MailclientController extends MailclientBaseController {
@@ -51,14 +49,8 @@ class MailclientController extends MailclientBaseController {
             'fileextensiontomimetype'=>$fileextensiontomimetype
         ));
     }
-    
-    /**
-     * Mailclient
-     *
-     * @Security("has_role('ROLE_MAILCLIENT_LIST')")
-     *
-     */
-    public function listfoldersAction() {
+
+    private function listfolders(){
         $user = $this->get('security.token_storage')->getToken()->getUser();
         $repository=$this->getDoctrine()->getManager()->getRepository('XxamMailclientBundle:Mailaccountuser');
         /* @var MailaccountuserRepository $repository */
@@ -90,11 +82,6 @@ class MailclientController extends MailclientBaseController {
                         $subfolder['leaf']=false;
                         $subfolder['loaded']=false;
                         $subfolder['expanded']=false;
-                        /*if ($mailaccountid.$mailaccount->getTrashfolder()==$path) $subfolder['children'][$fexp]['icon']='/bundles/xxammailclient/icons/16x16/bin.png';
-                        if ($mailaccountid.$mailaccount->getJunkfolder()==$path) $subfolder['children'][$fexp]['icon']='/bundles/xxammailclient/icons/16x16/spam_assassin.png';
-                        if ($mailaccountid.$mailaccount->getSentfolder()==$path) $subfolder['children'][$fexp]['icon']='/bundles/xxammailclient/icons/16x16/email_go.png';
-                        if ($mailaccountid.$mailaccount->getDraftfolder()==$path) $subfolder['children'][$fexp]['icon']='/bundles/xxammailclient/icons/16x16/email_edit.png';*/
-
                         if ($mailaccountid.$mailaccount->getTrashfolder()==$path) $subfolder['children'][$fexp]['iconCls']='fa fa-recycle';
                         if ($mailaccountid.$mailaccount->getJunkfolder()==$path) $subfolder['children'][$fexp]['iconCls']='fa fa-trash-o';
                         if ($mailaccountid.$mailaccount->getSentfolder()==$path) $subfolder['children'][$fexp]['iconCls']='fa fa-send-o';
@@ -111,8 +98,7 @@ class MailclientController extends MailclientBaseController {
             $returndata[] =  $this->removeChildrenkeys($children);
         }
 
-        //dump($returndata);
-        //setLocale(LC_ALL,'de_DE.UTF8');
+
         $response = new Response(json_encode($returndata));
         $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
         return $response;
@@ -123,18 +109,22 @@ class MailclientController extends MailclientBaseController {
      *
      * @Security("has_role('ROLE_MAILCLIENT_LIST')")
      *
-     * @param Request $request
-     * @return Response
-     *
      */
-    public function listmailsAction(Request $request){
-        //$page=$request->get('page',1);
-        $start=$request->get('start',0);
-        $limit=$request->get('limit',100);
-        $sort=$request->get('sort','arrival');
-        $dir=$request->get('dir','DESC');
-        $filter=json_decode($request->get('filter','[]')); //[{"operator":"like","value":"test","property":"subject"},{"operator":"lt","value":"08/03/2016","property":"date"}]
-        $path=$request->get('path','');
+    public function listfoldersAction() {
+        return $this->listfolders();
+    }
+
+    /**
+     * @param $start
+     * @param $limit
+     * @param $sort
+     * @param $dir
+     * @param $filter
+     * @param $path
+     * @param $timezone
+     * @return Response
+     */
+    private function listmails($start, $limit, $sort, $dir, $filter, $path, $timezone){
         $mailaccountid=0;
         if ($path){
             $pathexpl=explode('.',$path);
@@ -144,12 +134,12 @@ class MailclientController extends MailclientBaseController {
         }
 
         $mailaccount=$this->getUserMailaccountForId($mailaccountid);
-        
+
         if (!$mailaccount){
-          return $this->throwJsonError('Mailaccount not found');
+            return $this->throwJsonError('Mailaccount not found');
         }
         $returndata=Array();
-        
+
         $mailbox = $this->getImapMailbox($mailaccount,$path);
         if (count($filter)>0){
             $filterstrings=[];
@@ -200,18 +190,18 @@ class MailclientController extends MailclientBaseController {
         $sortarray=Array(
             'date' => SORTDATE,
             'arrival' => SORTARRIVAL,
-	        'from' => SORTFROM,
+            'from' => SORTFROM,
             'subject'=> SORTSUBJECT,
             'to' => SORTTO,
             'cc' => SORTCC,
             'size' =>  SORTSIZE,
         );
-        $mails_ids = $mailbox->sortMails(isset($sortarray[$sort]) ? $sortarray[$sort] : SORTARRIVAL, $dir=='DESC', $searchcriteria); 
+        $mails_ids = $mailbox->sortMails(isset($sortarray[$sort]) ? $sortarray[$sort] : SORTARRIVAL, $dir=='DESC', $searchcriteria);
         $totalcount=count($mails_ids);
         $pagingmails_ids=array_slice($mails_ids,$start,$limit);
         $mails=$mailbox->getMailsInfo($pagingmails_ids);
         $mailsbyid=Array();
-        $timezone=new \DateTimeZone($request->getSession()->get('timezone'));
+
 
         foreach($mails as $m){
             if (property_exists($m,'date')){
@@ -223,13 +213,13 @@ class MailclientController extends MailclientBaseController {
         //dump($mailsbyid);
         foreach($pagingmails_ids as $id){
             $returndata[]=$mailsbyid[$id];
-        } 
-        
+        }
+
         $response = new Response(json_encode(Array('totalCount'=>$totalcount,'mails'=>$returndata)));
         $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-        return $response; 
+        return $response;
     }
-
+    
     /**
      * Mailclient
      *
@@ -237,10 +227,26 @@ class MailclientController extends MailclientBaseController {
      *
      * @param Request $request
      * @return Response
+     *
      */
-    public function getmailAction(Request $request){
-        $mailid=$request->get('mailid',false);
+    public function listmailsAction(Request $request){
+        $start=$request->get('start',0);
+        $limit=$request->get('limit',100);
+        $sort=$request->get('sort','arrival');
+        $dir=$request->get('dir','DESC');
+        $filter=json_decode($request->get('filter','[]')); //[{"operator":"like","value":"test","property":"subject"},{"operator":"lt","value":"08/03/2016","property":"date"}]
         $path=$request->get('path','');
+        $timezone=new \DateTimeZone($request->getSession()->get('timezone'));
+        return $this->listmails($start,$limit,$sort,$dir,$filter,$path,$timezone);
+
+    }
+
+    /**
+     * @param $mailid
+     * @param $path
+     * @return Response
+     */
+    private function getmail($mailid, $path){
         $mailaccountid=false;
         if ($path){
             $pathexpl=explode('.',$path);
@@ -257,11 +263,11 @@ class MailclientController extends MailclientBaseController {
         }
         $mailaccount=$this->getUserMailaccountForId($mailaccountid);
         if (!$mailaccount){
-           return $this->throwJsonError('Mailaccount not found');
+            return $this->throwJsonError('Mailaccount not found');
         }
-        
+
         $mailbox = $this->getImapMailbox($mailaccount,$path);
-        $mail = $mailbox->getMail($mailid); 
+        $mail = $mailbox->getMail($mailid);
         $mail->hasexternallinks=false;
         if ($mail->textHtml){
             //clean html:
@@ -299,20 +305,31 @@ class MailclientController extends MailclientBaseController {
         //dump(json_encode($returndata->textHtml));
         $response = new Response(json_encode($returndata,JSON_HEX_QUOT));
         $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
-        return $response; 
+        return $response;
     }
 
     /**
      * Mailclient
      *
      * @Security("has_role('ROLE_MAILCLIENT_LIST')")
+     *
      * @param Request $request
      * @return Response
      */
-    public function getmailcontentAction(Request $request){
-
+    public function getmailAction(Request $request){
+        $mailid=$request->get('mailid',false);
         $path=$request->get('path','');
-        $externalsources=$request->get('externalsources',false);
+        return $this->getmail($mailid,$path);
+    }
+
+
+    /**
+     * @param string $path
+     * @param string|boolean $externalsources
+     * @param string $mailid
+     * @return Response
+     */
+    private function getmailcontent($path, $externalsources, $mailid){
         $mailaccountid=false;
         if ($path){
             $pathexpl=explode('.',$path);
@@ -320,7 +337,7 @@ class MailclientController extends MailclientBaseController {
             unset($pathexpl[0]);
             $path=count($pathexpl)>0 ? '.'.implode('.',$pathexpl) : '';
         }
-        $mailid=$request->get('mailid',false);
+
         if ($mailaccountid===false){
             return $this->throwJsonError('Please provide a mailaccountid');
         }
@@ -329,7 +346,7 @@ class MailclientController extends MailclientBaseController {
         }
         $mailaccount=$this->getUserMailaccountForId($mailaccountid);
         if (!$mailaccount){
-           return $this->throwJsonError('Mailaccount not found');
+            return $this->throwJsonError('Mailaccount not found');
         }
         $mailbox = $this->getImapMailbox($mailaccount,$path);
         $mail = $mailbox->getMail($mailid);
@@ -362,20 +379,26 @@ class MailclientController extends MailclientBaseController {
             $response->headers->set('Content-Type', 'text/html; charset=UTF-8');
             return $response;
         }
-        
     }
 
     /**
      * Mailclient
      *
-     * @Security("has_role('ROLE_MAILCLIENT_CREATE')")
+     * @Security("has_role('ROLE_MAILCLIENT_LIST')")
      * @param Request $request
      * @return Response
      */
-    public function writeAction(Request $request) {
+    public function getmailcontentAction(Request $request){
+
         $path=$request->get('path','');
-        $mailid=$request->get('mailid','');
-        $type=$request->get('type','');
+        $externalsources=$request->get('externalsources',false);
+        $mailid=$request->get('mailid',false);
+        return $this->getmailcontent($path, $externalsources, $mailid);
+
+        
+    }
+
+    private function writeMail($path,$mailid,$type){
         $user = $this->get('security.token_storage')->getToken()->getUser();
         $session  = $this->get("session");
         $params=array(
@@ -385,11 +408,11 @@ class MailclientController extends MailclientBaseController {
             'mail'=>new IncomingMail(),
             'attachmentsgridStoreData'=>[],
             'fieldattachments'=>[]
-            
+
         );
         $mailaccountid=false;
         if (in_array($type,array('reply','replyall','forward'))){
-           if ($path){
+            if ($path){
                 $pathexpl=explode('.',$path);
                 $mailaccountid=$pathexpl[0];
                 unset($pathexpl[0]);
@@ -403,7 +426,7 @@ class MailclientController extends MailclientBaseController {
             }
             $mailaccount=$this->getUserMailaccountForId($mailaccountid);
             if (!$mailaccount){
-               return $this->throwJsonError('Mailaccount not found');
+                return $this->throwJsonError('Mailaccount not found');
             }
 
             $mailbox = $this->getImapMailbox($mailaccount,$path);
@@ -486,7 +509,7 @@ class MailclientController extends MailclientBaseController {
                 $params['mail']->references = isset($mail->headers->references) ? $mail->headers->references . ' ' . $mail->headers->message_id : $mail->headers->message_id;
             }
         }
-        
+
         //dump($params);
         /* @var MailaccountuserRepository $repository */
         $repository=$this->getDoctrine()->getManager()->getRepository('XxamMailclientBundle:Mailaccountuser');
@@ -507,6 +530,21 @@ class MailclientController extends MailclientBaseController {
 
         }
         return $this->render('XxamMailclientBundle:Mailclient:write.js.twig', $params);
+    }
+
+    /**
+     * Mailclient
+     *
+     * @Security("has_role('ROLE_MAILCLIENT_CREATE')")
+     * @param Request $request
+     * @return Response
+     */
+    public function writeAction(Request $request) {
+        $path=$request->get('path','');
+        $mailid=$request->get('mailid','');
+        $type=$request->get('type','');
+        return $this->writeMail($path,$mailid,$type);
+
     }
     
     /**

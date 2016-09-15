@@ -218,10 +218,8 @@ class FilemanagerExtraController extends FilemanagerBaseController
         return $response;
     }
 
-    public function readfileAction(Request $request)
-    {
-        $filesystemid = $this->extractFilesystemIdFromPath($request->get('path', ''));
-        $path = $this->extractPathFromPath($request->get('path', ''));
+
+    private function readfile($filesystemid,$path){
         $returndata = Array('success' => false);
         $filesystems = $this->getFilesystems();
         if (count($filesystems) == 0) {
@@ -246,6 +244,13 @@ class FilemanagerExtraController extends FilemanagerBaseController
         $response = new Response(json_encode($returndata));
         $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
         return $response;
+    }
+
+    public function readfileAction(Request $request)
+    {
+        $filesystemid = $this->extractFilesystemIdFromPath($request->get('path', ''));
+        $path = $this->extractPathFromPath($request->get('path', ''));
+        return $this->readfile($filesystemid,$path);
     }
 
 }
