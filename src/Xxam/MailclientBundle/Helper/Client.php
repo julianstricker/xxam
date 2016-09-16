@@ -352,7 +352,7 @@ class Client implements WebSocketClientInterface
                 $this->createImapstream($imapaccount);
             });
         },
-        function ($error)  use(&$imapaccount) {
+        function (\Exception $error)  use(&$imapaccount) {
             echo "Call Error: \n";
             dump($error->getMessage());
             echo "trying again...\n";
