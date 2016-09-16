@@ -176,7 +176,7 @@ class XxamChat implements \Ratchet\MessageComponentInterface  {
         if (isset($this->subscriptionusers[$topic])){
             foreach($this->subscriptionusers[$topic] as $sessionid){
                 $userdata=$this->memcached->get('chatsessionid_'.$sessionid);
-                if($user['tenant_id']==null || $userdata['tenant_id']==null || $user['tenant_id']==$userdata['tenant_id']) $returnval[$userdata['sessionid']]=$userdata['username'];
+                if($user['tenant_id']===null || $userdata['tenant_id']===null || $user['tenant_id']==$userdata['tenant_id']) $returnval[$userdata['sessionid']]=$userdata['username'];
             }
         }
         return $returnval;
@@ -199,7 +199,7 @@ class XxamChat implements \Ratchet\MessageComponentInterface  {
             if ($conn !== $client) {
                 if(in_array($client->resourceId,$this->subscriptionusers[$topic])) {
                     $userdata = $this->memcached->get('chatsessionid_' . $client->resourceId);
-                    if ($user['tenant_id'] == null || $userdata['tenant_id'] == null || $user['tenant_id'] == $userdata['tenant_id']) {
+                    if ($user['tenant_id'] === null || $userdata['tenant_id'] === null || $user['tenant_id'] == $userdata['tenant_id']) {
                         $client->send($messagestring);
                     }
                 }
@@ -265,7 +265,7 @@ class XxamChat implements \Ratchet\MessageComponentInterface  {
             if ($conn !== $client && ((count($receivers)==0 && $topic!='' && isset($users[$client->resourceId])) || (count($receivers>0) && in_array($client->resourceId,$receivers)))) {
                 // The sender is not the receiver, send to each client connected
                 $userdata=$this->memcached->get('chatsessionid_'.$client->resourceId);
-                if($user['tenant_id']==null || $userdata['tenant_id']==null || $user['tenant_id']==$userdata['tenant_id'])
+                if($user['tenant_id']===null || $userdata['tenant_id']===null || $user['tenant_id']==$userdata['tenant_id'])
                     $client->send(json_encode([XxamChat::MSG_PUBLISH,["topic"=>$topic,"message"=>$message],$conn->resourceId]));
             }
         }
@@ -285,7 +285,7 @@ class XxamChat implements \Ratchet\MessageComponentInterface  {
             if ($conn !== $client &&  (count($receivers>0) && in_array($client->resourceId,$receivers))) {
                 // The sender is not the receiver, send to each client connected
                 $userdata=$this->memcached->get('chatsessionid_'.$client->resourceId);
-                if($user['tenant_id']==null || $userdata['tenant_id']==null || $user['tenant_id']==$userdata['tenant_id'])
+                if($user['tenant_id']===null || $userdata['tenant_id']===null || $user['tenant_id']==$userdata['tenant_id'])
                     $client->send(json_encode([$msgtype,$data? ["data"=>$data] : [],$conn->resourceId]));
             }
         }

@@ -134,7 +134,7 @@ class DefaultBaseController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $filter = Array('user_id' => $user->getId());
-        if ($key != false) $filter['statekey'] = $key;
+        if ($key !== false) $filter['statekey'] = $key;
         $states = $widget = $this->getDoctrine()->getManager()->getRepository('XxamCoreBundle:Extjsstate')->findBy($filter);
         if ($states) {
             foreach ($states as $state) {

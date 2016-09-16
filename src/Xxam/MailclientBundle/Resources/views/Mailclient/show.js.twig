@@ -126,7 +126,7 @@
                             }
                             
                             Ext.getCmp('mailclient_mailpanel{{id}}').setCollapsed(false);
-                            //if(responsejson.textHtml==null){
+                            //if(responsejson.textHtml===null){
                             Ext.getCmp('mailclient_mailpanelbody{{id}}').load('mailclient/getmailcontent?path='+path+'&mailid='+mailid);
                             Ext.getCmp('mailclient_mailpanel{{id}}').updateLayout();
                         }

@@ -262,7 +262,7 @@ class ContactController extends Controller
             //Addresses:
 
             //Private:
-            if ($xuser->private_address->city!=null) {
+            if ($xuser->private_address->city!==null) {
                 $address = new Address();
                 $address->setTimezone($xuser->time_zone->name);
                 $address->setAddresstypeId(5);
@@ -274,7 +274,7 @@ class ContactController extends Controller
                 $contact->addAddress($address);
             }
             //Work:
-            if ($xuser->business_address->city!=null) {
+            if ($xuser->business_address->city!==null) {
                 $address = new Address();
                 $address->setTimezone($xuser->time_zone->name);
                 $address->setAddresstypeId(6);
@@ -286,42 +286,42 @@ class ContactController extends Controller
                 $contact->addAddress($address);
             }
             //Private Email:
-            if ($xuser->private_address->email!=null) {
+            if ($xuser->private_address->email!==null) {
                 $communicationdata=new Communicationdata();
                 $communicationdata->setCommunicationdatatypeId('email_private');
                 $communicationdata->setValue($xuser->private_address->email);
                 $contact->addCommunicationdata($communicationdata);
             }
             //Work Email:
-            if ($xuser->business_address->email!=null) {
+            if ($xuser->business_address->email!==null) {
                 $communicationdata=new Communicationdata();
                 $communicationdata->setCommunicationdatatypeId('email_business');
                 $communicationdata->setValue($xuser->business_address->email);
                 $contact->addCommunicationdata($communicationdata);
             }
             //Private Phone:
-            if ($xuser->private_address->phone!=null) {
+            if ($xuser->private_address->phone!==null) {
                 $communicationdata=new Communicationdata();
                 $communicationdata->setCommunicationdatatypeId('phone_private');
                 $communicationdata->setValue($xuser->private_address->phone);
                 $contact->addCommunicationdata($communicationdata);
             }
             //Work Phone:
-            if ($xuser->business_address->phone!=null) {
+            if ($xuser->business_address->phone!==null) {
                 $communicationdata=new Communicationdata();
                 $communicationdata->setCommunicationdatatypeId('phone_business');
                 $communicationdata->setValue($xuser->business_address->phone);
                 $contact->addCommunicationdata($communicationdata);
             }
             //Private Mobile Phone:
-            if ($xuser->private_address->mobile_phone!=null) {
+            if ($xuser->private_address->mobile_phone!==null) {
                 $communicationdata=new Communicationdata();
                 $communicationdata->setCommunicationdatatypeId('phone_mobileprivate');
                 $communicationdata->setValue($xuser->private_address->mobile_phone);
                 $contact->addCommunicationdata($communicationdata);
             }
             //Work Mobile Phone:
-            if ($xuser->business_address->mobile_phone!=null) {
+            if ($xuser->business_address->mobile_phone!==null) {
                 $communicationdata=new Communicationdata();
                 $communicationdata->setCommunicationdatatypeId('phone_mobilebusiness');
                 $communicationdata->setValue($xuser->business_address->mobile_phone);
@@ -329,7 +329,7 @@ class ContactController extends Controller
             }
 
             //webprofiles:
-            if ($xuser->web_profiles!=null) {
+            if ($xuser->web_profiles!==null) {
                 if (property_exists($xuser->web_profiles, 'homepage') && is_array($xuser->web_profiles->homepage)) {
                     foreach($xuser->web_profiles->homepage as $url){
                         $communicationdata=new Communicationdata();
@@ -356,25 +356,25 @@ class ContactController extends Controller
                 }
             }
 
-            if (property_exists($xuser->instant_messaging_accounts, 'icq') && $xuser->instant_messaging_accounts->icq!=null) {
+            if (property_exists($xuser->instant_messaging_accounts, 'icq') && $xuser->instant_messaging_accounts->icq!==null) {
                 $communicationdata=new Communicationdata();
                 $communicationdata->setCommunicationdatatypeId('im_icq');
                 $communicationdata->setValue($xuser->instant_messaging_accounts->icq);
                 $contact->addCommunicationdata($communicationdata);
             }
-            if (property_exists($xuser->instant_messaging_accounts, 'icq') && $xuser->instant_messaging_accounts->msn!=null) {
+            if (property_exists($xuser->instant_messaging_accounts, 'icq') && $xuser->instant_messaging_accounts->msn!==null) {
                 $communicationdata=new Communicationdata();
                 $communicationdata->setCommunicationdatatypeId('im_msn');
                 $communicationdata->setValue($xuser->instant_messaging_accounts->msn);
                 $contact->addCommunicationdata($communicationdata);
             }
 
-            if ($xuser->professional_experience->primary_company!=null) {
+            if ($xuser->professional_experience->primary_company!==null) {
 
                 $contact->setOrganizationname($xuser->professional_experience->primary_company->name);
                 $contact->setOrganizationfunction($xuser->professional_experience->primary_company->title);
             }
-            if ($xuser->photo_urls->size_original!=null) {
+            if ($xuser->photo_urls->size_original!==null) {
                 $image=new Image();
                 $image->setOrigin($xuser->photo_urls->size_original);
                 $image->setUri($xuser->photo_urls->size_original);

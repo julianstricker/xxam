@@ -854,7 +854,7 @@ function createChatWindows(){
             var chatroom=subscriptions[i].substr(14);
             var commpanel=Ext.getCmp('commpanel');
 
-            if (commpanel.down('#commpanel_chatroom_'+chatroom)==null){
+            if (commpanel.down('#commpanel_chatroom_'+chatroom)===null){
                 //create new chatroom-panel:
                 var chatroompanel=Ext.create('Ext.panel.Panel', {
                     title: Ext.String.capitalize(chatroom),

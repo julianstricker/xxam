@@ -74,7 +74,7 @@ class MailspoolCommand extends ContainerAwareCommand
             $mailspool->setSendlog($logger->dump());
             $mailspool->setSendstatus($mailspool->getSendstatus()+1);
 
-            if ($error == false) {
+            if ($error === false) {
                 $mailspool->setSendtime(new \DateTime('now'));
                 //move into sent folder:
                 $msg = $message->toString();

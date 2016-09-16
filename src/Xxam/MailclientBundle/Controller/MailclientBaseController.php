@@ -210,7 +210,7 @@ class MailclientBaseController extends Controller {
         $doc->loadHTML($newhtml);
         libxml_clear_errors();
         $encoding=$doc->encoding;
-        if ($encoding==NULL) {
+        if ($encoding===NULL) {
             $encoding='UTF-8';
             $convhtml=iconv('UTF-8',$encoding,$newhtml);
             //return $convhtml;

@@ -26,7 +26,7 @@ class FilemanagerExtraController extends FilemanagerBaseController
         $filesystems = $this->getFilesystems();
         if (count($filesystems) == 0) {
             return $this->throwJsonError('No Filesystem found');
-        } elseif ($filesystemid == false) {
+        } elseif ($filesystemid === false) {
             $returndata['children']=$this->getFilesystemsFolders($filesystems);
         } else {
             $filesystem = isset($filesystems[$filesystemid]) ? $filesystems[$filesystemid] : null;
