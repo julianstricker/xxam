@@ -1,8 +1,3 @@
-{% set iconsize = '16x16' %}
-{% set buttonsize = 'medium' %}
-{% if buttonsize == 'large' %}
-{% set iconsize = '32x32' %}
-{% endif %}
 {
     tabtitle: '{% if entity.id %}{% trans with {'%code%': entity.code, '%id%': entity.id} %}Edit %code% (%id%){% endtrans %}{% else %}{% trans %}Create new Dynamic Module{% endtrans %}{% endif %}',
     iconCls: 'x-fa fa-cube',
@@ -17,19 +12,7 @@
                 url : '{{path('post_dynmod')}}',
                 writer: {
                     type: "json",
-                    writeAllFields: true /*,
-                    transform: {
-                        fn: function(data, request) {
-                            // do some manipulation of the unserialized data object
-                            console.log(data);
-                            ddd=data;
-                            rrr=request;
-                            data.additionalroles=Ext.JSON.decode(data.additionalroles);
-                            console.log(data);
-                            return data;
-                        },
-                        scope: this
-                    }*/
+                    writeAllFields: true
                 }
             }
         });
@@ -76,7 +59,7 @@
             ]
         }
     }
-    var additionalrules = {% if entity.additionalroles %}{{entity.additionalroles|jsonwithfunctions}}{% else %}[]{% endif %};
+    var additionalrules = {{ entity.additionalroles ? entity.additionalroles|jsonwithfunctions : '[]' }};
     var additionalrulesimputs=[];
     if(additionalrules.length==0) additionalrules.push('');
     Ext.Array.each(additionalrules,function(additionalrule){
@@ -85,7 +68,6 @@
 
     return {
         xtype: 'form',
-        //layout: 'form',
         defaultType: 'textfield',
         scrollable: true,
         bodyPadding: 5,
@@ -127,7 +109,7 @@
             fieldLabel: '{%trans%}Active{%endtrans%}',
             name: 'active',
             xtype: 'checkbox',
-            checked   :  {% if entity.active %}true{% else %}false{% endif %},
+            checked:  {{ entity.active ? 'true' : 'false' }},
             value: '{{entity.active}}'
         },{
             xtype: 'hiddenfield',
@@ -138,7 +120,6 @@
             fieldLabel: '{%trans%}Additional Roles{%endtrans%}',
             layout: 'vbox',
             anchor: '100%',
-            //flex: 1,
             items: [
                 {
                     xtype: 'component',
@@ -159,9 +140,7 @@
                     iconCls: 'x-fa fa-plus',
                     text: '{%trans%}Add{%endtrans%}',
                     handler: function(){
-                        ttt=this;
                         var fieldsetcontainer=this.up('fieldcontainer').down('fieldcontainer');
-                        //var fieldcontainer=fieldsetcontainer.down('fieldcontainer').cloneConfig();
                         fieldsetcontainer.add(generateAddtionalruleinput('',false));
                         fieldsetcontainer.down('button').setDisabled(false);
                     }
@@ -172,7 +151,6 @@
             xtype: 'toolbar',
             dock: 'bottom',
             ui: 'footer',
-            //defaults: {minWidth: minButtonWidth},
             items: [{% include "XxamCoreBundle:snippets:footerversionlog.js.twig" %}
                 { xtype: 'component', flex: 1 },
                 {
@@ -181,7 +159,6 @@
                     handler: function() {
                         // The getForm() method returns the Ext.form.Basic instance:
                         var form = this.up('form').getForm();
-                        fff=this.up('form');
                         if (form.isValid()) {
                             var newdynmod=Ext.create('DynmodModel',form.getValues());
                             var additionalroles=[];
@@ -201,17 +178,11 @@
                                     if (typeof Ext.getCmp('dynmodlist') !='undefined'){
                                         Ext.getCmp('dynmodlist').getStore().load({
                                             callback: function(records, operation, success) {
-                                                //Ext.getCmp('mailclient_maillist').view.scrollTo(0,scrollpos);
                                             }
                                         });
                                     }
-                                    //Ext.Msg.alert('Success', action.result.message);
                                 },
                                 failure: function(dynmod, operation) {
-                                    ttt=this;
-                                    ddd=dynmod;
-                                    ooo=operation;
-                                    console.log(this,dynmod,operation.error.response.responseText);
                                     var error=Ext.JSON.decode(operation.error.response.responseText);
                                     if (error){
                                         if(error.errors && error.errors.form && error.errors.form.children){
@@ -223,7 +194,6 @@
                                             console.log(errors);
                                         }
                                     }
-                                    //Ext.Msg.alert('Failed', action.result ? action.result.message : 'No response');
                                 }
                             });
                         }

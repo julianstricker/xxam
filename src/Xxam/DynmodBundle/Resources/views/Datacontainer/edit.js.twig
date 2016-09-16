@@ -1,8 +1,3 @@
-{% set iconsize = '16x16' %}
-{% set buttonsize = 'medium' %}
-{% if buttonsize == 'large' %}
-{% set iconsize = '32x32' %}
-{% endif %}
 {
     tabtitle: '{% if entity.id %}{% trans with {'%name%': entity.name, '%id%': entity.id} %}Edit %name% (%id%){% endtrans %}{% else %}{% trans %}Create new Datacontainer{% endtrans %}{% endif %}',
     iconCls: 'x-fa fa-cube',
@@ -34,7 +29,6 @@
 
     return {
         xtype: 'form',
-        //layout: 'form',
         defaultType: 'textfield',
         scrollable: true,
         bodyPadding: 5,
@@ -56,7 +50,7 @@
             displayField: 'value',
             valueField: 'id',
             itemId: 'fieldDynmod',
-            value: '{% if entity.getDynmod() %}{{entity.getDynmod().getId()}}{% endif %}',
+            value: '{{ entity.getDynmod() ? entity.getDynmod().getId() : '' }}',
             listeners: {
                 'select': function(){
 
@@ -71,14 +65,13 @@
             fieldLabel: '{%trans%}Is default{%endtrans%}',
             name: 'defaultcontainer',
             xtype: 'checkbox',
-            checked :  {% if entity.defaultcontainer %}true{% else %}false{% endif %},
-            value: '{{entity.defaultcontainer}}'
+            checked :  {{ entity.defaultcontainer ? 'true' : 'false'  }},
+            value: '{{entity.defaultcontainer }}'
         }],
         dockedItems: [{
             xtype: 'toolbar',
             dock: 'bottom',
             ui: 'footer',
-            //defaults: {minWidth: minButtonWidth},
             items: [{% include "XxamCoreBundle:snippets:footerversionlog.js.twig" %}
                 { xtype: 'component', flex: 1 },
                 {
@@ -90,8 +83,6 @@
                         fff=this.up('form');
                         if (form.isValid()) {
                             var newdatacontainer=Ext.create('DatacontainerModel',form.getValues());
-
-                            ndc=newdatacontainer;
                             // Submit the Ajax request and handle the response
                             newdatacontainer.save({
                                 scope: this.up('form'),
@@ -100,11 +91,9 @@
                                     if (typeof Ext.getCmp('datacontainerlist') !='undefined'){
                                         Ext.getCmp('datacontainerlist').getStore().load({
                                             callback: function(records, operation, success) {
-                                                //Ext.getCmp('mailclient_maillist').view.scrollTo(0,scrollpos);
                                             }
                                         });
                                     }
-                                    //Ext.Msg.alert('Success', action.result.message);
                                 },
                                 failure: function(datacontainer, operation) {
                                     var error=Ext.JSON.decode(operation.error.response.responseText);
@@ -117,7 +106,6 @@
                                             this.getForm().markInvalid(errors);
                                         }
                                     }
-                                    //Ext.Msg.alert('Failed', action.result ? action.result.message : 'No response');
                                 }
                             });
                         }

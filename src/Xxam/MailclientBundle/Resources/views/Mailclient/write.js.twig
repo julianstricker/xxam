@@ -1,9 +1,3 @@
-{% set iconsize = '16x16' %}
-{% set buttonsize = 'medium' %}
-{% if buttonsize == 'large' %}
-    {% set iconsize = '32x32' %}
-{% endif %}
-
 {
     tabtitle: '{% trans %}Write Mail{% endtrans %}',
     //tabicon: '/bundles/xxammailclient/icons/16x16/email_edit.png',
@@ -278,7 +272,7 @@
                                     itemId: 'fieldsubject',
                                     name: 'fieldsubject',
                                     padding: '4 2 4 2',
-                                    value: '{% if mail is defined and mail.subject is defined %}{{ mail.subject }}{% endif %}'
+                                    value: '{{ mail is defined and mail.subject is defined ? mail.subject : '' }}'
                                 }
                             ]
                         },
@@ -322,14 +316,14 @@
                                             name: 'fieldhtml',
                                             fieldLabel: '',
                                             baseBodyCls: '',
-                                            value: '{% if mail is defined and mail.textHtml is defined and mail.textHtml!='' %}{{ mail.textHtml }}{% endif %}'
+                                            value: '{{ mail is defined and mail.textHtml is defined and mail.textHtml!='' ? mail.textHtml : '' }}'
                                         },
                                         {
                                             xtype: 'textareafield',
                                             name: 'fieldtext',
                                             fieldLabel: '',
                                             hidden: true,
-                                            value: '{% if mail is defined and mail.textPlain is defined and mail.textPlain!='' %}{{ mail.textPlain }}{% endif %}'
+                                            value: '{{ mail is defined and mail.textPlain is defined and mail.textPlain!='' ? mail.textPlain '' }}'
                                         },
                                     ]
                                 },
