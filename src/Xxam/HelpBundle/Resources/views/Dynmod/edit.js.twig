@@ -58,9 +58,7 @@
             dock: 'bottom',
             ui: 'footer',
             //defaults: {minWidth: minButtonWidth},
-            items: [{% if log %}
-                { xtype: 'tbtext', html: 'Version {{ log.getVersion() }} from {{ log.getLoggedAt()|localizeddate('short','short') }} created by {{ log.getUsername() }}' },
-                {% endif %}
+            items: [{% include "XxamCoreBundle:snippets:footerversionlog.js.twig" %}
                 { xtype: 'component', flex: 1 },
                 {
                     xtype: 'button',
