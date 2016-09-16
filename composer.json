@@ -50,7 +50,7 @@
         
 
         "fxp/composer-asset-plugin": "~1.1",
-        "npm-asset/extjs": "dev-master",
+        "npm-asset/extjs": "6.0.1.250-dev",
         "cboden/ratchet": "^0.3",
         "php-imap/php-imap": "^2.0",
         "react/react": "^0.4.2",

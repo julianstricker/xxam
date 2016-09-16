@@ -323,7 +323,7 @@
                                             name: 'fieldtext',
                                             fieldLabel: '',
                                             hidden: true,
-                                            value: '{{ mail is defined and mail.textPlain is defined and mail.textPlain!='' ? mail.textPlain '' }}'
+                                            value: '{{ mail is defined and mail.textPlain is defined and mail.textPlain!='' ? mail.textPlain : '' }}'
                                         },
                                     ]
                                 },
