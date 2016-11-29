@@ -2,6 +2,7 @@
 
 namespace Xxam\ContactBundle\Entity;
 
+use Doctrine\Common\Collections\Criteria;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping as ORM;
 use Xxam\CoreBundle\Entity\Base as Base;

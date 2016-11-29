@@ -5,7 +5,7 @@
 {% endif %}
 {
     tabtitle: '{% if entity.id %}{% trans with {'%firstname%': entity.firstname, '%lastname%': entity.lastname} %}Edit %firstname% %lastname%{% endtrans %}{% else %}{% trans %}Create new contact{% endtrans %}{% endif %}',
-    iconCls: 'x-fa fa-users',
+    iconCls: 'x-fa fa-user',
     getitems: function(){
         if (typeof(ContactModel)=='undefined'){
           Ext.define('ContactModel',{
@@ -26,6 +26,80 @@
             fields: ['id', 'value'],
             data : {{contacttypes|jscode()}}
         });
+        var communicationdatatypes={{ communicationdatatypes|jscode() }};
+
+        var emailtypesdata=[];
+        Ext.Object.each(communicationdatatypes.email,function(key,value){
+            emailtypesdata.push({id:key,value:value});
+        });
+
+        var emailtypesStore = Ext.create('Ext.data.Store', {
+           fields: ['id', 'value'],
+            data: emailtypesdata
+        });
+
+
+
+    var generateEmailinput=function(value,disabled){
+        return {
+            xtype: 'fieldcontainer',
+            layout:'hbox',
+            shrinkWrap: 1,
+            hideLabel: true,
+            items: [
+                {
+                    xtype: 'combo',
+                    fieldLabel: 'Type',
+                    name: 'communicationdata_communicationdatatype_id',
+                    queryMode: 'local',
+                    displayField: 'value',
+                    valueField: 'id',
+                    editable: false,
+                    store: emailtypesStore,
+                    value: value.type_id,
+                    flex: 2
+                },{
+                    xtype: 'textfield',
+                    flex: 1,
+                    name: 'communicationdata_value',
+                    fieldLabel: 'Email',
+                    labelAlign: 'right',
+                    labelSeparator: ' ',
+                    labelWidth: 'auto',
+                    value: value.value,
+                    validators: {
+                        type: 'email'
+                    }
+                },
+                {
+                    xtype: 'button',
+                    flex: 0,
+                    width: 50,
+                    iconCls: 'x-fa fa-minus',
+                    margin: '0 0 0 5',
+                    scale: "small",
+                    tooltip: '{%trans%}Remove{%endtrans%}',
+                    disabled: disabled,
+                    handler: function(){
+                        ttt=this;
+                        var fieldcontainer=this.up('fieldcontainer');
+                        var fieldcontainerparent=fieldcontainer.up();
+                        fieldcontainerparent.remove(fieldcontainer);
+                        if (fieldcontainerparent.items.length==1){
+                            fieldcontainerparent.down('button').setDisabled(true);
+                        }
+                    }
+                }
+            ]
+        }
+    }
+    var emails = {{ entity.getCommunicationdataEmails() ? entity.getCommunicationdataEmails()|jsonwithfunctions : '[]' }};
+    var emailsinputs=[];
+    if(emails.length==0) emails.push({'':''});
+    Ext.Array.each(emails,function(email){
+       emailsinputs.push(generateEmailinput(email,emails.length==1));
+    });
+
         
         return {
             xtype: 'form',
@@ -151,30 +225,23 @@
                         items:[
                             {
                                 xtype: 'fieldcontainer',
+                                layout: 'vbox',
+                                shrinkWrap: 1,
                                 hideLabel: true,
-                                layout: {
-                                    type: 'hbox'
-                                },
-                                defaultType: 'textfield',
-                                defaults: {
-                                    //labelAlign: 'top'
-                                },
-                                items: [
-                                    {
-                                        hideLabel: true,
-                                        name: 'nickname',
-                                        value: '',
-                                        flex: 1
-                                    }, {
-                                        xtype: 'splitter'
-                                    },{
-                                        hideLabel: true,
-                                        //name: 'initials',
-                                        allowBlank: true,
-                                        flex: 2,
-                                        value: '{{ entity.initials }}'
-                                    }
-                                ]
+                                padding:5,
+                                anchor: '100%',
+                                flex: 1,
+                                items: emailsinputs
+                            },
+                            {
+                                xtype: 'button',
+                                iconCls: 'x-fa fa-plus',
+                                text: '{%trans%}Add{%endtrans%}',
+                                handler: function(){
+                                    var fieldsetcontainer=this.up('fieldcontainer').down('fieldcontainer');
+                                    fieldsetcontainer.add(generateEmailinput('',false));
+                                    fieldsetcontainer.down('button').setDisabled(false);
+                                }
                             }
                         ]
                     }, {

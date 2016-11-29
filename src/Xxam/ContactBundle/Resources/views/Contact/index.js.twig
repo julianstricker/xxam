@@ -25,7 +25,7 @@
             xtype: 'actioncolumn',
             width: 100,
             items: [{
-                icon: '/bundles/xxamcontact/icons/16x16/user_edit.png',
+                iconCls: 'x-fa fa-edit',
                 tooltip: '{%trans%}Edit{%endtrans%}',
                 handler: function(grid, rowIndex, colIndex) {
                     var rec = grid.getStore().getAt(rowIndex);
@@ -33,14 +33,14 @@
                     window.location.href='#contact/edit/'+rec.get('id');
                 }
             },{
-                icon: '/bundles/xxamcontact/icons/16x16/card_export.png',
+                iconCls: 'x-fa fa-share',
                 tooltip: '{%trans%}Export{%endtrans%}',
                 handler: function(grid, rowIndex, colIndex) {
                     var rec = grid.getStore().getAt(rowIndex);
                     Ext.Msg.alert('{%trans%}Export{%endtrans%}', '{%trans%}Export{%endtrans%} ' + rec.get('firstname')+' ' + rec.get('lastname')+'?');
                 }
             },{
-                icon: '/bundles/xxamcontact/icons/16x16/user_delete.png',
+                iconCls: 'x-fa fa-trash-o',
                 tooltip: '{%trans%}Remove{%endtrans%}',
                 handler: function(grid, rowIndex, colIndex) {
                     var rec = grid.getStore().getAt(rowIndex);
@@ -72,6 +72,14 @@
                     
                     
                 }
+            },{
+                iconCls: 'x-fa fa-history',
+                tooltip: '{%trans%}Log entries{%endtrans%}',
+                handler: function(grid, rowIndex, colIndex) {
+                    var rec = grid.getStore().getAt(rowIndex);
+                    showlogentries('Xxam\\ContactBundle\\Entity\\Contact',rec.get('id'),'contact/edit');
+
+                }
             }]
         });
         
@@ -80,7 +88,7 @@
             tbar: [{ 
                 xtype: 'button', 
                 text: '{%trans%}Add new Contact{%endtrans%}',
-                icon: '/bundles/xxamcontact/icons/{{iconsize}}/user_add.png',
+                iconCls: 'x-fa fa-user-plus',
                 handler: function(){
                         window.location.href='#contact/edit';
                     }

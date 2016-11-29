@@ -299,5 +299,46 @@ class MailclientExtraController extends MailclientBaseController {
         );
         return $this->getJsonResponse(Array('status'=>'OK','filename'=>$filename,'hash'=>$newfilename));
     }
+
+    /**
+     * Mailclient imageproxyAction
+     *
+     * @Security("has_role('ROLE_MAILCLIENT_LIST')")
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function imageproxyAction(Request $request){
+        $url=$request->get('url','');
+        $md5url=md5($url);
+        $response = new Response();
+        if ($request->server->has('HTTP_IF_NONE_MATCH') && trim($request->server->get('HTTP_IF_NONE_MATCH'))==$md5url){
+            $response->setStatusCode(304,'Not Modified');
+            return $response;
+        }
+        $memcached = $this->get('memcached');
+
+        $imgfromcache=$memcached->get('xxam_mailclient_'.$md5url);
+
+        if($imgfromcache){
+            $response->headers->set('Content-Type',$imgfromcache['content_type']);
+            //$response->headers->set('X-From-Cache','jou!');
+            $response->setContent($imgfromcache['content']);
+        }else{
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            $content_type = curl_getinfo($ch,CURLINFO_CONTENT_TYPE);
+            $content=curl_exec($ch);
+            curl_close($ch);
+            $response->headers->set('Content-Type',$content_type);
+            $response->setContent($content);
+            $res=$memcached->set('xxam_mailclient_'.$md5url,['content_type'=>$content_type,'content'=>$content],time() + 86400);
+            //$response->headers->set('X-From-Cache','Na!'.($res ? 'jo':'na').$memcached->getResultCode());
+        }
+        $response->setEtag($md5url);
+        return $response;
+    }
     
 }

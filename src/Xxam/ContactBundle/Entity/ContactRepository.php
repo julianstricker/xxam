@@ -37,8 +37,9 @@ class ContactRepository extends EntityRepository
         $fields[]=Array('name'=> 'vat','type'=>'string');
         $fields[]=Array('name'=> 'tax','type'=>'string');
         $fields[]=Array('name'=> 'birthday','type'=>'date', 'dateFormat'=>'Y-m-d', 'format'=>'Y-m-d');
-        $fields[]=Array('name'=> 'photo','type'=>'string');
+        $fields[]=Array('name'=> 'images','type'=>'string');
         $fields[]=Array('name'=> 'organizationfunction','type'=>'string');
+        $fields[]=Array('name'=> 'communicationdatas');
         $fields[]=Array('name'=> 'created','type'=>'date', 'dateFormat'=>'Y-m-d H:i:s');
         $fields[]=Array('name'=> 'updated','type'=>'date', 'dateFormat'=>'Y-m-d H:i:s');
         return $fields;
@@ -57,7 +58,7 @@ class ContactRepository extends EntityRepository
         $columns[]=Array('text'=> 'Vat','dataIndex'=> 'vat', 'filter'=> Array('type'=> 'string'),'hidden'=> true);
         $columns[]=Array('text'=> 'Tax','dataIndex'=> 'tax', 'filter'=> Array('type'=> 'string'),'hidden'=> true);
         $columns[]=Array('text'=> 'Birthday','dataIndex'=> 'birthday', 'xtype'=> 'datecolumn', 'format'=>'Y-m-d','filter'=> Array('type'=> 'date'),'hidden'=> true);
-        $columns[]=Array('text'=> 'Photo','dataIndex'=> 'photo','hidden'=> true);
+        $columns[]=Array('text'=> 'Images','dataIndex'=> 'images','hidden'=> true);
         $columns[]=Array('text'=> 'Function','dataIndex'=> 'organizationfunction', 'filter'=> Array('type'=> 'string'),'hidden'=> true);
         $columns[]=Array('text'=> 'Created','dataIndex'=> 'created', 'xtype'=> 'datecolumn', 'format'=>'Y-m-d H:i:s', 'filter'=> Array('type'=> 'date'),'hidden'=> true);
         $columns[]=Array('text'=> 'Updated','dataIndex'=> 'updated', 'xtype'=> 'datecolumn', 'format'=>'Y-m-d H:i:s', 'filter'=> Array('type'=> 'date'),'hidden'=> true);
@@ -75,6 +76,9 @@ class ContactRepository extends EntityRepository
         $query->andWhere("c.communicationdatatype_id LIKE 'email_%'");
         $query->andWhere('c.value LIKE :value');
         $query->setParameter('value', $email);
-        return $query->getQuery()->getFirstResult();
+        $results=$query->getQuery()->getResult();
+        return $results ? $results[0] : null;
     }
+
+
 }

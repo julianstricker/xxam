@@ -19,7 +19,7 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('xxam_contact');
-/*
+
 
         $rootNode
             ->children()
@@ -31,7 +31,7 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end()
         ;
-*/
+
         return $treeBuilder;
     }
 }

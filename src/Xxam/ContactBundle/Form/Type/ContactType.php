@@ -29,7 +29,7 @@ class ContactType extends AbstractType
             ->add('vat')
             ->add('tax')
             ->add('birthday',DateType::class, array('input'=>'datetime', /*'format' => 'dd.MM.yyyy',*/ 'widget'=>'single_text'))
-            ->add('photo')
+            ->add('images')
             ->add('organizationfunction')
             ->add('additionalfields')
             ->add('notes')

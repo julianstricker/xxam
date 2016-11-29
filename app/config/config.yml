@@ -23,7 +23,10 @@ parameters:
   memcached_server_port: 11211
   memcached_options: {  }
 
-
+  xxam_contact:
+     xing:
+        key: %xxam_contact_xing_key%
+        secret: %xxam_contact_xing_secret%
 
 framework:
     #esi:             ~

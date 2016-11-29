@@ -16,7 +16,8 @@
                             text: '{%trans%}Reply{%endtrans%}', 
                             tooltip: '{%trans%}Reply to sender{%endtrans%}', 
                             scale: '{{buttonsize}}', 
-                            icon: '/bundles/xxammailclient/icons/{{iconsize}}/outlook_reply.png',
+                            //icon: '/bundles/xxammailclient/icons/{{iconsize}}/outlook_reply.png',
+                            iconCls: 'x-fa fa-mail-reply',
                             handler: function(){
                                 var path=Ext.getCmp('mailclient_maillist').getStore().getProxy().extraParams.path.toString()
                                 var mailid=Ext.getCmp('mailclient_maillist').view.selection.id
@@ -28,7 +29,8 @@
                             text: '{%trans%}Reply all{%endtrans%}',
                             tooltip: '{%trans%}Reply to list or to sender and all recipients{%endtrans%}',
                             scale: '{{buttonsize}}',
-                            icon: '/bundles/xxammailclient/icons/{{iconsize}}/outlook_reply_all.png',
+                            //icon: '/bundles/xxammailclient/icons/{{iconsize}}/outlook_reply_all.png',
+                            iconCls: 'x-fa fa-mail-reply-all',
                             handler: function(){
                                 var path=Ext.getCmp('mailclient_maillist').getStore().getProxy().extraParams.path.toString()
                                 var mailid=Ext.getCmp('mailclient_maillist').view.selection.id
@@ -40,7 +42,8 @@
                             text: '{%trans%}Forward{%endtrans%}',
                             tooltip: '{%trans%}Forward{%endtrans%}',
                             scale: '{{buttonsize}}',
-                            icon: '/bundles/xxammailclient/icons/{{iconsize}}/email_forward.png',
+                            //icon: '/bundles/xxammailclient/icons/{{iconsize}}/email_forward.png',
+                            iconCls: 'x-fa fa-mail-forward',
                             handler: function(){
                                 var path=Ext.getCmp('mailclient_maillist').getStore().getProxy().extraParams.path.toString()
                                 var mailid=Ext.getCmp('mailclient_maillist').view.selection.id
@@ -51,7 +54,8 @@
                             xtype: 'button', text: '{%trans%}Trash{%endtrans%}', 
                             tooltip: '{%trans%}Move message to trash{%endtrans%}', 
                             scale: '{{buttonsize}}', 
-                            icon: '/bundles/xxammailclient/icons/{{iconsize}}/outlook_delete_all.png',
+                            //icon: '/bundles/xxammailclient/icons/{{iconsize}}/outlook_delete_all.png',
+                            iconCls: 'x-fa fa-trash-o',
                             handler: function(){
                                 
                                 if (typeof mailid == 'undefined'){
@@ -85,8 +89,8 @@
                                 });
                             }
                         },
-                        { xtype: 'button', text: '{%trans%}Junk{%endtrans%}', tooltip: '{%trans%}Mark as junk{%endtrans%}', scale: '{{buttonsize}}', icon: '/bundles/xxammailclient/icons/{{iconsize}}/spam_assassin.png' },
-                        { xtype: 'button', text: '{%trans%}Mark{%endtrans%}', tooltip: '{%trans%}Mark message{%endtrans%}', scale: '{{buttonsize}}', icon: '/bundles/xxammailclient/icons/{{iconsize}}/publisher_bookmark.png',
+                        { xtype: 'button', text: '{%trans%}Junk{%endtrans%}', tooltip: '{%trans%}Mark as junk{%endtrans%}', scale: '{{buttonsize}}', iconCls: 'x-fa fa-recycle' },
+                        { xtype: 'button', text: '{%trans%}Mark{%endtrans%}', tooltip: '{%trans%}Mark message{%endtrans%}', scale: '{{buttonsize}}', iconCls: 'x-fa fa-bookmark',
                             menu: [
                                 { text: '{%trans%}As read{%endtrans%}' },
                                 { text: '{%trans%}As unread{%endtrans%}' },
@@ -97,12 +101,12 @@
                         { xtype: 'tbfill' },
                         { 
                             xtype: 'button', 
-                            tooltip: '{%trans%}Minimize header{%endtrans%}', 
+                            tooltip: '{%trans%}Show header{%endtrans%}', 
                             enableToggle: true, 
                             scale: '{{buttonsize}}', 
-                            id: 'mailclient_minimizeheaderbutton{{id}}',
+                            id: 'mailclient_showheaderbutton{{id}}',
                             stateful: true,
-                            stateId: 'mailclient_minimizeheaderbutton{{id}}',
+                            stateId: 'mailclient_showheaderbutton{{id}}',
                             stateEvents: ['press'],
                             getState: function() {
                                 return { pressed: this.pressed };
@@ -111,11 +115,12 @@
                                 //this.toggle(state.pressed);
                                 this.toggle(1);
                             },
-                            icon: '/bundles/xxammailclient/icons/{{iconsize}}/bullet_arrow_top.png',
+                            //icon: '/bundles/xxammailclient/icons/{{iconsize}}/bullet_arrow_top.png',
+                            iconCls: 'x-fa fa-list-alt',
                             listeners: {
                                 toggle: function(button){
                                     if (Ext.getCmp('mailclient_mailpanel{{id}}')){
-                                        if(button.pressed){
+                                        if(!button.pressed){
                                             Ext.get(Ext.getCmp('mailclient_mailpanel{{id}}').body.dom.querySelector('.mailpanelheader')).setVisibilityMode(Ext.Element.DISPLAY).hide();
                                         }else{
                                             Ext.get(Ext.getCmp('mailclient_mailpanel{{id}}').body.dom.querySelector('.mailpanelheader')).show();
@@ -130,7 +135,8 @@
                             xtype: 'button', 
                             tooltip: '{%trans%}Open in new tab{%endtrans%}', 
                             scale: '{{buttonsize}}', 
-                            icon: '/bundles/xxammailclient/icons/{{iconsize}}/arrow_out.png',
+                            //icon: '/bundles/xxammailclient/icons/{{iconsize}}/arrow_out.png',
+                            iconCls: 'x-fa fa-plus-square',
                             handler: function(){
                                 path=Ext.getCmp('mailclient_maillist').getStore().getProxy().extraParams.path.toString()
                                 var mailid=Ext.getCmp('mailclient_maillist').view.selection.id

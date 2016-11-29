@@ -1,0 +1,3 @@
+{% if log %}
+{ xtype: 'tbtext', html: 'Version {{ log.getVersion() }} from {{ log.getLoggedAt()|localizeddate('short','short') }} created by {{ log.getUsername() }}' },
+{% endif %}

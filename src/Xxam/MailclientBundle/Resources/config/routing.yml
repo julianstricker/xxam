@@ -70,6 +70,10 @@ mailclient_settings:
     path: /mailclient/settings
     defaults: { _controller: XxamMailclientBundle:Mailclient:settings }
 
+mailclient_imageproxy:
+    path: /mailclient/imageproxy
+    defaults: { _controller: XxamMailclientBundle:MailclientExtra:imageproxy }
+
 xxam_mailclient_mailspool:
     resource: "@XxamMailclientBundle/Controller/MailspoolController.php"
     type:   annotation

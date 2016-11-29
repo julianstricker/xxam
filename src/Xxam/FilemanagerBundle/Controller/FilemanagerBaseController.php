@@ -153,7 +153,6 @@ class FilemanagerBaseController extends Controller {
         if(!$adapter) return false;
         if (!empty($settings['cache']) && $settings['cache']){
             $memcached = $this->get('memcached');
-            dump($memcached);
             $cadapter = new CachedAdapter(
                 $adapter,
                 new Cache($memcached, 'xxam_filemanager_'.$filesystem->getId(), 300)

@@ -618,11 +618,25 @@ class Contact implements Base\TenantInterface
     /**
      * Get communicationdatas
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection|Communicationdata[]
      */
     public function getCommunicationdatas()
     {
         return $this->communicationdatas;
+    }
+    /**
+     * Get communicationdataEmails
+     *
+     * @return array
+     */
+    public function getCommunicationdataEmails(){
+        $emails=[];
+        foreach($this->getCommunicationdatas() as $communicationdata){
+            //if (strpos($communicationdata->getCommunicationdatatypeId(),'email_')===0){
+                $emails[]=["value"=>$communicationdata->getValue(),"type_id"=>$communicationdata->getCommunicationdatatypeId()];
+            //}
+        }
+        return $emails;
     }
 
     /**

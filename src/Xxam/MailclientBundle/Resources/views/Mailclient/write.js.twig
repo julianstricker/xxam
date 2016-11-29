@@ -91,6 +91,22 @@
                     url: '{{path('mailclient_sendmail')}}?type={{type}}&path={{path}}&mailid={{mailid}}',
                     buttons: [
                         {
+                            text: '{% trans %}Track{% endtrans %}',
+                            xtype:'button',
+                            iconCls: 'x-fa fa-eye-slash',
+                            enableToggle: true,
+                            listeners: {
+                                click: function(btn, el){
+                                    // do stuff
+                                    if(this.pressed){
+                                        this.setIconCls('x-fa fa-eye');
+                                    }else {
+                                        this.setIconCls('x-fa fa-eye-slash');
+                                    }
+                                }
+                            }
+                        },
+                        {
                             text: '{% trans %}Send now{% endtrans %}',
                             xtype: 'splitbutton',
                             iconCls: 'x-fa fa-clock-o',

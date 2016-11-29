@@ -106,7 +106,7 @@
                                 Ext.getCmp('mailclient_mailpanel{{id}}').updateLayout();
                                 return false;
                             }
-                            if(Ext.getCmp('mailclient_minimizeheaderbutton{{id}}').pressed){
+                            if(!Ext.getCmp('mailclient_showheaderbutton{{id}}').pressed){
                                 Ext.get(Ext.getCmp('mailclient_mailpanel{{id}}').body.dom.querySelector('.mailpanelheader')).setVisibilityMode(Ext.Element.DISPLAY).hide();
                             }else{
                                 Ext.get(Ext.getCmp('mailclient_mailpanel{{id}}').body.dom.querySelector('.mailpanelheader')).show();

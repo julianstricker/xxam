@@ -10,6 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use WhatsProt;
 use Xxam\ContactBundle\Entity\Address;
 use Xxam\ContactBundle\Entity\Communicationdata;
 use Xxam\ContactBundle\Entity\Contact;
@@ -109,7 +110,7 @@ class ContactController extends Controller
         foreach($this->container->getParameter('contacttypes') as $key => $value){
             $contacttypes[]=Array('id'=>$key,'value'=>$value);
         }
-        return $this->render('XxamContactBundle:Contact:edit.js.twig', array('entity'=>$entity,'contacttypes'=>$this->contacttypesAsKeyValue(),'modelfields'=>$repository->getModelFields()));
+        return $this->render('XxamContactBundle:Contact:edit.js.twig', array('entity'=>$entity,'contacttypes'=>$this->contacttypesAsKeyValue(),'communicationdatatypes'=>$this->getParameter('communicationdatatypes'),'modelfields'=>$repository->getModelFields()));
     }
 
     /**
@@ -184,7 +185,6 @@ class ContactController extends Controller
 
         /** @var ContactRepository $repository */
         $repository=$this->getDoctrine()->getManager()->getRepository('XxamContactBundle:Contact');
-
         $entity = $repository->findOneByEmail($email);
         if (!$entity){
             $entity=new Contact();
@@ -219,6 +219,7 @@ class ContactController extends Controller
 
     private function mapXingDataToContact($email,Contact $contact){
         $config = $this->getXingConfig();
+        //dump($config);
         if ($config==[]) return;
 
         require_once $this->get('kernel')->getRootDir().'/../vendor/hybridauth/hybridauth/hybridauth/Hybrid/Auth.php';
@@ -230,7 +231,7 @@ class ContactController extends Controller
 
         }
         catch(\Exception $e) {
-            dump($e);
+            //dump($e);
         }
 
         if(!$oXING) return;
@@ -415,7 +416,6 @@ class ContactController extends Controller
      * hybridauth url
      *
      * @Route("/hauth", name="contact_hauth")
-     * @Method("GET")
      * @param Request $request
      * @return Response
      */
@@ -478,6 +478,33 @@ class ContactController extends Controller
             $contacttypes[]=Array('id'=>$key,'value'=>$value);
         }
         return $contacttypes;
+    }
+
+    /**
+     * Whatsapp Test
+     *
+     * @Route("/whatsapptest", name="contact_whatsapptest")
+     * @Method("GET")
+     */
+    public function whatsapptestAction() {
+        $username = '393281570269';    // Your number with country code, ie: 34123456789
+        $nickname = 'Julian Stricker';    // Your nickname, it will appear in push notifications
+        $password = 'B8VuFn2hhlwFuCjPJvr14VOfOdc=';
+        $debug    = true;  // Shows debug log, this is set to false if not specified
+        $log      = true;  // Enables log file, this is set to false if not specified
+
+// Create a instance of WhastPort.
+        $w = new WhatsProt($username, $nickname, $debug);
+
+        $w->connect(); // Connect to WhatsApp network
+        $w->loginWithPassword($password); // logging in with the password we got!
+
+        $target = '393281570269'; // The number of the person you are sending the message
+        $message = 'Hi! :) this is a test message';
+
+        $w->sendMessage($target , $message);
+
+        return new Response('');
     }
     
 }
